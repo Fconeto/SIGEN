@@ -1,0 +1,6 @@
+@SIGEN.API_HostAddress = http://localhost:5099
+
+GET {{SIGEN.API_HostAddress}}/weatherforecast/
+Accept: application/json
+
+###
