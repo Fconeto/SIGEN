@@ -1,0 +1,20 @@
+{
+  "recommendations": [
+    // Back-End (.NET / C#)
+    "ms-dotnettools.csharp",
+    "jmrog.vscode-nuget-package-manager",
+    "josefpihrt-vscode.roslynator",
+    "fernandoescolar.vscode-solution-explorer",
+
+    // Front-End (React)
+    "dbaeumer.vscode-eslint",
+    "esbenp.prettier-vscode",
+    "dsznajder.es7-react-js-snippets",
+
+    // Fullstack / Dev Tools tes
+    "eamodio.gitlens",
+    "ms-azuretools.vscode-docker",
+    "PKief.material-icon-theme",
+    "streetsidesoftware.code-spell-checker"
+  ]
+}
