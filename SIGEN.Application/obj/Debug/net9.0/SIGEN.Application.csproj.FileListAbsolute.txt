@@ -1,0 +1,16 @@
+C:\Users\Francisco Linhares\Documents\Sistema agente de endemias\SIGEN\SIGEN.Application\bin\Debug\net9.0\SIGEN.Application.deps.json
+C:\Users\Francisco Linhares\Documents\Sistema agente de endemias\SIGEN\SIGEN.Application\bin\Debug\net9.0\SIGEN.Application.dll
+C:\Users\Francisco Linhares\Documents\Sistema agente de endemias\SIGEN\SIGEN.Application\bin\Debug\net9.0\SIGEN.Application.pdb
+C:\Users\Francisco Linhares\Documents\Sistema agente de endemias\SIGEN\SIGEN.Application\bin\Debug\net9.0\SIGEN.Domain.dll
+C:\Users\Francisco Linhares\Documents\Sistema agente de endemias\SIGEN\SIGEN.Application\bin\Debug\net9.0\SIGEN.Domain.pdb
+C:\Users\Francisco Linhares\Documents\Sistema agente de endemias\SIGEN\SIGEN.Application\obj\Debug\net9.0\SIGEN.Application.csproj.AssemblyReference.cache
+C:\Users\Francisco Linhares\Documents\Sistema agente de endemias\SIGEN\SIGEN.Application\obj\Debug\net9.0\SIGEN.Application.GeneratedMSBuildEditorConfig.editorconfig
+C:\Users\Francisco Linhares\Documents\Sistema agente de endemias\SIGEN\SIGEN.Application\obj\Debug\net9.0\SIGEN.Application.AssemblyInfoInputs.cache
+C:\Users\Francisco Linhares\Documents\Sistema agente de endemias\SIGEN\SIGEN.Application\obj\Debug\net9.0\SIGEN.Application.AssemblyInfo.cs
+C:\Users\Francisco Linhares\Documents\Sistema agente de endemias\SIGEN\SIGEN.Application\obj\Debug\net9.0\SIGEN.Application.csproj.CoreCompileInputs.cache
+C:\Users\Francisco Linhares\Documents\Sistema agente de endemias\SIGEN\SIGEN.Application\obj\Debug\net9.0\SIGEN.Application.sourcelink.json
+C:\Users\Francisco Linhares\Documents\Sistema agente de endemias\SIGEN\SIGEN.Application\obj\Debug\net9.0\SIGEN.Ap.9ACF0640.Up2Date
+C:\Users\Francisco Linhares\Documents\Sistema agente de endemias\SIGEN\SIGEN.Application\obj\Debug\net9.0\SIGEN.Application.dll
+C:\Users\Francisco Linhares\Documents\Sistema agente de endemias\SIGEN\SIGEN.Application\obj\Debug\net9.0\refint\SIGEN.Application.dll
+C:\Users\Francisco Linhares\Documents\Sistema agente de endemias\SIGEN\SIGEN.Application\obj\Debug\net9.0\SIGEN.Application.pdb
+C:\Users\Francisco Linhares\Documents\Sistema agente de endemias\SIGEN\SIGEN.Application\obj\Debug\net9.0\ref\SIGEN.Application.dll
