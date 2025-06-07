@@ -1,0 +1,78 @@
+import { useState } from "react";
+
+type ValidatorFn<T> = (value: T[keyof T], values: T) => string | undefined;
+
+type Validators<T> = Partial<Record<keyof T, ValidatorFn<T>[]>>;
+
+export const validators = {
+    required: (msg = "Campo obrigatório") =>
+        (v: string) => (!v ? msg : undefined),
+
+    minLength: (min: number, msg?: string) =>
+        (v: string) =>
+            v.length < min ? msg ?? `Mínimo ${min} caracteres` : undefined,
+};
+
+
+export function useForm<T extends Record<string, any>>(initialValues: T, validators?: Validators<T>) {
+    const [values, setValues] = useState<T>(initialValues);
+    const [errors, setErrors] = useState<Partial<Record<keyof T, string>>>({});
+
+    const runValidators = (field: keyof T, value: any): string | undefined => {
+        const fieldValidators = validators?.[field];
+        if (!fieldValidators) return undefined;
+
+        for (const validator of fieldValidators) {
+            const error = validator(value, values);
+            if (error) return error;
+        }
+        return undefined;
+    };
+
+    const handleChange = (field: keyof T, value: string) => {
+        setValues((prev) => {
+            const newValues = { ...prev, [field]: value };
+            const error = runValidators(field, value);
+            setErrors((prevErrors) => ({ ...prevErrors, [field]: error }));
+            return newValues;
+        });
+    };
+
+    const setFieldError = (field: keyof T, message: string) => {
+        setErrors((prev) => ({ ...prev, [field]: message }));
+    };
+
+    const resetForm = () => {
+        setValues(initialValues);
+        setErrors({});
+    };
+
+    const validateForm = (): boolean => {
+        if (!validators) return true;
+        let isValid = true;
+        const newErrors: Partial<Record<keyof T, string>> = {};
+
+        for (const field in validators) {
+            const fieldKey = field as keyof T;
+            const value = values[fieldKey];
+            const error = runValidators(fieldKey, value);
+            if (error) {
+                newErrors[fieldKey] = error;
+                isValid = false;
+            }
+        }
+
+        setErrors(newErrors);
+        return isValid;
+    };
+
+    return {
+        values,
+        errors,
+        handleChange,
+        setFieldError,
+        resetForm,
+        validateForm,
+        setValues,
+    };
+}
