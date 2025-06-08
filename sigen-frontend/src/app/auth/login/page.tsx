@@ -5,34 +5,30 @@ import { SigenFormField } from "@/components/sigen-form-field";
 import { SigenLoadingButton } from "@/components/sigen-loading-button";
 import { SigenAppLayout } from "@/components/sigen-app-layout";
 import { SigenPasswordInput } from "@/components/sigen-password-input";
-import { SigenDropdown } from "@/components/sigen-dropdown";
 import { SigenInput } from "@/components/sigen-input";
 import { useState } from "react";
-import { AgentTeams } from "@/domain/entities/team";
 import {
   defaultDialogs,
   SigenDialog,
   SigenDialogProps,
 } from "@/components/sigen-dialog";
 
+interface LoginForm {
+  user: string;
+  password: string;
+}
+
 export default function AgentRegistrationForm() {
   const { values, errors, handleChange, validateForm, resetForm } = useForm(
     {
-      agentId: "",
-      agentName: "",
-      team: "",
+      user: "",
       password: "",
-    },
+    }as LoginForm,
     {
-      agentId: [
+      user: [
         validators.required("Campo obrigatório"),
         validators.minLength(6, "Mínimo 6 caracteres"),
       ],
-      agentName: [
-        validators.required("Campo obrigatório"),
-        validators.minLength(6, "Mínimo 6 caracteres"),
-      ],
-      team: [validators.required("Campo obrigatório")],
       password: [
         validators.required("Campo obrigatório"),
         validators.minLength(6, "Mínimo 6 caracteres"),
@@ -63,66 +59,57 @@ export default function AgentRegistrationForm() {
   };
 
   return (
-    <>
+    <>                                        
       <SigenAppLayout
-        headerTitle="Cadastro de Agente"
-        showBackButton
-        onBackClick={() => {}}
+        headerTitle="SIGEN"
+        className="bg-[#222831]"
       >
-        <form onSubmit={handleSubmit} className="space-y-6 mt-8">
+      <div className="text-center pt-4 pb-4">
+        <h1 className="text-white text-4xl font-bold mb-2">LOGIN</h1>
+        <p className="text-yellow-400 text-lg">Entre na sua conta</p>
+      </div>
+      
+      <div className="flex justify-center py-2">
+        <img
+          src="/images/login-illustration.png"
+          alt="Ilustração da tela de Login"
+          className="w-68 h-auto"
+        />
+      </div>
+        <form onSubmit={handleSubmit} className="space-y-4 mt-3">
           <SigenFormField
-            id="agentName"
-            label="Nome do Agente:"
-            error={errors.agentName}
+            id="user"
+            label="Usuário:"
+            labelStyle="text-white font-normal"
+            error={errors.user}
           >
             <SigenInput
-              id="agentName"
-              value={values.agentName}
-              onChange={(e) => handleChange("agentName", e.target.value)}
-              aria-invalid={!!errors.agentName}
+              id="user"
+              value={values.user}
+              onChange={(e) => handleChange("user", e.target.value)}
+              className="bg-[#292F37] border-0 border-b border-white/70 text-gray-200"
+              aria-invalid={!!errors.user}
             />
           </SigenFormField>
 
           <SigenFormField
-            id="agentId"
-            label="Matrícula do agente:"
-            error={errors.agentId}
+            id="password"
+            label="Senha:"
+            labelStyle="text-white font-normal"
+            error={errors.password}
           >
-            <SigenInput
-              id="agentId"
-              value={values.agentId}
-              onChange={(e) => handleChange("agentId", e.target.value)}
-              aria-invalid={!!errors.agentId}
-            />
-          </SigenFormField>
-
-          <SigenFormField id="team" label="Equipe:" error={errors.team}>
-            <SigenDropdown
-              value={values.team}
-              onValueChange={(v) => handleChange("team", v)}
-              options={[
-                { value: AgentTeams.dengue, label: AgentTeams.dengue },
-                {
-                  value: AgentTeams.febreAmarela,
-                  label: AgentTeams.febreAmarela,
-                },
-                { value: AgentTeams.chagas, label: AgentTeams.chagas },
-              ]}
-            />
-          </SigenFormField>
-
-          <SigenFormField id="password" label="Senha:" error={errors.password}>
             <SigenPasswordInput
               id="password"
               value={values.password}
               onChange={(e) => handleChange("password", e.target.value)}
+              className="bg-[#292F37] border-0 border-b border-white/70 text-gray-200"
               aria-invalid={!!errors.password}
             />
           </SigenFormField>
 
-          <div className="pt-8">
+          <div className="pt-6">
             <SigenLoadingButton type="submit" loading={isLoading}>
-              Cadastrar
+              Confirmar
             </SigenLoadingButton>
           </div>
         </form>
