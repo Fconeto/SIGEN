@@ -28,7 +28,6 @@ export function middleware(request: NextRequest) {
         const userRole = globalService.getUser()!.role;
         return NextResponse.redirect(new URL(roleRedirects[userRole] || "/auth/login", request.url));
     }
-
     return NextResponse.next();
 }
 export const config = {

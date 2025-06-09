@@ -15,6 +15,8 @@ interface SigenAppLayoutProps {
   onNotificationsClick?: () => void;
   showProfile?: boolean;
   onProfileClick?: () => void;
+  showLogoutButton?: boolean;
+  onLogoutClick?: () => void;
   headerRightContent?: React.ReactNode;
   className?: string;
   contentClassName?: string;
@@ -27,13 +29,8 @@ export function SigenAppLayout({
   headerTitle,
   showBackButton = false,
   onBackClick,
-  showMenuButton = false,
-  onMenuClick,
-  showNotifications = false,
-  onNotificationsClick,
-  showProfile = false,
-  onProfileClick,
-  headerRightContent,
+  showLogoutButton = false,
+  onLogoutClick,
   className,
   contentClassName,
   maxWidth = "md",
@@ -60,13 +57,8 @@ export function SigenAppLayout({
         title={headerTitle}
         showBackButton={showBackButton}
         onBackClick={onBackClick}
-        showMenuButton={showMenuButton}
-        onMenuClick={onMenuClick}
-        showNotifications={showNotifications}
-        onNotificationsClick={onNotificationsClick}
-        showProfile={showProfile}
-        onProfileClick={onProfileClick}
-        rightContent={headerRightContent}
+        showLogoutButton={showLogoutButton}
+        onLogoutClick={onLogoutClick}
       />
 
       <div className={cn("mx-auto", maxWidthClasses[maxWidth])}>

@@ -6,6 +6,7 @@ interface SigenFormFieldProps {
   label: string;
   error?: string;
   children: React.ReactNode;
+  labelStyle?: string;
 }
 
 export function SigenFormField({
@@ -15,10 +16,10 @@ export function SigenFormField({
   children,
 }: SigenFormFieldProps) {
   return (
-    <div className="space-y-1">
+    <div className="space-y-1 :className">
       <SigenLabel htmlFor={id}>{label}</SigenLabel>
       {children}
-      {error && <p className="text-sm text-red-500">{error}</p>}
+      <p className="text-sm text-red-500 min-h-[1.25rem]">{error}</p>
     </div>
   );
 }

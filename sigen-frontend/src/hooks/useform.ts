@@ -6,11 +6,15 @@ type Validators<T> = Partial<Record<keyof T, ValidatorFn<T>[]>>;
 
 export const validators = {
     required: (msg = "Campo obrigatório") =>
-        (v: string) => (!v ? msg : undefined),
+        (v: any) => (!v ? msg : undefined),
 
     minLength: (min: number, msg?: string) =>
-        (v: string) =>
-            v.length < min ? msg ?? `Mínimo ${min} caracteres` : undefined,
+        (v: string | undefined) =>
+            !v ? msg : v.length < min ? msg ?? `Mínimo ${min} caracteres` : undefined,
+    equal: (compare: string, msg?: string) => (v: string | undefined) => v !== compare ? msg : undefined,
+    equalField: <T>(otherField: keyof T, msg?: string): ValidatorFn<T> =>
+        (v, values) =>
+            v !== values[otherField] ? msg ?? "Valores não coincidem" : undefined,
 };
 
 
@@ -29,7 +33,7 @@ export function useForm<T extends Record<string, any>>(initialValues: T, validat
         return undefined;
     };
 
-    const handleChange = (field: keyof T, value: string) => {
+    const handleChange = (field: keyof T, value: string | boolean | Date | undefined) => {
         setValues((prev) => {
             const newValues = { ...prev, [field]: value };
             const error = runValidators(field, value);

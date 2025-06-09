@@ -8,7 +8,7 @@ import { SigenPasswordInput } from "@/components/sigen-password-input";
 import { SigenDropdown } from "@/components/sigen-dropdown";
 import { SigenInput } from "@/components/sigen-input";
 import { useState } from "react";
-import { AgentTeams } from "@/domain/entities/team";
+import { AgentTeam } from "@/domain/entities/team";
 import {
   defaultDialogs,
   SigenDialog,
@@ -68,11 +68,13 @@ export default function AgentRegistrationForm() {
         headerTitle="Cadastro de Agente"
         showBackButton
         onBackClick={() => {}}
+        className="bg-gray-900"
       >
         <form onSubmit={handleSubmit} className="space-y-6 mt-8">
           <SigenFormField
             id="agentName"
             label="Nome do Agente:"
+            labelStyle="text-red-800"
             error={errors.agentName}
           >
             <SigenInput
@@ -101,12 +103,12 @@ export default function AgentRegistrationForm() {
               value={values.team}
               onValueChange={(v) => handleChange("team", v)}
               options={[
-                { value: AgentTeams.dengue, label: AgentTeams.dengue },
+                { value: AgentTeam.dengue, label: AgentTeam.dengue },
                 {
-                  value: AgentTeams.febreAmarela,
-                  label: AgentTeams.febreAmarela,
+                  value: AgentTeam.febreAmarela,
+                  label: AgentTeam.febreAmarela,
                 },
-                { value: AgentTeams.chagas, label: AgentTeams.chagas },
+                { value: AgentTeam.chagas, label: AgentTeam.chagas },
               ]}
             />
           </SigenFormField>
