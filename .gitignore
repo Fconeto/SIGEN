@@ -1,2 +1,23 @@
 **/bin/
 **/obj/
+
+**/public/workbox**
+**/public/sw**
+**/public/worker**
+**/public/fallback**
+**/public/precache**
+
+**/node_modules
+**/.pnp
+.pnp.*
+.yarn/*
+!.yarn/patches
+!.yarn/plugins
+!.yarn/releases
+!.yarn/versions
+
+**/coverage
+
+# next.js
+**/.next/
+**/out/

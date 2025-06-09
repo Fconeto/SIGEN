@@ -1,0 +1,1 @@
+export const APP_WEB_PUBLIC_URL = process.env.APP_WEB_PUBLIC_URL;
