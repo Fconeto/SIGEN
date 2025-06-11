@@ -31,7 +31,7 @@ export default function AgentRegistrationForm() {
     {
       agentId: "",
       agentName: "",
-      team: AgentTeam.chagas,
+      team: undefined,
       password: "",
       confirmPassword: "",
     } as AgentForm,
