@@ -1,8 +1,12 @@
+using SIGEN.Domain.Enums;
 namespace SIGEN.Domain.Shared;
 
 public class RegisterRequest
 {
-    public string Email { get; set; }
-    public string Password { get; set; }
-    public string Name { get; set; }
+    public string NomeDoAgente { get; set; }
+    public Turma Turma { get; set; }
+    public string Senha { get; set; }
+    public long Matricula { get; set; }
+    public string CPF { get; set; }
+    public Hierarquia Hierarquia { get; set; }
 }
