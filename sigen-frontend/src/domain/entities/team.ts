@@ -1,4 +1,4 @@
-export enum AgentTeams {
+export enum AgentTeam {
     chagas = 'Chagas',
     febreAmarela = 'Febre Amarela',
     dengue = 'Dengue',

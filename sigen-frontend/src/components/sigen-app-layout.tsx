@@ -6,7 +6,8 @@ import { cn } from "@/lib/utils";
 
 interface SigenAppLayoutProps {
   children: React.ReactNode;
-  headerTitle: string;
+  headerTitle?: string;
+  hideHeader?: boolean;
   showBackButton?: boolean;
   onBackClick?: () => void;
   showMenuButton?: boolean;
@@ -15,6 +16,8 @@ interface SigenAppLayoutProps {
   onNotificationsClick?: () => void;
   showProfile?: boolean;
   onProfileClick?: () => void;
+  showLogoutButton?: boolean;
+  onLogoutClick?: () => void;
   headerRightContent?: React.ReactNode;
   className?: string;
   contentClassName?: string;
@@ -24,16 +27,12 @@ interface SigenAppLayoutProps {
 
 export function SigenAppLayout({
   children,
+  hideHeader = false,
   headerTitle,
   showBackButton = false,
   onBackClick,
-  showMenuButton = false,
-  onMenuClick,
-  showNotifications = false,
-  onNotificationsClick,
-  showProfile = false,
-  onProfileClick,
-  headerRightContent,
+  showLogoutButton = false,
+  onLogoutClick,
   className,
   contentClassName,
   maxWidth = "md",
@@ -56,19 +55,15 @@ export function SigenAppLayout({
 
   return (
     <div className={cn("min-h-screen bg-gray-100", className)}>
-      <SigenHeader
-        title={headerTitle}
-        showBackButton={showBackButton}
-        onBackClick={onBackClick}
-        showMenuButton={showMenuButton}
-        onMenuClick={onMenuClick}
-        showNotifications={showNotifications}
-        onNotificationsClick={onNotificationsClick}
-        showProfile={showProfile}
-        onProfileClick={onProfileClick}
-        rightContent={headerRightContent}
-      />
-
+      {!hideHeader && (
+        <SigenHeader
+          title={headerTitle ?? ""}
+          showBackButton={showBackButton}
+          onBackClick={onBackClick}
+          showLogoutButton={showLogoutButton}
+          onLogoutClick={onLogoutClick}
+        />
+      )}
       <div className={cn("mx-auto", maxWidthClasses[maxWidth])}>
         <div className={cn(paddingClasses[padding], contentClassName)}>
           {children}
