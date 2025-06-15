@@ -18,7 +18,7 @@ interface LoginForm {
   password: string;
 }
 
-export default function AgentRegistrationForm() {
+export default function LoginForm() {
   const { values, errors, handleChange, validateForm, resetForm } = useForm(
     {
       user: "",
