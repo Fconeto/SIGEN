@@ -24,7 +24,7 @@ export function SigenHeader({
 }: SigenHeaderProps) {
   return (
     <div className={cn("bg-gray-800 sticky top-0 z-50 shadow-sm", className)}>
-      <div className="grid grid-cols-3 items-center p-4 max-w-md mx-auto">
+      <div className="grid grid-cols-3 items-center p-4 max-w-md mx-auto h-[72px]">
         <div className="flex items-center">
           {showLogoutButton && (
             <SigenButton

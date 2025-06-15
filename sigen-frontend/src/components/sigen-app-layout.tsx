@@ -6,7 +6,8 @@ import { cn } from "@/lib/utils";
 
 interface SigenAppLayoutProps {
   children: React.ReactNode;
-  headerTitle: string;
+  headerTitle?: string;
+  hideHeader?: boolean;
   showBackButton?: boolean;
   onBackClick?: () => void;
   showMenuButton?: boolean;
@@ -26,6 +27,7 @@ interface SigenAppLayoutProps {
 
 export function SigenAppLayout({
   children,
+  hideHeader = false,
   headerTitle,
   showBackButton = false,
   onBackClick,
@@ -53,14 +55,15 @@ export function SigenAppLayout({
 
   return (
     <div className={cn("min-h-screen bg-gray-100", className)}>
-      <SigenHeader
-        title={headerTitle}
-        showBackButton={showBackButton}
-        onBackClick={onBackClick}
-        showLogoutButton={showLogoutButton}
-        onLogoutClick={onLogoutClick}
-      />
-
+      {!hideHeader && (
+        <SigenHeader
+          title={headerTitle ?? ""}
+          showBackButton={showBackButton}
+          onBackClick={onBackClick}
+          showLogoutButton={showLogoutButton}
+          onLogoutClick={onLogoutClick}
+        />
+      )}
       <div className={cn("mx-auto", maxWidthClasses[maxWidth])}>
         <div className={cn(paddingClasses[padding], contentClassName)}>
           {children}

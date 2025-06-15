@@ -20,7 +20,7 @@ export default function MenuScreen({ menuConfigurations }: MenuScreenProps) {
     <>
       <div className="flex justify-center py-6">
         <img
-          src="./images/endemias.png"
+          src="/images/endemias.png"
           alt="Imagem sobre endemias"
           className="max-w-full h-auto"
         />

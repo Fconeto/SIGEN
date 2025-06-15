@@ -60,7 +60,7 @@ export default function LoginForm() {
 
   return (
     <>
-      <SigenAppLayout headerTitle="SIGEN" className="bg-[#222831]">
+      <SigenAppLayout className="bg-[#222831]">
         <div className="text-center pt-4 pb-4">
           <h1 className="text-white text-4xl font-bold mb-2">LOGIN</h1>
           <p className="text-yellow-400 text-lg">Entre na sua conta</p>
