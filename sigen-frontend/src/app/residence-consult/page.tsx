@@ -5,7 +5,6 @@ import { useForm, validators } from "@/hooks/useform";
 import { SigenAppLayout } from "@/components/sigen-app-layout";
 import { useState } from "react";
 import {
-  defaultDialogs,
   SigenDialog,
   SigenDialogProps,
 } from "@/components/sigen-dialog";
@@ -14,12 +13,7 @@ import { SigenFormField } from "@/components/sigen-form-field";
 import { SigenInput } from "@/components/sigen-input";
 import { SigenDropdown } from "@/components/sigen-dropdown";
 import { SigenLoadingButton } from "@/components/sigen-loading-button";
-
-const filterOptions = [
-  { value: "nomeMorador", label: "Nome do morador", fieldLabel: "Nome do Morador" },
-  { value: "bairro", label: "Bairro", fieldLabel: "Bairro" },
-  { value: "numeroCasa", label: "Número da casa", fieldLabel: "Número da Casa" },
-];
+import { residenceFilterOptions } from "@/domain/entities/residence-filter";
 
 interface ResidenceConsult {
   locationId: string;
@@ -32,7 +26,7 @@ interface ResidenceConsult {
 export default function ResidenceConsult(){
   const router = useRouter();
   
-  const { values, errors, handleChange, validateForm, resetForm, setValues } = useForm(
+  const { values, errors, handleChange, validateForm, setValues } = useForm(
     {
       locationId: "",
       filterOption: "",
@@ -102,7 +96,7 @@ export default function ResidenceConsult(){
   };
 
   const renderDropboxInputFilter = () => {
-    const selectedOption = filterOptions.find(opt => opt.value === values.filterOption);
+    const selectedOption = residenceFilterOptions.find(opt => opt.value === values.filterOption);
     
     if (!selectedOption)
       return null;
@@ -153,7 +147,7 @@ export default function ResidenceConsult(){
               <SigenDropdown
                 value={values.filterOption}
                 onValueChange={handleFilterLocationChange}
-                options={filterOptions}
+                options={residenceFilterOptions}
               />
             </SigenFormField>
 
