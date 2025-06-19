@@ -6,15 +6,24 @@ type Validators<T> = Partial<Record<keyof T, ValidatorFn<T>[]>>;
 
 export const validators = {
     required: (msg = "Campo obrigatório") =>
-        (v: any) => (!v ? msg : undefined),
+        <T>(v: T[keyof T], _values: T) =>
+            v === undefined || v === null || v === "" ? msg : undefined,
 
     minLength: (min: number, msg?: string) =>
-        (v: string | undefined) =>
-            !v ? msg : v.length < min ? msg ?? `Mínimo ${min} caracteres` : undefined,
-    equal: (compare: string, msg?: string) => (v: string | undefined) => v !== compare ? msg : undefined,
+        <T>(v: T[keyof T], _values: T) =>
+            typeof v === "string" && v.length < min
+                ? msg ?? `Mínimo ${min} caracteres`
+                : undefined,
+
+    equal: (compare: string, msg?: string) =>
+        <T>(v: T[keyof T], _values: T) =>
+            v !== compare ? msg : undefined,
+
     equalField: <T>(otherField: keyof T, msg?: string): ValidatorFn<T> =>
         (v, values) =>
-            v !== values[otherField] ? msg ?? "Valores não coincidem" : undefined,
+            v !== values[otherField]
+                ? msg ?? "Valores não coincidem"
+                : undefined,
 };
 
 

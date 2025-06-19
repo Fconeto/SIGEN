@@ -46,7 +46,9 @@ export default function HomePage() {
             id: "consulta-residencia",
             label: "Consulta de Residência",
             icon: <FileText className="w-5 h-5" />,
-            action: () => {router.push("chief-agent/residence-consult")},
+            action: () => {
+              router.push("chief-agent/residence-consult");
+            },
           },
           {
             id: "pesquisa",

@@ -1,21 +1,19 @@
-"use client"
-
 import type React from "react";
-import { Eye } from "lucide-react"
+import { Eye } from "lucide-react";
 import { cn } from "@/lib/utils";
 
 interface ResidenceInfos {
-  id: string
-  location: string
-  numeroCasa: string
-  nomeMorador: string
+  id: string;
+  location: string;
+  numeroCasa: string;
+  nomeMorador: string;
 }
 
 interface ResidenceTableProps {
-  residences: ResidenceInfos[]
-  locationid?: string
-  onViewDetails?: (residenceId: string) => void
-  className?: string
+  residences: ResidenceInfos[];
+  locationid?: string;
+  onViewDetails?: (residenceId: string) => void;
+  className?: string;
 }
 
 export function SigenTable({
@@ -25,12 +23,12 @@ export function SigenTable({
   className,
 }: ResidenceTableProps) {
   return (
-    <div className={cn("bg-white rounded-lg shadow-sm overflow-hidden", className)}>
+    <div
+      className={cn("bg-white rounded-lg shadow-sm overflow-hidden", className)}
+    >
       {locationid && (
         <div className="bg-gray-200 px-4 py-3 border-b border-gray-300">
-          <h3 className="text-sm font-medium text-gray-700">
-            {locationid}
-          </h3>
+          <h3 className="text-sm font-medium text-gray-700">{locationid}</h3>
         </div>
       )}
 
@@ -96,7 +94,8 @@ export function SigenTable({
       {residences.length > 0 && (
         <div className="bg-gray-50 px-4 py-3 border-t border-gray-200">
           <p className="text-xs text-gray-600">
-            {residences.length} residência{residences.length !== 1 ? 's' : ''} encontrada{residences.length !== 1 ? 's' : ''}
+            {residences.length} residência{residences.length !== 1 ? "s" : ""}{" "}
+            encontrada{residences.length !== 1 ? "s" : ""}
           </p>
         </div>
       )}

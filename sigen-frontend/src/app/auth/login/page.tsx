@@ -12,6 +12,7 @@ import {
   SigenDialog,
   SigenDialogProps,
 } from "@/components/sigen-dialog";
+import Image from "next/image";
 
 interface LoginForm {
   user: string;
@@ -67,7 +68,9 @@ export default function LoginForm() {
         </div>
 
         <div className="flex justify-center py-2">
-          <img
+          <Image
+            width={300}
+            height={500}
             src="/images/login-illustration.png"
             alt="Ilustração da tela de Login"
             className="w-68 h-auto"
