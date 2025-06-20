@@ -38,20 +38,29 @@ export default function ResidenceConsult(){
       locationId: [
         validators.required("Campo obrigatório"),
       ],
-      filterOption: [
-        validators.required("Campo obrigatório"),
-      ],
       nomeMorador: [
-        (value, formValues) =>
-          formValues.filterOption === "nomeMorador" && !value
-            ? "Campo obrigatório"
-            : undefined,
-      ],
+      (value, formValues) => {
+        if (formValues.filterOption === "nomeMorador") {
+          if (!value)
+            return "Campo obrigatório"; 
+
+          if (/\d/.test(value))
+            return "O campo nome não pode conter números";
+        }
+        return undefined;
+      },
+    ],
       bairro: [
-        (value, formValues) =>
-          formValues.filterOption === "bairro" && !value
-            ? "Campo obrigatório"
-            : undefined,
+        (value, formValues) => {
+          if (formValues.filterOption === "bairro") {
+            if(!value)
+              return "Campo obrigatório"
+
+          if (/\d/.test(value))
+              return "O campo bairro não pode conter números";
+          }
+          return undefined;
+        }  
       ],
       numeroCasa: [
         (value, formValues) =>
@@ -92,7 +101,7 @@ export default function ResidenceConsult(){
     console.log("Form Data:", values);
     setIsLoading(false);
     
-    router.push('/residence-infos');
+    router.push('/chief-agent/residence-infos');
   };
 
   const renderDropboxInputFilter = () => {
@@ -104,19 +113,35 @@ export default function ResidenceConsult(){
     const inputId = selectedOption.value as keyof ResidenceConsult;
     const inputLabel = selectedOption.fieldLabel ?? "";
 
+    const validatorInput = (e: React.ChangeEvent<HTMLInputElement>) => {
+      const { value } = e.target;
+
+      if (inputId === "nomeMorador") {
+        const removeNumbers = value.replace(/\d/g, '');
+        handleChange(inputId, removeNumbers);
+      } 
+      else if (inputId === "bairro") {
+        const removeNumbers = value.replace(/\d/g, '');
+        handleChange(inputId, removeNumbers);
+      }
+      else {
+        handleChange(inputId, value);
+      }
+  };
+ 
     return (
       <SigenFormField
         id={inputId}
         label={inputLabel}
         error={errors[inputId]}
       >
-        <SigenInput
-          id={inputId}
-          value={values[inputId] || ""}
-          onChange={(e) => handleChange(inputId, e.target.value)}
-          aria-invalid={!!errors[inputId]}
-          placeholder={`Digite o ${inputLabel.toLowerCase()}`}
-        />
+      <SigenInput
+        id={inputId}
+        value={values[inputId] || ""}
+        onChange={(e) => handleChange(inputId, e.target.value)}
+        aria-invalid={!!errors[inputId]}
+        placeholder={`Digite o ${inputLabel.toLowerCase()}`}
+      />
       </SigenFormField>
     );
   };

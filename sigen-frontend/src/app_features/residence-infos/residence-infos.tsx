@@ -21,10 +21,10 @@ useEffect(() => {
     const searchResults = async () => {
       setLoading(true);
       
-      await new Promise(resolve => setTimeout(resolve, 1000));
+      await new Promise(resolve => setTimeout(resolve, 600));
       
       const mockData: ResidenceInfos[] = [
-        { id: "1", location: "Barro dos Venâncios", numeroCasa: "20", nomeMorador: "João Moreira da Silva" },
+        { id: "1", location: "Barro dos Venâncios", numeroCasa: "203A", nomeMorador: "João Moreira da Silva" },
         { id: "2", location: "Barro V.", numeroCasa: "20", nomeMorador: "João" },
         { id: "3", location: "Barro V.", numeroCasa: "20", nomeMorador: "João" },
         { id: "4", location: "Barro V.", numeroCasa: "20", nomeMorador: "João" },
@@ -48,20 +48,25 @@ useEffect(() => {
 if (loading) {
     return (
       <SigenAppLayout
-        headerTitle="Informações de Residências"
+        headerTitle="Consulta de Residência"
         showBackButton
         onBackClick={() => router.back()}
       >
         <div className="flex items-center justify-center h-64">
-          <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-blue-600"></div>
+          <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-gray-800"></div>
         </div>
       </SigenAppLayout>
     );
   }
 
+  const showResidence = (id: string) => {
+    console.log("Vizualizar detalhes da residência:", id);
+    router.push(`/chief-agent/residence-details/${id}`);
+  };
+
   return (
     <SigenAppLayout
-      headerTitle="Informações de Residências"
+      headerTitle="Consulta de Residência"
       showBackButton
       onBackClick={() => router.back()}
       padding="sm"
@@ -69,8 +74,8 @@ if (loading) {
       <div className="space-y-4">
         <SigenTable
           residences={residences}
-          locationid="00001 CUPIM"
-          //onViewDetails={handleViewDetails}
+          locationid="0020"
+          viewResidence={showResidence}
         />
       </div>
     </SigenAppLayout>

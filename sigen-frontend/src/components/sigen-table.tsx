@@ -1,45 +1,45 @@
 import type React from "react";
-import { Eye } from "lucide-react";
+import { Eye } from "lucide-react"
 import { cn } from "@/lib/utils";
 
 interface ResidenceInfos {
-  id: string;
-  location: string;
-  numeroCasa: string;
-  nomeMorador: string;
+  id: string
+  location: string
+  numeroCasa: string
+  nomeMorador: string
 }
 
 interface ResidenceTableProps {
-  residences: ResidenceInfos[];
-  locationid?: string;
-  onViewDetails?: (residenceId: string) => void;
-  className?: string;
+  residences: ResidenceInfos[]
+  locationid?: string
+  viewResidence?: (id: string) => void
+  className?: string
 }
 
 export function SigenTable({
   residences,
   locationid,
-  onViewDetails,
+  viewResidence,
   className,
 }: ResidenceTableProps) {
   return (
-    <div
-      className={cn("bg-white rounded-lg shadow-sm overflow-hidden", className)}
-    >
+    <div className={cn("bg-white rounded-lg shadow-sm overflow-hidden", className)}>
       {locationid && (
         <div className="bg-gray-200 px-4 py-3 border-b border-gray-300">
-          <h3 className="text-sm font-medium text-gray-700">{locationid}</h3>
+          <h3 className="text-sm font-medium text-gray-700">
+            {locationid}
+          </h3>
         </div>
       )}
 
       <div className="overflow-x-auto">
-        <table className="w-full">
+        <table className="w-full table-fixed">
           <thead>
             <tr className="bg-gray-50 border-b border-gray-200">
               <th className="px-4 py-3 text-left text-xs font-medium text-gray-600 uppercase tracking-wider">
                 Localidade
               </th>
-              <th className="px-4 py-3 text-left text-xs font-medium text-gray-600 uppercase tracking-wider">
+              <th className="w-22 px-4 py-3 text-left text-xs font-medium text-gray-600 uppercase tracking-wider">
                 Nº Casa
               </th>
               <th className="px-4 py-3 text-left text-xs font-medium text-gray-600 uppercase tracking-wider">
@@ -66,22 +66,22 @@ export function SigenTable({
                     index % 2 === 0 ? "bg-white" : "bg-gray-25"
                   )}
                 >
-                  <td className="px-4 py-3 text-sm text-gray-900">
-                    {residence.location}
+                  <td className="truncate px-4 py-3 text-sm text-gray-900">
+                      {residence.location}
                   </td>
                   <td className="px-4 py-3 text-sm text-gray-900">
                     {residence.numeroCasa}
                   </td>
-                  <td className="px-4 py-3 text-sm text-gray-900">
+                  <td className="truncate px-4 py-3 text-sm text-gray-900">
                     {residence.nomeMorador}
                   </td>
                   <td className="px-4 py-3 text-center">
                     <button
-                      onClick={() => onViewDetails?.(residence.id)}
+                      onClick={() => viewResidence?.(residence.id)}
                       className="inline-flex items-center justify-center w-8 h-8 rounded-full bg-gray-100 hover:bg-gray-200 text-gray-600 hover:text-gray-800 transition-colors"
                       title="Visualizar detalhes"
                     >
-                      <Eye size={16} />
+                      <Eye size={15} />
                     </button>
                   </td>
                 </tr>
@@ -94,8 +94,7 @@ export function SigenTable({
       {residences.length > 0 && (
         <div className="bg-gray-50 px-4 py-3 border-t border-gray-200">
           <p className="text-xs text-gray-600">
-            {residences.length} residência{residences.length !== 1 ? "s" : ""}{" "}
-            encontrada{residences.length !== 1 ? "s" : ""}
+            {residences.length} residência{residences.length !== 1 ? 's' : ''} encontrada{residences.length !== 1 ? 's' : ''}
           </p>
         </div>
       )}
