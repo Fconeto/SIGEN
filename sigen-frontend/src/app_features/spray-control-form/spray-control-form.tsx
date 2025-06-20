@@ -23,14 +23,7 @@ interface SprayControlForm {
 export default function SprayControlForm() {
   const router = useRouter();
 
-  const {
-    values,
-    errors,
-    handleChange,
-    validateForm,
-    resetForm,
-    setFieldError,
-  } = useForm(
+  const { values, errors, handleChange, validateForm, resetForm } = useForm(
     {
       date: undefined,
       pendency: undefined,

@@ -1,8 +1,7 @@
-"use client";
-
 import type React from "react";
 
 import { Card } from "@/components/ui/card";
+import Image from "next/image";
 
 export interface MenuItem {
   id: string;
@@ -19,7 +18,9 @@ export default function MenuScreen({ menuConfigurations }: MenuScreenProps) {
   return (
     <>
       <div className="flex justify-center py-6">
-        <img
+        <Image
+          width={124}
+          height={124}
           src="/images/endemias.png"
           alt="Imagem sobre endemias"
           className="max-w-full h-auto"

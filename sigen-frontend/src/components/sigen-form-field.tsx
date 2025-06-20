@@ -5,7 +5,6 @@ interface SigenFormFieldProps {
   id: string;
   label: string;
   error?: string;
-  labelStyle?: string;
   children: React.ReactNode;
   labelStyle?: string;
 }

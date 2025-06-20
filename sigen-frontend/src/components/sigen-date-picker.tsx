@@ -1,5 +1,3 @@
-"use client";
-
 import { useState, useEffect, forwardRef } from "react";
 import { format, parse, isValid } from "date-fns";
 import { ptBR } from "date-fns/locale";

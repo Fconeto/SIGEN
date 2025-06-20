@@ -20,7 +20,7 @@ const roleAccessConfig: Record<UserRole, {
 function isPathAllowed(path: string, role: UserRole): boolean {
     const config = roleAccessConfig[role]
     return config.allowedPaths.some((allowedPath) =>
-        path === allowedPath || path.startsWith(allowedPath + '/') || config.path === path
+        path === allowedPath || path.startsWith(allowedPath + '/') || path.startsWith(config.path)
     )
 }
 

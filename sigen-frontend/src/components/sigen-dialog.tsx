@@ -1,4 +1,3 @@
-"use client";
 import { useEffect } from "react";
 import { X, AlertTriangle, CheckCircle, Info, AlertCircle } from "lucide-react";
 import { SigenButton } from "@/components/sigen-button";

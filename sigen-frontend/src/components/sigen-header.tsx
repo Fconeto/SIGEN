@@ -1,5 +1,3 @@
-"use client";
-
 import type React from "react";
 import { ArrowLeft, LogOut } from "lucide-react";
 import { SigenButton } from "@/components/sigen-button";
