@@ -2,6 +2,6 @@ namespace SIGEN.API.Requests;
 
 public class LoginRequest
 {
-    public string Email { get; set; }
-    public string Password { get; set; }
+    public required string CPF { get; set; }
+    public required string Senha { get; set; }
 }

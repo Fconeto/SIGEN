@@ -1,8 +1,9 @@
 using Microsoft.AspNetCore.Mvc;
-using SIGEN.Application.Services;
+using SIGEN.Application.Interfaces;
 using SIGEN.Domain.Shared;
 using RegisterRequestAPI = SIGEN.API.Requests.RegisterRequest;
 using SIGEN.API.Mappers;
+using SIGEN.API.Requests;
 
 namespace SIGEN.API.Controllers;
 
@@ -17,12 +18,14 @@ public class AuthController : ControllerBase
         _authService = authService;
     }
 
-    [HttpPost("login")]
-    public async Task<IActionResult> Login([FromBody] LoginRequest request)
+    [HttpGet("login")]
+    public async Task<IActionResult> Login([FromQuery] SIGEN.API.Requests.LoginRequest request)
     {
-        var domainRequest = new SIGEN.Domain.Shared.LoginRequest();
-        domainRequest.Email = request.Email;
-        domainRequest.Password = request.Password;
+        var domainRequest = new SIGEN.Domain.Shared.LoginRequest
+        {
+            CPF = request.CPF,
+            Senha = request.Senha
+        };
         var result = await _authService.LoginAsync(domainRequest);
         if (result.IsSuccess)
         {
@@ -32,12 +35,10 @@ public class AuthController : ControllerBase
     }
 
     [HttpPost("register")]
-
     public async Task<IActionResult> Register([FromBody] RegisterRequestAPI request)
     {
-        RegisterRequest registerRequest = AuthMapper.RegisterMapper(request);
-        var result = _authService.RegisterAsync(registerRequest);
-        
+        var registerRequest = AuthMapper.RegisterMapper(request);
+        var result = await _authService.RegisterAsync(registerRequest);
         return Ok(result);
     }
 }
