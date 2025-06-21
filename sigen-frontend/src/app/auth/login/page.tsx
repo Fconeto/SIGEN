@@ -26,10 +26,7 @@ export default function LoginForm() {
       password: "",
     } as LoginForm,
     {
-      cpf: [
-        validators.condition((cpf) => CPF.isValid(cpf), "CPF inválido"),
-        validators.minLength(6, "Mínimo 6 caracteres"),
-      ],
+      cpf: [validators.condition((cpf) => CPF.isValid(cpf), "CPF inválido")],
       password: [
         validators.required("Campo obrigatório"),
         validators.minLength(6, "Mínimo 6 caracteres"),
