@@ -12,6 +12,7 @@ import {
   SigenDialog,
   SigenDialogProps,
 } from "@/components/sigen-dialog";
+import { API_BASE_URL } from "@/config/api-config";
 
 interface LoginForm {
   user: string;
@@ -52,10 +53,43 @@ export default function LoginForm() {
     }
 
     setIsLoading(true);
-    await new Promise((r) => setTimeout(r, 2000));
-    console.log("Form Data:", values);
-    setIsLoading(false);
-    resetForm();
+    try {
+      const params = new URLSearchParams({
+        CPF: values.user,
+        Senha: values.password,
+      });
+
+      const response = await fetch(
+        `${API_BASE_URL}/api/auth/login?${params.toString()}`,
+        {
+          method: "GET",
+          mode: "cors",
+        }
+      );
+      const data = await response.json();
+      if (response.ok && data.token) {
+        setDialog({
+          isOpen: true,
+          type: "success",
+          message: "Login realizado com sucesso!",
+        });
+      } else {
+        setDialog({
+          isOpen: true,
+          type: "error",
+          message: data.message || "Usuário ou senha inválidos.",
+        });
+      }
+    } catch (error) {
+      setDialog({
+        isOpen: true,
+        type: "error",
+        message: "Erro ao conectar ao servidor.",
+      });
+    } finally {
+      setIsLoading(false);
+      resetForm();
+    }
   };
 
   return (

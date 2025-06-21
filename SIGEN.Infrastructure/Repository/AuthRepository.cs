@@ -42,7 +42,6 @@ namespace SIGEN.Infrastructure.Repository
                 }
                 else if (!string.IsNullOrEmpty(cpf))
                 {
-                    // Busca o agenteId pelo CPF e incrementa tentativas
                     var agente = await GetAgenteByCPF(cpf);
                     if (agente != null)
                     {

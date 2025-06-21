@@ -27,12 +27,9 @@ namespace SIGEN.Application.Services
                 var agente = await _authRepository.GetAgenteByCPF(request.CPF);
                 if (agente == null)
                 {
-                    // Atualiza tentativas se não encontrou
                     await _authRepository.UpdateAgenteTentativas(null, null, request.CPF);
                     throw new Exception("O login ou senha informados estão incorretos.");
                 }
-
-                // Comparação de senha com SHA-256
                 string senhaHash = ComputeSha256Hash(request.Senha);
                 if (agente.Senha != senhaHash)
                 {
@@ -40,10 +37,8 @@ namespace SIGEN.Application.Services
                     throw new Exception("O login ou senha informados estão incorretos.");
                 }
 
-                // Login correto, zera tentativas
                 await _authRepository.UpdateAgenteTentativas(agente.AgenteId, 0, null);
-                // Gerar JWT (implementação simplificada)
-                string token = "jwt_token_fake"; // Substitua por geração real
+                string token = "jwt_token_fake";
                 return new AuthResponse
                 {
                     IsSuccess = true,
