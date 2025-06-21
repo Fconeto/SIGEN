@@ -9,8 +9,18 @@ export const validators = {
         (v: string) => (!v ? msg : undefined),
 
     minLength: (min: number, msg?: string) =>
-        (v: string) =>
-            v.length < min ? msg ?? `Mínimo ${min} caracteres` : undefined,
+        (v: string | undefined) =>
+            !v ? msg : v.length < min ? msg ?? `Mínimo ${min} caracteres` : undefined,
+    equal: (compare: string, msg?: string) => (v: string | undefined) => v !== compare ? msg : undefined,
+    equalField: <T>(otherField: keyof T, msg?: string): ValidatorFn<T> =>
+        (v, values) =>
+            v !== values[otherField] ? msg ?? "Valores não coincidem" : undefined,
+    condition: <T>(
+        predicate: (value: T[keyof T]) => boolean,
+        msg?: string
+    ): ValidatorFn<T> => (value, values) =>
+            predicate(value) ? undefined : msg ?? "Valor inválido",
+
 };
 
 

@@ -1,5 +1,5 @@
 import { NextResponse } from "next/server";
-import type { NextRequest } from "next/server";
+import { NextRequest } from "next/server";
 import { GlobalService } from "./services/global-service";
 import { UserRole } from "./domain/entities/user";
 import { baseUrlNormalized } from "./lib/utils";

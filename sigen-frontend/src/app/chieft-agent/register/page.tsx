@@ -14,6 +14,17 @@ import {
   SigenDialog,
   SigenDialogProps,
 } from "@/components/sigen-dialog";
+import { useRouter } from "next/navigation";
+import { CPF } from "@/domain/entities/document";
+
+interface AgentForm {
+  agentId: string;
+  agentName: string;
+  team: AgentTeam | undefined;
+  cpf: string;
+  password: string;
+  confirmPassword: string;
+}
 
 export default function AgentRegistrationForm() {
   const { values, errors, handleChange, validateForm, resetForm } = useForm(
@@ -22,7 +33,9 @@ export default function AgentRegistrationForm() {
       agentName: "",
       team: "",
       password: "",
-    },
+      confirmPassword: "",
+      cpf: "",
+    } as AgentForm,
     {
       agentId: [
         validators.required("Campo obrigatório"),
@@ -33,6 +46,13 @@ export default function AgentRegistrationForm() {
         validators.minLength(6, "Mínimo 6 caracteres"),
       ],
       team: [validators.required("Campo obrigatório")],
+      cpf: [
+        validators.required("Campo obrigatório"),
+        validators.condition(
+          (value) => CPF.isValid(value ?? ""),
+          "CPF inválido"
+        ),
+      ],
       password: [
         validators.required("Campo obrigatório"),
         validators.minLength(6, "Mínimo 6 caracteres"),
@@ -80,6 +100,18 @@ export default function AgentRegistrationForm() {
               value={values.agentName}
               onChange={(e) => handleChange("agentName", e.target.value)}
               aria-invalid={!!errors.agentName}
+              placeholder="Digite o nome do agente"
+            />
+          </SigenFormField>
+
+          <SigenFormField id="cpf" label="CPF do agente:" error={errors.cpf}>
+            <SigenInput
+              id="cpf"
+              mask={CPF.mask}
+              value={values.cpf}
+              onChange={(e) => handleChange("cpf", e.target.value)}
+              aria-invalid={!!errors.cpf}
+              placeholder="Digite o CPF do agente"
             />
           </SigenFormField>
 
