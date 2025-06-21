@@ -19,12 +19,12 @@ interface LoginForm {
   password: string;
 }
 
-export default function AgentRegistrationForm() {
+export default function LoginForm() {
   const { values, errors, handleChange, validateForm, resetForm } = useForm(
     {
       cpf: "",
       password: "",
-    }as LoginForm,
+    } as LoginForm,
     {
       cpf: [
         validators.condition((cpf) => CPF.isValid(cpf), "CPF inválido"),
@@ -60,23 +60,20 @@ export default function AgentRegistrationForm() {
   };
 
   return (
-    <>                                        
-      <SigenAppLayout
-        headerTitle="SIGEN"
-        className="bg-[#222831]"
-      >
-      <div className="text-center pt-4 pb-4">
-        <h1 className="text-white text-4xl font-bold mb-2">LOGIN</h1>
-        <p className="text-yellow-400 text-lg">Entre na sua conta</p>
-      </div>
-      
-      <div className="flex justify-center py-2">
-        <img
-          src="/images/login-illustration.png"
-          alt="Ilustração da tela de Login"
-          className="w-68 h-auto"
-        />
-      </div>
+    <>
+      <SigenAppLayout className="bg-[#222831]">
+        <div className="text-center pt-4 pb-4">
+          <h1 className="text-white text-4xl font-bold mb-2">LOGIN</h1>
+          <p className="text-yellow-400 text-lg">Entre na sua conta</p>
+        </div>
+
+        <div className="flex justify-center py-2">
+          <img
+            src="/images/login-illustration.png"
+            alt="Ilustração da tela de Login"
+            className="w-68 h-auto"
+          />
+        </div>
         <form onSubmit={handleSubmit} className="space-y-4 mt-3">
           <SigenFormField
             id="cpf"
