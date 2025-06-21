@@ -1,7 +1,6 @@
 using SIGEN.Domain.Shared;
-using System.Threading.Tasks;
 
-namespace SIGEN.Application.Services
+namespace SIGEN.Application.Interfaces
 {
     public interface IAuthService
     {

@@ -1,5 +1,5 @@
 CREATE TABLE Residencia (
-    ResidenciaId BIGINT PRIMARY KEY,
+    ResidenciaId BIGINT PRIMARY KEY IDENTITY(1,1),
     TipoDoImovel INT NOT NULL, -- Enum
     NomeDoMorador NVARCHAR(255) NOT NULL,
     Numero INT NOT NULL,
