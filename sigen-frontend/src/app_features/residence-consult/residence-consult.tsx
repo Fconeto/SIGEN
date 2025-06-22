@@ -86,7 +86,7 @@ export default function ResidenceConsult(){
         <form onSubmit={handleSubmit} className="space-y-2 p-6">
           <SigenFormField
             id="locationId"
-            label="Código da Localidade (obrigatório)"
+            label={<>Código da Localidade <span className="text-red-500 font-semibold">*</span></>}
             error={errors.locationId}
           >
             <SigenInput

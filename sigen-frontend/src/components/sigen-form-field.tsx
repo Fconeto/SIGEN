@@ -1,9 +1,10 @@
 import { SigenLabel } from "@/components/sigen-label";
 import { cn } from "@/lib/utils";
+import React from "react";
 
 interface SigenFormFieldProps {
   id: string;
-  label: string;
+  label: React.ReactNode;
   error?: string;
   children: React.ReactNode;
   labelStyle?: string;
