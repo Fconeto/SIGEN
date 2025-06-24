@@ -28,30 +28,15 @@ namespace SIGEN.Infrastructure.Repository
             }
         }
 
-        public async Task UpdateAgenteTentativas(long? agenteId, int? tentativas, string? cpf)
+        public async Task UpdateAgenteTentativas(long? agenteId, int? tentativas)
         {
             using (var connection = new SqlConnection(_connectionString))
             {
-                if (agenteId.HasValue && tentativas.HasValue)
-                {
-                    await connection.ExecuteAsync(
-                        "UpdateAgenteTentativas",
-                        new { AgenteId = agenteId, Tentativas = tentativas },
-                        commandType: CommandType.StoredProcedure
-                    );
-                }
-                else if (!string.IsNullOrEmpty(cpf))
-                {
-                    var agente = await GetAgenteByCPF(cpf);
-                    if (agente != null)
-                    {
-                        await connection.ExecuteAsync(
-                            "UpdateAgenteTentativas",
-                            new { AgenteId = agente.AgenteId, Tentativas = agente.Tentativas + 1 },
-                            commandType: CommandType.StoredProcedure
-                        );
-                    }
-                }
+                await connection.ExecuteAsync(
+                    "UpdateAgenteTentativas",
+                    new { AgenteId = agenteId, Tentativas = tentativas },
+                    commandType: CommandType.StoredProcedure
+                );
             }
         }
     }

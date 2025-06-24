@@ -19,18 +19,13 @@ public class AuthController : ControllerBase
     }
 
     [HttpGet("login")]
-    public async Task<IActionResult> Login([FromQuery] SIGEN.API.Requests.LoginRequest request)
+    public async Task<IActionResult> Login([FromQuery] SIGEN.Domain.Shared.LoginRequest request)
     {
-        var domainRequest = new SIGEN.Domain.Shared.LoginRequest
-        {
-            CPF = request.CPF,
-            Senha = request.Senha
-        };
-        var result = await _authService.LoginAsync(domainRequest);
+        AuthResponse result = await _authService.LoginAsync(request);
+
         if (result.IsSuccess)
-        {
             return Ok(result);
-        }
+        
         return Unauthorized(result);
     }
 

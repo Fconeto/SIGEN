@@ -25,19 +25,21 @@ namespace SIGEN.Application.Services
                     throw new Exception("O campo Senha é obrigatório.");
 
                 var agente = await _authRepository.GetAgenteByCPF(request.CPF);
+
                 if (agente == null)
-                {
-                    await _authRepository.UpdateAgenteTentativas(null, null, request.CPF);
-                    throw new Exception("O login ou senha informados estão incorretos.");
-                }
+                    throw new Exception("O login informado está incorreto.");
+
+                if (agente.Tentativas >= 5 && agente.UltimaTentativa > DateTime.Now.AddMinutes(-10))
+                    throw new Exception("O usuário está bloqueado por muitas tentativas de login, aguarde " + (int)(DateTime.Now - agente.UltimaTentativa).TotalMinutes + " minutos para tentar novamente.");
+                
                 string senhaHash = ComputeSha256Hash(request.Senha);
                 if (agente.Senha != senhaHash)
                 {
-                    await _authRepository.UpdateAgenteTentativas(agente.AgenteId, agente.Tentativas + 1, null);
-                    throw new Exception("O login ou senha informados estão incorretos.");
+                    await _authRepository.UpdateAgenteTentativas(agente.AgenteId, agente.Tentativas + 1);
+                    throw new Exception("A senha informada está incorreta.");
                 }
 
-                await _authRepository.UpdateAgenteTentativas(agente.AgenteId, 0, null);
+                await _authRepository.UpdateAgenteTentativas(agente.AgenteId, 0);
                 string token = "jwt_token_fake";
                 return new AuthResponse
                 {
