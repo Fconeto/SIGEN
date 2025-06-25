@@ -1,5 +1,5 @@
 using Microsoft.AspNetCore.Mvc;
-using SIGEN.Application.Services;
+using SIGEN.Application.Interfaces;
 using SIGEN.Domain.Shared.Requests;
 using SIGEN.API.Mappers;
 using SIGEN.Domain.Shared.Responses;
@@ -19,17 +19,14 @@ public class AuthController : ControllerBase
         _authService = authService;
     }
 
-    [HttpPost("login")]
-    public async Task<IActionResult> Login([FromBody] LoginRequest request)
+    [HttpGet("login")]
+    public async Task<IActionResult> Login([FromQuery] LoginRequest request)
     {
-        var domainRequest = new SIGEN.Domain.Shared.Requests.LoginRequest();
-        domainRequest.Email = request.Email;
-        domainRequest.Password = request.Password;
-        var result = await _authService.LoginAsync(domainRequest);
+        AuthResponse result = await _authService.LoginAsync(request);
+
         if (result.IsSuccess)
-        {
             return Ok(result);
-        }
+        
         return Unauthorized(result);
     }
 

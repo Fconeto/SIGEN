@@ -8,21 +8,36 @@ import { SigenPasswordInput } from "@/components/sigen-password-input";
 import { SigenDropdown } from "@/components/sigen-dropdown";
 import { SigenInput } from "@/components/sigen-input";
 import { useState } from "react";
-import { AgentTeams } from "@/domain/entities/team";
+import { AgentTeam } from "@/domain/entities/team";
 import {
   defaultDialogs,
   SigenDialog,
   SigenDialogProps,
 } from "@/components/sigen-dialog";
+import { useRouter } from "next/navigation";
+import { CPF } from "@/domain/entities/document";
+
+interface AgentForm {
+  agentId: string;
+  agentName: string;
+  team: AgentTeam | undefined;
+  cpf: string;
+  password: string;
+  confirmPassword: string;
+}
 
 export default function AgentRegistrationForm() {
+  const router = useRouter();
+
   const { values, errors, handleChange, validateForm, resetForm } = useForm(
     {
       agentId: "",
       agentName: "",
-      team: "",
+      team: undefined,
       password: "",
-    },
+      confirmPassword: "",
+      cpf: "",
+    } as AgentForm,
     {
       agentId: [
         validators.required("Campo obrigatório"),
@@ -33,9 +48,20 @@ export default function AgentRegistrationForm() {
         validators.minLength(6, "Mínimo 6 caracteres"),
       ],
       team: [validators.required("Campo obrigatório")],
+      cpf: [
+        validators.required("Campo obrigatório"),
+        validators.condition(
+          (value) => CPF.isValid(value ?? ""),
+          "CPF inválido"
+        ),
+      ],
       password: [
         validators.required("Campo obrigatório"),
         validators.minLength(6, "Mínimo 6 caracteres"),
+      ],
+      confirmPassword: [
+        validators.required("Campo obrigatório"),
+        validators.equalField<AgentForm>("password", "As senhas não condizem"),
       ],
     }
   );
@@ -67,9 +93,9 @@ export default function AgentRegistrationForm() {
       <SigenAppLayout
         headerTitle="Cadastro de Agente"
         showBackButton
-        onBackClick={() => {}}
+        onBackClick={() => router.back()}
       >
-        <form onSubmit={handleSubmit} className="space-y-6 mt-8">
+        <form onSubmit={handleSubmit} className="space-y-2 mt-8">
           <SigenFormField
             id="agentName"
             label="Nome do Agente:"
@@ -80,6 +106,18 @@ export default function AgentRegistrationForm() {
               value={values.agentName}
               onChange={(e) => handleChange("agentName", e.target.value)}
               aria-invalid={!!errors.agentName}
+              placeholder="Digite o nome do agente"
+            />
+          </SigenFormField>
+
+          <SigenFormField id="cpf" label="CPF do agente:" error={errors.cpf}>
+            <SigenInput
+              id="cpf"
+              mask={CPF.mask}
+              value={values.cpf}
+              onChange={(e) => handleChange("cpf", e.target.value)}
+              aria-invalid={!!errors.cpf}
+              placeholder="Digite o CPF do agente"
             />
           </SigenFormField>
 
@@ -93,6 +131,7 @@ export default function AgentRegistrationForm() {
               value={values.agentId}
               onChange={(e) => handleChange("agentId", e.target.value)}
               aria-invalid={!!errors.agentId}
+              placeholder="Digite identificador do agente"
             />
           </SigenFormField>
 
@@ -101,12 +140,12 @@ export default function AgentRegistrationForm() {
               value={values.team}
               onValueChange={(v) => handleChange("team", v)}
               options={[
-                { value: AgentTeams.dengue, label: AgentTeams.dengue },
+                { value: AgentTeam.dengue, label: AgentTeam.dengue },
                 {
-                  value: AgentTeams.febreAmarela,
-                  label: AgentTeams.febreAmarela,
+                  value: AgentTeam.febreAmarela,
+                  label: AgentTeam.febreAmarela,
                 },
-                { value: AgentTeams.chagas, label: AgentTeams.chagas },
+                { value: AgentTeam.chagas, label: AgentTeam.chagas },
               ]}
             />
           </SigenFormField>
@@ -117,11 +156,36 @@ export default function AgentRegistrationForm() {
               value={values.password}
               onChange={(e) => handleChange("password", e.target.value)}
               aria-invalid={!!errors.password}
+              placeholder="Digite a senha"
+            />
+          </SigenFormField>
+
+          <SigenFormField
+            id="confirmPassword"
+            label="Confirme sua senha:"
+            error={errors.confirmPassword}
+          >
+            <SigenPasswordInput
+              id="confirmPassword"
+              value={values.confirmPassword}
+              onChange={(e) => handleChange("confirmPassword", e.target.value)}
+              aria-invalid={!!errors.confirmPassword}
+              placeholder="Digite confirme sua senha"
             />
           </SigenFormField>
 
           <div className="pt-8">
-            <SigenLoadingButton type="submit" loading={isLoading}>
+            <SigenLoadingButton
+              type="submit"
+              loading={isLoading}
+              disabled={
+                !!errors.agentId ||
+                !!errors.agentName ||
+                !!errors.password ||
+                !!errors.team ||
+                !!errors.confirmPassword
+              }
+            >
               Cadastrar
             </SigenLoadingButton>
           </div>

@@ -12,23 +12,22 @@ import {
   SigenDialog,
   SigenDialogProps,
 } from "@/components/sigen-dialog";
+import { CPF } from "@/domain/entities/document";
+import { API_BASE_URL } from "@/config/api-config";
 
 interface LoginForm {
-  user: string;
+  cpf: string;
   password: string;
 }
 
-export default function AgentRegistrationForm() {
+export default function LoginForm() {
   const { values, errors, handleChange, validateForm, resetForm } = useForm(
     {
-      user: "",
+      cpf: "",
       password: "",
-    }as LoginForm,
+    } as LoginForm,
     {
-      user: [
-        validators.required("Campo obrigatório"),
-        validators.minLength(6, "Mínimo 6 caracteres"),
-      ],
+      cpf: [validators.condition((cpf) => CPF.isValid(cpf), "CPF inválido")],
       password: [
         validators.required("Campo obrigatório"),
         validators.minLength(6, "Mínimo 6 caracteres"),
@@ -52,43 +51,74 @@ export default function AgentRegistrationForm() {
     }
 
     setIsLoading(true);
-    await new Promise((r) => setTimeout(r, 2000));
-    console.log("Form Data:", values);
-    setIsLoading(false);
-    resetForm();
+    try {
+      const params = new URLSearchParams({
+        CPF: values.user,
+        Senha: values.password,
+      });
+
+      const response = await fetch(
+        `${API_BASE_URL}/api/auth/login?${params.toString()}`,
+        {
+          method: "GET",
+          mode: "cors",
+        }
+      );
+      const data = await response.json();
+      if (response.ok && data.token) {
+        setDialog({
+          isOpen: true,
+          type: "success",
+          message: "Login realizado com sucesso!",
+        });
+      } else {
+        setDialog({
+          isOpen: true,
+          type: "error",
+          message: data.message || "Usuário ou senha inválidos.",
+        });
+      }
+    } catch (error) {
+      setDialog({
+        isOpen: true,
+        type: "error",
+        message: "Erro ao conectar ao servidor.",
+      });
+    } finally {
+      setIsLoading(false);
+      resetForm();
+    }
   };
 
   return (
-    <>                                        
-      <SigenAppLayout
-        headerTitle="SIGEN"
-        className="bg-[#222831]"
-      >
-      <div className="text-center pt-4 pb-4">
-        <h1 className="text-white text-4xl font-bold mb-2">LOGIN</h1>
-        <p className="text-yellow-400 text-lg">Entre na sua conta</p>
-      </div>
-      
-      <div className="flex justify-center py-2">
-        <img
-          src="/images/login-illustration.png"
-          alt="Ilustração da tela de Login"
-          className="w-68 h-auto"
-        />
-      </div>
+    <>
+      <SigenAppLayout className="bg-[#222831]">
+        <div className="text-center pt-4 pb-4">
+          <h1 className="text-white text-4xl font-bold mb-2">LOGIN</h1>
+          <p className="text-yellow-400 text-lg">Entre na sua conta</p>
+        </div>
+
+        <div className="flex justify-center py-2">
+          <img
+            src="/images/login-illustration.png"
+            alt="Ilustração da tela de Login"
+            className="w-68 h-auto"
+          />
+        </div>
         <form onSubmit={handleSubmit} className="space-y-4 mt-3">
           <SigenFormField
-            id="user"
-            label="Usuário:"
+            id="cpf"
+            label="CPF:"
             labelStyle="text-white font-normal"
-            error={errors.user}
+            error={errors.cpf}
           >
             <SigenInput
-              id="user"
-              value={values.user}
-              onChange={(e) => handleChange("user", e.target.value)}
+              id="cpf"
+              value={values.cpf}
+              mask={CPF.mask}
+              onChange={(e) => handleChange("cpf", e.target.value)}
               className="bg-[#292F37] border-0 border-b border-white/70 text-gray-200"
-              aria-invalid={!!errors.user}
+              aria-invalid={!!errors.cpf}
             />
           </SigenFormField>
 
