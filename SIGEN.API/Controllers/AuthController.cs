@@ -1,8 +1,10 @@
 using Microsoft.AspNetCore.Mvc;
 using SIGEN.Application.Services;
-using SIGEN.Domain.Shared;
-using RegisterRequestAPI = SIGEN.API.Requests.RegisterRequest;
+using SIGEN.Domain.Shared.Requests;
 using SIGEN.API.Mappers;
+using SIGEN.Domain.Shared.Responses;
+using Application.UseCases.Agents.Register;
+using Application.UseCases.REsidences.Create;
 
 namespace SIGEN.API.Controllers;
 
@@ -20,7 +22,7 @@ public class AuthController : ControllerBase
     [HttpPost("login")]
     public async Task<IActionResult> Login([FromBody] LoginRequest request)
     {
-        var domainRequest = new SIGEN.Domain.Shared.LoginRequest();
+        var domainRequest = new SIGEN.Domain.Shared.Requests.LoginRequest();
         domainRequest.Email = request.Email;
         domainRequest.Password = request.Password;
         var result = await _authService.LoginAsync(domainRequest);
@@ -32,12 +34,24 @@ public class AuthController : ControllerBase
     }
 
     [HttpPost("register")]
-
-    public async Task<IActionResult> Register([FromBody] RegisterRequestAPI request)
+    [ProducesResponseType(typeof(AuthResponse), StatusCodes.Status201Created)]
+    [ProducesResponseType(StatusCodes.Status400BadRequest)]
+    public async Task<IActionResult> Register([FromServices] IRegisterAgentUseCase UseCase,
+        [FromBody] RegisterRequest request)
     {
-        RegisterRequest registerRequest = AuthMapper.RegisterMapper(request);
-        var result = _authService.RegisterAsync(registerRequest);
-        
-        return Ok(result);
+        var response = await UseCase.Execute(request);
+
+        return Created(string.Empty, response);
+    }
+
+    [HttpPost("createResidence")]
+    [ProducesResponseType(typeof(AuthResponse), StatusCodes.Status201Created)]
+    [ProducesResponseType(StatusCodes.Status400BadRequest)]
+    public async Task<IActionResult> CreateResidence([FromServices] ICreateResidenceUseCase useCase,
+        [FromBody] ResidenceCreateRequest request)
+    {
+        var response = await useCase.Execute(request);
+
+        return Created(string.Empty, response);
     }
 }
