@@ -12,24 +12,22 @@ import {
   SigenDialog,
   SigenDialogProps,
 } from "@/components/sigen-dialog";
+import { CPF } from "@/domain/entities/document";
 import { API_BASE_URL } from "@/config/api-config";
 
 interface LoginForm {
-  user: string;
+  cpf: string;
   password: string;
 }
 
 export default function LoginForm() {
   const { values, errors, handleChange, validateForm, resetForm } = useForm(
     {
-      user: "",
+      cpf: "",
       password: "",
     } as LoginForm,
     {
-      user: [
-        validators.required("Campo obrigatório"),
-        validators.minLength(6, "Mínimo 6 caracteres"),
-      ],
+      cpf: [validators.condition((cpf) => CPF.isValid(cpf), "CPF inválido")],
       password: [
         validators.required("Campo obrigatório"),
         validators.minLength(6, "Mínimo 6 caracteres"),
@@ -109,17 +107,18 @@ export default function LoginForm() {
         </div>
         <form onSubmit={handleSubmit} className="space-y-4 mt-3">
           <SigenFormField
-            id="user"
-            label="Usuário:"
+            id="cpf"
+            label="CPF:"
             labelStyle="text-white font-normal"
-            error={errors.user}
+            error={errors.cpf}
           >
             <SigenInput
-              id="user"
-              value={values.user}
-              onChange={(e) => handleChange("user", e.target.value)}
+              id="cpf"
+              value={values.cpf}
+              mask={CPF.mask}
+              onChange={(e) => handleChange("cpf", e.target.value)}
               className="bg-[#292F37] border-0 border-b border-white/70 text-gray-200"
-              aria-invalid={!!errors.user}
+              aria-invalid={!!errors.cpf}
             />
           </SigenFormField>
 
