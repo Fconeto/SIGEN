@@ -3,7 +3,6 @@ using SIGEN.Application.Interfaces;
 using SIGEN.Domain.Shared;
 using RegisterRequestAPI = SIGEN.API.Requests.RegisterRequest;
 using SIGEN.API.Mappers;
-using SIGEN.API.Requests;
 
 namespace SIGEN.API.Controllers;
 
@@ -19,7 +18,7 @@ public class AuthController : ControllerBase
     }
 
     [HttpGet("login")]
-    public async Task<IActionResult> Login([FromQuery] SIGEN.Domain.Shared.LoginRequest request)
+    public async Task<IActionResult> Login([FromQuery] LoginRequest request)
     {
         AuthResponse result = await _authService.LoginAsync(request);
 
