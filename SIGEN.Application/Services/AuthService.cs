@@ -1,5 +1,7 @@
 using SIGEN.Application.Interfaces;
 using SIGEN.Domain.Shared;
+using SIGEN.Domain.Shared.Requests;
+using SIGEN.Domain.Shared.Responses;
 using SIGEN.Infrastructure.Interfaces;
 using System.Security.Cryptography;
 using System.Text;

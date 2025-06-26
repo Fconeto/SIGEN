@@ -3,8 +3,7 @@ using SIGEN.Application.Interfaces;
 using SIGEN.Domain.Shared.Requests;
 using SIGEN.API.Mappers;
 using SIGEN.Domain.Shared.Responses;
-using Application.UseCases.Agents.Register;
-using Application.UseCases.REsidences.Create;
+using Application.Interfaces;
 
 namespace SIGEN.API.Controllers;
 
@@ -33,21 +32,10 @@ public class AuthController : ControllerBase
     [HttpPost("register")]
     [ProducesResponseType(typeof(AuthResponse), StatusCodes.Status201Created)]
     [ProducesResponseType(StatusCodes.Status400BadRequest)]
-    public async Task<IActionResult> Register([FromServices] IRegisterAgentUseCase UseCase,
+    public async Task<IActionResult> Register([FromServices] IRegisterAgentService UseCase,
         [FromBody] RegisterRequest request)
     {
         var response = await UseCase.Execute(request);
-
-        return Created(string.Empty, response);
-    }
-
-    [HttpPost("createResidence")]
-    [ProducesResponseType(typeof(AuthResponse), StatusCodes.Status201Created)]
-    [ProducesResponseType(StatusCodes.Status400BadRequest)]
-    public async Task<IActionResult> CreateResidence([FromServices] ICreateResidenceUseCase useCase,
-        [FromBody] ResidenceCreateRequest request)
-    {
-        var response = await useCase.Execute(request);
 
         return Created(string.Empty, response);
     }

@@ -3,15 +3,18 @@ using SIGEN.Domain.Shared.Responses;
 using SIGEN.Domain.ExeptionsBase;
 using SIGEN.Domain.Repositories;
 using AutoMapper;
+using SIGEN.Application.Validators;
+using Application.Interfaces;
+using SIGEN.Domain.Entities;
 
-namespace SIGEN.Application.UseCases.Agents.Register;
-    public class RegisterAgentUseCase
+namespace SIGEN.Application.Services;
+    public class RegisterAgentService : IRegisterAgentService
 {
     private readonly IAgentWriteOnlyRepository _agentRepository;
     private readonly IUnitOfWork _unitOfWork;
     private readonly IMapper _mapper;
 
-    public RegisterAgentUseCase(IAgentWriteOnlyRepository agentRepository,
+    public RegisterAgentService(IAgentWriteOnlyRepository agentRepository,
     IUnitOfWork unitOfWork,
     IMapper mapper)
     {
@@ -24,7 +27,7 @@ namespace SIGEN.Application.UseCases.Agents.Register;
     {
         Validate(request);
         
-        var entity = _mapper.Map<RegisterRequest>(request);
+        var entity = _mapper.Map<Agent>(request);
 
         await _agentRepository.Add(entity);
 

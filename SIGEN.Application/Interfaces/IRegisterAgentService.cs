@@ -1,9 +1,9 @@
 using SIGEN.Domain.Shared.Requests;
 using SIGEN.Domain.Shared.Responses;
 
-namespace Application.UseCases.Agents.Register;
+namespace Application.Interfaces;
 
-public interface IRegisterAgentUseCase
+public interface IRegisterAgentService
 {
     Task<AuthResponse> Execute(RegisterRequest request);
 }

@@ -4,17 +4,18 @@ using SIGEN.Domain.Shared.Responses;
 using SIGEN.Domain.Shared.Requests;
 using SIGEN.Domain.ExeptionsBase;
 using SIGEN.Domain.Entities;
-using Application.UseCases.REsidences.Create;
+using SIGEN.Application.Interfaces;
+using SIGEN.Application.Validators;
 
-namespace SIGEN.Application.UseCases.Residence.Create;
+namespace SIGEN.Application.Services;
 
-public class CreateResidenceUseCase : ICreateResidenceUseCase
+public class CreateResidenceService : ICreateResidenceService
 {
     private readonly IResidenceWriteOnlyRepository _residenceRepository;
     private readonly IUnitOfWork _unitOfWork;
     private readonly IMapper _mapper;
 
-    public CreateResidenceUseCase(IResidenceWriteOnlyRepository residenceRepository, IUnitOfWork unitOfWork, IMapper mapper)
+    public CreateResidenceService(IResidenceWriteOnlyRepository residenceRepository, IUnitOfWork unitOfWork, IMapper mapper)
     {
         _residenceRepository = residenceRepository;
         _unitOfWork = unitOfWork;

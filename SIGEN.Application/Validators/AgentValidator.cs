@@ -1,7 +1,7 @@
 using SIGEN.Domain.Shared.Requests;
 using FluentValidation;
 
-namespace SIGEN.Application.UseCases;
+namespace SIGEN.Application.Validators;
     public class AgentValidator : AbstractValidator<RegisterRequest>
     {
         public AgentValidator()
