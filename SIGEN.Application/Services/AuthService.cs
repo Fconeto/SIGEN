@@ -1,4 +1,8 @@
+using AutoMapper;
 using SIGEN.Application.Interfaces;
+using SIGEN.Application.Validators;
+using SIGEN.Domain.Entities;
+using SIGEN.Domain.Repositories;
 using SIGEN.Domain.Shared;
 using SIGEN.Domain.Shared.Requests;
 using SIGEN.Domain.Shared.Responses;
@@ -12,8 +16,11 @@ namespace SIGEN.Application.Services
     public class AuthService : IAuthService
     {
         private readonly IAuthRepository _authRepository;
-        public AuthService(IAuthRepository authRepository)
+        private readonly IMapper _mapper;
+        public AuthService(IAuthRepository authRepository,
+                           IMapper mapper)
         {
+            _mapper = mapper;
             _authRepository = authRepository;
         }
 
@@ -33,7 +40,7 @@ namespace SIGEN.Application.Services
 
                 if (agente.Tentativas >= 5 && agente.UltimaTentativa > DateTime.Now.AddMinutes(-10))
                     throw new Exception("O usuário está bloqueado por muitas tentativas de login, aguarde " + (int)(DateTime.Now - agente.UltimaTentativa).TotalMinutes + " minutos para tentar novamente.");
-                
+
                 string senhaHash = ComputeSha256Hash(request.Senha);
                 if (agente.Senha != senhaHash)
                 {
@@ -83,5 +90,33 @@ namespace SIGEN.Application.Services
                 return builder.ToString();
             }
         }
-    }
+        public async Task<AuthResponse> Execute(RegisterRequest request)
+        {
+            try
+            {
+                AgentValidator validator = new AgentValidator();
+                validator.Validate(request);
+
+                var entity = _mapper.Map<Agent>(request);
+
+                await _authRepository.InsertAgente(entity);
+            
+                AuthResponse response = new AuthResponse
+                {
+                    IsSuccess = true,
+                    Message = "Agente cadastrado com sucesso!",
+                };
+
+                return response;
+            }
+            catch (Exception ex)
+            {
+                return new AuthResponse
+                {
+                    IsSuccess = false,
+                    Message = "Erro ao processar a solicitação: " + ex.Message,
+                };
+            }
+        }
+    } 
 }

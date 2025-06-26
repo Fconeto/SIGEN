@@ -1,6 +1,7 @@
 using SIGEN.Domain.Shared.Enums;
 
 namespace SIGEN.Domain.Entities;
+
 public class Agent
 {
     public long Id { get; set; }
@@ -10,4 +11,5 @@ public class Agent
     public long Matricula { get; set; }
     public string CPF { get; set; } = string.Empty;
     public Hierarquia Hierarquia { get; set; }
+    public int Tentativas { get; set; } = 0;
 }

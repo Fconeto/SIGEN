@@ -4,6 +4,7 @@ using System.Threading.Tasks;
 using Dapper;
 using SIGEN.Infrastructure.Interfaces;
 using Microsoft.Extensions.Configuration;
+using SIGEN.Domain.Entities;
 
 namespace SIGEN.Infrastructure.Repository
 {
@@ -35,6 +36,26 @@ namespace SIGEN.Infrastructure.Repository
                 await connection.ExecuteAsync(
                     "UpdateAgenteTentativas",
                     new { AgenteId = agenteId, Tentativas = tentativas },
+                    commandType: CommandType.StoredProcedure
+                );
+            }
+        }
+        public async Task InsertAgente(Agent agent)
+        {
+            using (var connection = new SqlConnection(_connectionString))
+            {
+                var result = await connection.ExecuteAsync(
+                    "InsertAgente",
+                    new
+                    {
+                        agent.NomeDoAgente,
+                        agent.Turma,
+                        agent.Senha,
+                        agent.Matricula,
+                        agent.CPF,
+                        agent.Hierarquia,
+                        agent.Tentativas
+                    },
                     commandType: CommandType.StoredProcedure
                 );
             }

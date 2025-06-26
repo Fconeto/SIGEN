@@ -1,16 +1,24 @@
-using SIGEN.Domain.Shared.Requests;
 using FluentValidation;
+using SIGEN.Domain.Shared.Requests;
 
 namespace SIGEN.Application.Validators;
-    public class AgentValidator : AbstractValidator<RegisterRequest>
+public class AgentValidator
+{
+    public void Validate(RegisterRequest request)
     {
-        public AgentValidator()
-        {
-            RuleFor(x => x.NomeDoAgente).NotEmpty().WithMessage("Nome do Agente é obrigatório.");
-            RuleFor(x => x.Turma).NotEmpty().WithMessage("Turma é obrigatória.");
-            RuleFor(x => x.Senha).NotEmpty().WithMessage("Senha é obrigatória.");
-            RuleFor(x => x.Matricula).NotEmpty().WithMessage("Matrícula é obrigatória.");
-            RuleFor(x => x.CPF).NotEmpty().WithMessage("CPF é obrigatório.");
-            RuleFor(x => x.Hierarquia).NotEmpty().WithMessage("Hierarquia é obrigatória.");
-        }
+        if (string.IsNullOrEmpty(request.NomeDoAgente))
+            throw new ValidationException("Nome é obrigatório.");
+
+        if (request.Turma == null)
+            throw new ValidationException("Turma é obrigatória.");
+
+        if (string.IsNullOrEmpty(request.Senha))
+            throw new ValidationException("Senha é obrigatória.");
+
+        if (request.Matricula <= 0)
+            throw new ValidationException("Matrícula deve ser um número positivo.");
+        
+        if (string.IsNullOrEmpty(request.CPF))
+            throw new ValidationException("CPF é obrigatório.");
     }
+}

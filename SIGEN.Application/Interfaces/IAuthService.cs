@@ -8,5 +8,6 @@ namespace SIGEN.Application.Interfaces
     {
         Task<AuthResponse> LoginAsync(LoginRequest request);
         Task<AuthResponse> RegisterAsync(RegisterRequest request);
+        Task<AuthResponse> Execute(RegisterRequest request);
     }
 }

@@ -1,7 +1,6 @@
 using Microsoft.AspNetCore.Mvc;
 using SIGEN.Application.Interfaces;
 using SIGEN.Domain.Shared.Requests;
-using SIGEN.API.Mappers;
 using SIGEN.Domain.Shared.Responses;
 using Application.Interfaces;
 
@@ -32,11 +31,12 @@ public class AuthController : ControllerBase
     [HttpPost("register")]
     [ProducesResponseType(typeof(AuthResponse), StatusCodes.Status201Created)]
     [ProducesResponseType(StatusCodes.Status400BadRequest)]
-    public async Task<IActionResult> Register([FromServices] IRegisterAgentService UseCase,
-        [FromBody] RegisterRequest request)
+    public async Task<IActionResult> Register([FromBody] RegisterRequest request)
     {
-        var response = await UseCase.Execute(request);
-
-        return Created(string.Empty, response);
+        var response = await _authService.Execute(request);
+        if (response.IsSuccess)
+            return Ok(response);
+        
+        return Unauthorized(response);
     }
 }

@@ -1,4 +1,5 @@
 using System.Threading.Tasks;
+using SIGEN.Domain.Entities;
 
 namespace SIGEN.Infrastructure.Interfaces
 {
@@ -6,6 +7,7 @@ namespace SIGEN.Infrastructure.Interfaces
     {
         Task<AgenteDto?> GetAgenteByCPF(string cpf);
         Task UpdateAgenteTentativas(long? agenteId, int? tentativas);
+        Task InsertAgente(Agent request);
     }
 
     public class AgenteDto
