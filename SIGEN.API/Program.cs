@@ -1,4 +1,3 @@
-using AutoMapper;
 using SIGEN.API;
 using SIGEN.API.Middlewares;
 using SIGEN.Application.Interfaces;
@@ -18,7 +17,6 @@ builder.Services.AddEndpointsApiExplorer();
 // Injeção de dependências
 builder.Services.AddScoped<IAuthService, AuthService>();
 builder.Services.AddScoped<IAuthRepository, AuthRepository>();
-builder.Services.AddScoped<IMapper, Mapper>();
 
 var app = builder.Build();
 

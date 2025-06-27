@@ -1,5 +1,6 @@
 using AutoMapper;
 using SIGEN.Application.Interfaces;
+using SIGEN.Application.Mappers;
 using SIGEN.Application.Validators;
 using SIGEN.Domain.Entities;
 using SIGEN.Domain.Repositories;
@@ -16,11 +17,8 @@ namespace SIGEN.Application.Services
     public class AuthService : IAuthService
     {
         private readonly IAuthRepository _authRepository;
-        private readonly IMapper _mapper;
-        public AuthService(IAuthRepository authRepository,
-                           IMapper mapper)
+        public AuthService(IAuthRepository authRepository)
         {
-            _mapper = mapper;
             _authRepository = authRepository;
         }
 
@@ -97,7 +95,8 @@ namespace SIGEN.Application.Services
                 AgentValidator validator = new AgentValidator();
                 validator.Validate(request);
 
-                var entity = _mapper.Map<Agent>(request);
+                AuthMapper authMapper = new AuthMapper();
+                var entity = authMapper.Mapper(request);
 
                 await _authRepository.InsertAgente(entity);
             
