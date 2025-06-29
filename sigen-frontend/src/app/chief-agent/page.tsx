@@ -12,6 +12,7 @@ import {
   Search,
   Users,
   Home,
+  FileSearch,
 } from "lucide-react";
 import { SigenAppLayout } from "@/components/sigen-app-layout";
 import { useRouter } from "next/navigation";
@@ -78,8 +79,8 @@ export default function HomePage() {
           {
             id: "cadastro-pesquisa",
             label: "Cadastro de Pesquisa",
-            icon: <FileText className="w-5 h-5" />,
-            action: () => {"chief-agent/search-register"},
+            icon: <FileSearch className="w-5 h-5" />,
+            action: () => router.push("chief-agent/search-register"),
           },
         ]}
       />

@@ -70,7 +70,7 @@ export default function SearchRegisterForm() {
       <SigenAppLayout
         headerTitle="Cadastro de Pesquisa"
         showBackButton
-        onBackClick={() => router.back}
+        onBackClick={() => router.back()}
       >
         <form onSubmit={handleSubmit} className="space-y-2 mt-8">
           <SigenFormField
