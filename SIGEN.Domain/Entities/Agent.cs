@@ -2,7 +2,7 @@ using SIGEN.Domain.Shared.Enums;
 
 namespace SIGEN.Domain.Entities;
 
-public class Agent
+public class Agent : BaseEntity
 {
     public long Id { get; set; }
     public string NomeDoAgente { get; set; } = string.Empty;
@@ -12,4 +12,5 @@ public class Agent
     public string CPF { get; set; } = string.Empty;
     public Hierarquia Hierarquia { get; set; }
     public int Tentativas { get; set; } = 0;
+    public DateTime UltimaTentativa { get; set; }
 }

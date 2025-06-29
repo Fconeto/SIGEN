@@ -1,7 +1,7 @@
 using SIGEN.Domain.Shared.Enums;
 
 namespace SIGEN.Domain.Entities;
-public class Residence
+public class Residence : BaseEntity
 {
     public long Id { get; set; }
     public string CodigoDaLocalidade { get; set; } = string.Empty;

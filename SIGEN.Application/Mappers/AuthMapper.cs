@@ -14,7 +14,11 @@ public class AuthMapper
             Senha = request.Senha,
             Matricula = request.Matricula,
             CPF = request.CPF,
-            Hierarquia = request.Hierarquia
+            Hierarquia = request.Hierarquia,
+            DataDeRegistro = DateTime.Now,
+            DataDeAtualizacao = DateTime.Now,
+            CriadoPor = request.AgenteId ?? default(long),
+            AtualizadoPor = request.AgenteId ?? default(long),
         };
     }
 }

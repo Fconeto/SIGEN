@@ -1,3 +1,4 @@
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using SIGEN.Application.Interfaces;
 using SIGEN.Domain.Shared.Requests;
@@ -8,19 +9,29 @@ namespace SIGEN.API.Controllers;
 [Route("api/[controller]")]
 public class ResidenceController : ControllerBase
 {
-    private readonly ICreateResidenceService _useCase;
+    private readonly IResidenceService _residenceService;
 
-    public ResidenceController(ICreateResidenceService useCase)
+    public ResidenceController(IResidenceService residenceService)
     {
-        _useCase = useCase;
+        _residenceService = residenceService;
     }
     
-    [HttpPost("createResidence")]
+    [HttpPost("createresidence")]
+    [Authorize]
     [ProducesResponseType(typeof(ResidenceCreateResponse), StatusCodes.Status201Created)]
     [ProducesResponseType(StatusCodes.Status400BadRequest)]
     public async Task<IActionResult> CreateResidence([FromBody] ResidenceCreateRequest request)
     {
-        var response = await _useCase.Execute(request);
+        var result = await _residenceService.CreateResidence(request);
+
+        Response response = new Response
+        {
+            IsSuccess = true,
+            Message = "Cadastro de residência realizado com sucesso!",
+            Data = null
+        };
+        
+        return Ok(response);
 
         return Created(string.Empty, response);
     }

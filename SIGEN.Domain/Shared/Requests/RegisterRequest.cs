@@ -3,6 +3,7 @@ using SIGEN.Domain.Shared.Enums;
 namespace SIGEN.Domain.Shared.Requests;
 public class RegisterRequest
 {
+    public long? AgenteId { get; set; }
     public string NomeDoAgente { get; set; } = string.Empty;
     public Turma Turma { get; set; }
     public string Senha { get; set; } = string.Empty;

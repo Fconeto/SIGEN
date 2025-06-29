@@ -3,7 +3,7 @@ using SIGEN.Domain.Shared.Responses;
 
 namespace SIGEN.Application.Interfaces;
 
-public interface ICreateResidenceService
+public interface IResidenceService
 {
-    Task<ResidenceCreateResponse> Execute(ResidenceCreateRequest request);
+    Task<ResidenceCreateResponse> CreateResidence(ResidenceCreateRequest request);
 }

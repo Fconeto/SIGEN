@@ -5,13 +5,13 @@ public enum Turma
     Chagas = 0,
     FebreAmarela = 1,
     Dengue = 2,
-     Peste = 3
+    Peste = 3
 }
 
 public enum Hierarquia
 {
+    AgenteCampo = 0,
     AgenteChefe = 0,
-    AgenteCampo = 1
 }
 
 public enum TipoDeImovel
