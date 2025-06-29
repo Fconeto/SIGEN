@@ -75,6 +75,12 @@ export default function HomePage() {
             icon: <FileText className="w-5 h-5" />,
             action: () => {},
           },
+          {
+            id: "cadastro-pesquisa",
+            label: "Cadastro de Pesquisa",
+            icon: <FileText className="w-5 h-5" />,
+            action: () => {"chief-agent/search-register"},
+          },
         ]}
       />
     </SigenAppLayout>
