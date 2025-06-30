@@ -7,7 +7,6 @@ interface SigenFormFieldProps {
   error?: string;
   labelStyle?: string;
   children: React.ReactNode;
-  labelStyle?: string;
 }
 
 export function SigenFormField({
