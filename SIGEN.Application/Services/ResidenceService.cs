@@ -1,35 +1,47 @@
-using SIGEN.Domain.Repositories;
-using AutoMapper;
 using SIGEN.Domain.Shared.Responses;
 using SIGEN.Domain.Shared.Requests;
 using SIGEN.Domain.ExeptionsBase;
 using SIGEN.Domain.Entities;
 using SIGEN.Application.Interfaces;
 using SIGEN.Application.Validators;
+using SIGEN.Application.Mappers;
+using SIGEN.Infrastructure.Interfaces;
 
 namespace SIGEN.Application.Services;
 
 public class ResidenceService : IResidenceService
 {
     private readonly IResidenceRepository _residenceRepository;
-    private readonly IUnitOfWork _unitOfWork;
-    private readonly IMapper _mapper;
 
-    public ResidenceService(IResidenceRepository residenceRepository, IUnitOfWork unitOfWork, IMapper mapper)
+    public ResidenceService(IResidenceRepository residenceRepository)
     {
         _residenceRepository = residenceRepository;
-        _unitOfWork = unitOfWork;
-        _mapper = mapper;
     }
 
-    public async Task<ResidenceCreateResponse> CreateResidence(ResidenceCreateRequest request)
+    public async Task CreateResidence(ResidenceCreateRequest request)
     {
+        try
+        {
+            ResidenceValidator validator = new ResidenceValidator();
+            validator.Validate(request);
+            
+            ResidenceMapper residenceMapper = new ResidenceMapper();
+            Residence entity = residenceMapper.Mapper(request);
 
-        var entity = _mapper.Map<SIGEN.Domain.Entities.Residence>(request);
+            Residence existingResidence = await _residenceRepository.GetResidenciaByLocalidadeAndNumeroAndComplemento(
+                entity.CodigoDaLocalidade,
+                entity.Numero,
+                entity.Complemento
+            );
 
-        await _residenceRepository.Add(entity);
+            if (existingResidence != null)
+                throw new SigenValidationException("Já existe uma residência cadastrada com o mesmo número e complemento nessa localidade.");
 
-        await _unitOfWork.Commit();
-        return _mapper.Map<ResidenceCreateResponse>(entity);
+            await _residenceRepository.InsertResidence(entity);
+        }
+        catch (SigenValidationException ex)
+        {
+            throw new SigenValidationException(ex.Message);
+        }
     }
 }

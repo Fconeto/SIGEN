@@ -1,13 +1,14 @@
 CREATE TABLE Residencia (
     ResidenciaId BIGINT PRIMARY KEY IDENTITY(1,1),
-    TipoDoImovel INT NOT NULL, -- Enum
-    NomeDoMorador NVARCHAR(255) NOT NULL,
-    Numero INT NOT NULL,
-    CodigoDaLocalidade NVARCHAR(100) NOT NULL,
+    CodigoDaLocalidade BIGINT NOT NULL,
+    TipoDoImovel INT NOT NULL,
+    NomeDoMorador NVARCHAR(255),
+    Numero INT,
     Complemento NVARCHAR(255),
-    NumeroDoQuarteirao BIGINT NOT NULL,
+    NumeroDoQuarteirao BIGINT,
     ComplementoDoQuarteirao NVARCHAR(255),
-    SituacaoDoImovel INT NOT NULL, -- Enum
+    Demolida INT NOT NULL,
+    Inabitado INT NOT NULL,
     DataDeRegistro DATETIME NOT NULL,
     DataDeAtualizacao DATETIME NOT NULL,
     CriadoPor BIGINT NOT NULL,

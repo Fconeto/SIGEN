@@ -4,14 +4,11 @@ using SIGEN.Application.Mappers;
 using SIGEN.Application.Validators;
 using SIGEN.Domain.Entities;
 using SIGEN.Domain.ExeptionsBase;
-using SIGEN.Domain.Repositories;
 using SIGEN.Domain.Shared;
 using SIGEN.Domain.Shared.Requests;
-using SIGEN.Domain.Shared.Responses;
 using SIGEN.Infrastructure.Interfaces;
 using System.Security.Cryptography;
 using System.Text;
-using System.Threading.Tasks;
 
 namespace SIGEN.Application.Services
 {
@@ -89,9 +86,9 @@ namespace SIGEN.Application.Services
 
                 await _authRepository.InsertAgente(entity);
             }
-            catch (Exception ex)
+            catch (SigenValidationException ex)
             {
-                throw new Exception(ex.Message);
+                throw new SigenValidationException(ex.Message);
             }
         }
     } 

@@ -22,7 +22,7 @@ public class ResidenceController : ControllerBase
     [ProducesResponseType(StatusCodes.Status400BadRequest)]
     public async Task<IActionResult> CreateResidence([FromBody] ResidenceCreateRequest request)
     {
-        var result = await _residenceService.CreateResidence(request);
+        await _residenceService.CreateResidence(request);
 
         Response response = new Response
         {
@@ -30,8 +30,6 @@ public class ResidenceController : ControllerBase
             Message = "Cadastro de residência realizado com sucesso!",
             Data = null
         };
-        
-        return Ok(response);
 
         return Created(string.Empty, response);
     }
