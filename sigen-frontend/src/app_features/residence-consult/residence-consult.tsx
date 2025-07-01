@@ -17,7 +17,7 @@ import { SigenLoadingButton } from "@/components/sigen-loading-button";
 interface ResidenceConsult {
   locationId: string;
   nomeMorador: string;
-  bairro: string;
+  numeroComplemento: string;
   numeroCasa: string;
 }
 
@@ -28,7 +28,7 @@ export default function ResidenceConsult(){
     {
       locationId: "",
       nomeMorador: "",
-      bairro: "",
+      numeroComplemento: "",
       numeroCasa: "",
     } as ResidenceConsult,
     {
@@ -38,10 +38,10 @@ export default function ResidenceConsult(){
       nomeMorador: [
         (value) => /\d/.test(value) ? "O campo nome não pode conter números" :  undefined,
       ],
-      bairro: [
-        (value) => /\d/.test(value) ? "O campo bairro não pode conter números" : undefined,
+      numeroComplemento: [],
+      numeroCasa: [
+        (value) => !/^\d+$/.test(value) ? "O campo número da casa não pode conter letras ou caracteres diferente de um número" : undefined,
       ],
-      numeroCasa: [],
     }
   );
 
@@ -64,7 +64,7 @@ export default function ResidenceConsult(){
     const searchParams = {
       locationId: values.locationId,
       ...(values.nomeMorador && { nomeMorador: values.nomeMorador }),
-      ...(values.bairro && { bairro: values.bairro }),
+      ...(values.numeroComplemento && { numeroComplemento: values.numeroComplemento }),
       ...(values.numeroCasa && { numeroCasa: values.numeroCasa }),
     };
 
@@ -113,16 +113,16 @@ export default function ResidenceConsult(){
           </SigenFormField>
 
           <SigenFormField
-            id="bairro"
-            label="Bairro:"
-            error={errors.bairro}
+            id="numeroComplemento"
+            label="Número do complemento:"
+            error={errors.numeroComplemento}
           >
             <SigenInput
-              id="bairro"
-              value={values.bairro}
-              onChange={(e) => handleChange("bairro", e.target.value)}
-              aria-invalid={!!errors.bairro}
-              placeholder="Digite o nome do bairro"
+              id="numeroComplemento"
+              value={values.numeroComplemento}
+              onChange={(e) => handleChange("numeroComplemento", e.target.value)}
+              aria-invalid={!!errors.numeroComplemento}
+              placeholder="Digite o número do complemento"
             />
           </SigenFormField>
 
