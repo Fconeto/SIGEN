@@ -7,6 +7,7 @@ interface SigenFormFieldProps {
   label: React.ReactNode;
   error?: string;
   children: React.ReactNode;
+  className?: string;
   labelStyle?: string;
 }
 
@@ -16,9 +17,10 @@ export function SigenFormField({
   error,
   children,
   labelStyle,
+  className,
 }: SigenFormFieldProps) {
   return (
-    <div>
+    <div className={cn("", className)}>
       <SigenLabel htmlFor={id} className={cn("pl-1", labelStyle)}>
         {label}
       </SigenLabel>

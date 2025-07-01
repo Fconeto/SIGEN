@@ -52,7 +52,7 @@ export default function HouseRegistrationForm() {
       complement: [],
       quarterNumber: [validators.required("Campo obrigatório")],
       quarterComplement: [validators.required("Campo obrigatório")],
-      residentName: [validators.required("Campo obrigatório")],
+      residentName: [],
     }
   );
   const [isLoading, setIsLoading] = useState(false);
@@ -232,6 +232,7 @@ export default function HouseRegistrationForm() {
             id="uninhabited"
             label="Inabitado"
             error={errors.uninhabited}
+            className="flex items-center gap-2 cursor-pointer"
           >
             <SigenInput
               type="checkbox"
