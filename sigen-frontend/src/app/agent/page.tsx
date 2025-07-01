@@ -2,24 +2,14 @@
 
 import MenuScreen from "@/app_features/menu-screen/menu-screen";
 import {
-  Calendar,
   ClipboardList,
-  FileText,
   SprayCanIcon as Spray,
   Search,
-  Users,
   Home,
 } from "lucide-react";
 import { SigenAppLayout } from "@/components/sigen-app-layout";
-import { useRouter } from "next/navigation";
 
 export default function HomePage() {
-  const router = useRouter();
-
-  const handleLogout = () => {
-    console.log("Logout clicked");
-  };
-
   return (
     <SigenAppLayout
       headerTitle="Página Inicial"
