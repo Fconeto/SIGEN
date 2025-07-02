@@ -54,7 +54,7 @@ export default function LoginForm() {
     setIsLoading(true);
     try {
       const params = new URLSearchParams({
-        CPF: values.user,
+        CPF: values.cpf,
         Senha: values.password,
       });
 
