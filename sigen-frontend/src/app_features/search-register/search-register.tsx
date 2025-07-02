@@ -8,7 +8,7 @@ import { SigenInputConnector } from "@/components/sigen-input-connector";
 import { CeilingType } from "@/domain/entities/ceiling";
 import { PendencyState } from "@/domain/entities/pendency";
 import { WallType } from "@/domain/entities/wall";
-import { defaultDialogs, SigenDialogProps } from "@/components/sigen-dialog";
+import { SigenDialogProps } from "@/components/sigen-dialog";
 import { useForm, validators } from "@/hooks/useform";
 import { useRouter } from "next/navigation";
 import { useState } from "react";
@@ -50,7 +50,7 @@ export default function SearchRegisterForm() {
       numberOfDogs: 0,
     } as SearchForm,
     {
-      nomeMorador:[ validators.required("Campo obrigatório") ],
+      nomeMorador:[],
       numberOfPeople:[ validators.required("Campo obrigatório") ],
       wallType:[ validators.required("Campo obrigatório") ],
       otherWallType: [ 
@@ -59,35 +59,55 @@ export default function SearchRegisterForm() {
             return "Por favor, especifique o tipo de parede.";
           }
           return undefined;
-        }
+        },
+        (value) =>
+          value && /\d/.test(String(value))
+            ? "O campo não deve conter números"
+            : undefined,
       ],
       ceilingType:[ validators.required("Campo obrigatório") ],
       otherCeilingType: [ 
         (value: unknown, allValues: SearchForm) => {
-          if (allValues.otherCeilingType === CeilingType.others && !value) {
+          if (allValues.ceilingType === CeilingType.others && !value) {
             return "Por favor, especifique o tipo de telhado.";
           }
           return undefined;
-        }
+        },
+        (value) =>
+          value && /\d/.test(String(value))
+            ? "O campo não deve conter números"
+            : undefined,
       ],
-      captureIntra: [
-        (value: any, allValues: SearchForm) => {
-          if (!allValues.captureIntra && !allValues.capturePeri) {
-            return "Selecione ao menos um tipo de captura.";
-          }
-
-          return undefined;
-        }
-      ],
-      positiveAttachments:[ validators.required("Campo obrigatório") ],
-      negativeAttachments:[ validators.required("Campo obrigatório") ],
-      numberOfCats:[ validators.required("Campo obrigatório") ],
-      numberOfDogs:[ validators.required("Campo obrigatório") ],
+      captureIntra: [],
+      positiveAttachments:[ validators.required("Campo obrigatório"),
+        (value) =>
+          value && !/^\d+$/.test(String(value))
+            ? "O campo anexos positivos deve conter apenas números"
+            : undefined,
+       ],
+      negativeAttachments:[ validators.required("Campo obrigatório"),
+        (value) =>
+          value && !/^\d+$/.test(String(value))
+            ? "O campo anexos negativos deve conter apenas números"
+            : undefined,
+       ],
+      numberOfCats:[ validators.required("Campo obrigatório"),
+        (value) =>
+          value && !/^\d+$/.test(String(value))
+            ? "O campo número de gatos deve conter apenas números"
+            : undefined,
+       ],
+      numberOfDogs:[ validators.required("Campo obrigatório"),
+        (value) =>
+          value && !/^\d+$/.test(String(value))
+            ? "O campo número de cachorros deve conter apenas números"
+            : undefined,
+       ],
     }
   );
 
   const [isLoading, setIsLoading] = useState(false);
-  const [dialog, setDialog] = useState<SigenDialogProps>({
+  const [, setDialog] = useState<SigenDialogProps>({
     isOpen: false,
     type: "info",
     message: "",
@@ -138,7 +158,7 @@ const handleSubmit = async (e: React.FormEvent) => {
         message: errorData.message || 'Ocorreu um erro ao realizar o cadastro.',
       });
     }
-  } catch (error) {
+  } catch {
     setDialog({
         isOpen: true,
         type: 'error',
@@ -165,6 +185,7 @@ const handleSubmit = async (e: React.FormEvent) => {
               value={values.pendencyState}
               onValueChange={(v) => handleChange("pendencyState", v)}
               options={[
+                { value: PendencyState.nenhuma, label: PendencyState.nenhuma },
                 { value: PendencyState.recusa, label: PendencyState.recusa },
                 { value: PendencyState.casaFechada, label: PendencyState.casaFechada },
               ]}
