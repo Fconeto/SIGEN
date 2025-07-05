@@ -1,4 +1,4 @@
-namespace SIGEN.Domain.Enums;
+namespace SIGEN.Domain.Shared.Enums;
 
 public enum Turma
 {
@@ -10,6 +10,6 @@ public enum Turma
 
 public enum Hierarquia
 {
+    AgenteCampo = 0,
     AgenteChefe = 0,
-    AgenteCampo = 1
 }

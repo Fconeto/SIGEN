@@ -1,5 +1,3 @@
-"use client";
-
 import type React from "react";
 import { SigenHeader } from "@/components/sigen-header";
 import { cn } from "@/lib/utils";
@@ -23,6 +21,7 @@ interface SigenAppLayoutProps {
   contentClassName?: string;
   maxWidth?: "sm" | "md" | "lg" | "xl" | "full";
   padding?: "none" | "sm" | "md" | "lg";
+  scrollDisable?: boolean;
 }
 
 export function SigenAppLayout({
@@ -37,6 +36,7 @@ export function SigenAppLayout({
   contentClassName,
   maxWidth = "md",
   padding = "md",
+  scrollDisable = false,
 }: SigenAppLayoutProps) {
   const maxWidthClasses = {
     sm: "max-w-sm",
@@ -52,6 +52,32 @@ export function SigenAppLayout({
     md: "p-6",
     lg: "p-8",
   };
+  
+  if (scrollDisable) {
+    return (
+      <div className={cn("h-screen w-screen flex flex-col bg-gray-100 overflow-hidden", className)}>
+        {!hideHeader && (
+          <header className="flex-shrink-0">
+            <SigenHeader
+              title={headerTitle ?? ""}
+              showBackButton={showBackButton}
+              onBackClick={onBackClick}
+              showLogoutButton={showLogoutButton}
+              onLogoutClick={onLogoutClick}
+            />
+          </header>
+        )}
+        <main className={cn(
+          "flex-1 overflow-hidden mx-auto w-full",
+          maxWidthClasses[maxWidth]
+        )}>
+          <div className={cn("h-full", paddingClasses[padding], contentClassName)}>
+            {children}
+          </div>
+        </main>
+      </div>
+    );
+  }
 
   return (
     <div className={cn("min-h-screen bg-gray-100", className)}>

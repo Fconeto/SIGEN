@@ -1,4 +1,4 @@
-namespace SIGEN.Domain.Shared;
+namespace SIGEN.Domain.Shared.Requests;
 
 public class LoginRequest
 {

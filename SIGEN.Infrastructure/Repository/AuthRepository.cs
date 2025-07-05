@@ -4,6 +4,8 @@ using System.Threading.Tasks;
 using Dapper;
 using SIGEN.Infrastructure.Interfaces;
 using Microsoft.Extensions.Configuration;
+using SIGEN.Domain.Entities;
+using SIGEN.Domain.Shared.Enums;
 
 namespace SIGEN.Infrastructure.Repository
 {
@@ -15,11 +17,11 @@ namespace SIGEN.Infrastructure.Repository
             _connectionString = configuration.GetConnectionString("DefaultConnection");
         }
 
-        public async Task<AgenteDto?> GetAgenteByCPF(string cpf)
+        public async Task<Agent> GetAgenteByCPF(string cpf)
         {
             using (var connection = new SqlConnection(_connectionString))
             {
-                var result = await connection.QueryFirstOrDefaultAsync<AgenteDto>(
+                var result = await connection.QueryFirstOrDefaultAsync<Agent>(
                     "GetAgenteByCPF",
                     new { CPF = cpf },
                     commandType: CommandType.StoredProcedure
@@ -35,6 +37,30 @@ namespace SIGEN.Infrastructure.Repository
                 await connection.ExecuteAsync(
                     "UpdateAgenteTentativas",
                     new { AgenteId = agenteId, Tentativas = tentativas },
+                    commandType: CommandType.StoredProcedure
+                );
+            }
+        }
+        public async Task InsertAgente(Agent agent)
+        {
+            using (var connection = new SqlConnection(_connectionString))
+            {
+                await connection.ExecuteAsync(
+                    "InsertAgente",
+                    new
+                    {
+                        agent.NomeDoAgente,
+                        Turma = (int)agent.Turma,
+                        agent.Senha,
+                        agent.Matricula,
+                        agent.CPF,
+                        Hierarquia = (int)agent.Hierarquia,
+                        agent.Tentativas,
+                        agent.DataDeRegistro,
+                        agent.DataDeAtualizacao,
+                        agent.CriadoPor,
+                        agent.AtualizadoPor
+                    },
                     commandType: CommandType.StoredProcedure
                 );
             }

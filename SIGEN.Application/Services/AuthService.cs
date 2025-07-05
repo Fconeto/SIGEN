@@ -1,9 +1,14 @@
+using AutoMapper;
 using SIGEN.Application.Interfaces;
+using SIGEN.Application.Mappers;
+using SIGEN.Application.Validators;
+using SIGEN.Domain.Entities;
+using SIGEN.Domain.ExeptionsBase;
 using SIGEN.Domain.Shared;
+using SIGEN.Domain.Shared.Requests;
 using SIGEN.Infrastructure.Interfaces;
 using System.Security.Cryptography;
 using System.Text;
-using System.Threading.Tasks;
 
 namespace SIGEN.Application.Services
 {
@@ -15,57 +20,42 @@ namespace SIGEN.Application.Services
             _authRepository = authRepository;
         }
 
-        public async Task<AuthResponse> LoginAsync(LoginRequest request)
+        public async Task<string> LoginAsync(LoginRequest request)
         {
             try
             {
-                if (string.IsNullOrWhiteSpace(request.CPF))
-                    throw new Exception("O campo CPF é obrigatório.");
-                if (string.IsNullOrWhiteSpace(request.Senha))
-                    throw new Exception("O campo Senha é obrigatório.");
+                AgentValidator validator = new AgentValidator();
+                validator.Validate(request);
 
-                var agente = await _authRepository.GetAgenteByCPF(request.CPF);
+                Agent agente = await _authRepository.GetAgenteByCPF(request.CPF);
 
                 if (agente == null)
-                    throw new Exception("O login informado está incorreto.");
+                    throw new SigenValidationException("O login informado está incorreto.");
 
                 if (agente.Tentativas >= 5 && agente.UltimaTentativa > DateTime.Now.AddMinutes(-10))
-                    throw new Exception("O usuário está bloqueado por muitas tentativas de login, aguarde " + (int)(DateTime.Now - agente.UltimaTentativa).TotalMinutes + " minutos para tentar novamente.");
-                
+                    throw new SigenValidationException("O usuário está bloqueado por muitas tentativas de login, aguarde " + (int)(DateTime.Now - agente.UltimaTentativa).TotalMinutes + " minutos para tentar novamente.");
+
                 string senhaHash = ComputeSha256Hash(request.Senha);
                 if (agente.Senha != senhaHash)
                 {
-                    await _authRepository.UpdateAgenteTentativas(agente.AgenteId, agente.Tentativas + 1);
-                    throw new Exception("A senha informada está incorreta.");
+                    await _authRepository.UpdateAgenteTentativas(agente.Id, agente.Tentativas + 1);
+                    throw new SigenValidationException("A senha informada está incorreta.");
                 }
 
-                await _authRepository.UpdateAgenteTentativas(agente.AgenteId, 0);
-                string token = "jwt_token_fake";
-                return new AuthResponse
-                {
-                    IsSuccess = true,
-                    Message = "Login realizado com sucesso!",
-                    Token = token
-                };
-            }
-            catch (Exception ex)
-            {
-                return new AuthResponse
-                {
-                    IsSuccess = false,
-                    Message = "Erro ao processar a solicitação: " + ex.Message,
-                };
-            }
-        }
+                await _authRepository.UpdateAgenteTentativas(agente.Id, 0);
 
-        public Task<AuthResponse> RegisterAsync(RegisterRequest request)
-        {
-            return Task.FromResult(new AuthResponse
+                // Gerar JWT real
+                var secretKey = Environment.GetEnvironmentVariable("JWT_SECRET") ?? "sua_chave_secreta_temporaria_1234567890";
+                var issuer = "SIGEN";
+                var audience = "SIGENUsers";
+                string token = JwtTokenGenerator.GenerateToken(agente, secretKey, issuer, audience);
+
+                return token;
+            }
+            catch (SigenValidationException ex)
             {
-                IsSuccess = true,
-                Message = "User registered successfully!",
-                Token = "fake-jwt-token"
-            });
+                throw new SigenValidationException(ex.Message);
+            }
         }
 
         private string ComputeSha256Hash(string rawData)
@@ -81,5 +71,25 @@ namespace SIGEN.Application.Services
                 return builder.ToString();
             }
         }
-    }
+
+        public async Task RegisterAsync(RegisterRequest request)
+        {
+            try
+            {
+                AgentValidator validator = new AgentValidator();
+                validator.Validate(request);
+
+                request.Senha = ComputeSha256Hash(request.Senha);
+
+                AuthMapper authMapper = new AuthMapper();
+                Agent entity = authMapper.Mapper(request);
+
+                await _authRepository.InsertAgente(entity);
+            }
+            catch (SigenValidationException ex)
+            {
+                throw new SigenValidationException(ex.Message);
+            }
+        }
+    } 
 }
