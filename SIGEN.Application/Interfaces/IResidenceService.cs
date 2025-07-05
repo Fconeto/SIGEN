@@ -6,4 +6,5 @@ namespace SIGEN.Application.Interfaces;
 public interface IResidenceService
 {
     Task CreateResidence(ResidenceCreateRequest request);
+    Task<List<GetResidenceListResponse>> GetResidenceList(GetResidenceListRequest request);
 }

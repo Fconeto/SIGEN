@@ -5,6 +5,7 @@ using SIGEN.Domain.Shared.Requests;
 using SIGEN.Domain.Shared.Responses;
 
 namespace SIGEN.API.Controllers;
+
 [ApiController]
 [Route("api/[controller]")]
 public class ResidenceController : ControllerBase
@@ -15,7 +16,7 @@ public class ResidenceController : ControllerBase
     {
         _residenceService = residenceService;
     }
-    
+
     [HttpPost("createresidence")]
     [Authorize]
     [ProducesResponseType(typeof(ResidenceCreateResponse), StatusCodes.Status201Created)]
@@ -32,5 +33,23 @@ public class ResidenceController : ControllerBase
         };
 
         return Created(string.Empty, response);
+    }
+    
+    [HttpGet("getresidencelist")]
+    [Authorize]
+    [ProducesResponseType(typeof(GetResidenceListResponse), StatusCodes.Status201Created)]
+    [ProducesResponseType(StatusCodes.Status400BadRequest)]
+    public async Task<IActionResult> GetResidenceList ([FromQuery] GetResidenceListRequest request)
+    {
+        List<GetResidenceListResponse> result = await _residenceService.GetResidenceList(request);
+
+        Response response = new Response
+        {
+            IsSuccess = true,
+            Message = "Consulta realizada com sucesso!",
+            Data = result
+        };
+
+        return Ok(response);
     }
 }
