@@ -17,4 +17,13 @@ public class ResidenceValidator
         if (string.IsNullOrEmpty(request.Complemento) && request.Numero == null)
             throw new SigenValidationException("O complemento e número não podem ser nulos.");
     }
+
+    public void Validate(GetResidenceListRequest request)
+    {
+        if (request.CodigoDaLocalidade <= 0)
+            throw new SigenValidationException("Código da localidade é obrigatório e deve ser um número positivo.");
+
+        if (request.Page <= 0)
+            throw new SigenValidationException("O número da página deve ser maior que zero.");
+    }
 }

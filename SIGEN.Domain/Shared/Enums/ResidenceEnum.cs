@@ -18,3 +18,4 @@ public enum TipoDoImovel
     Comercial = 1,
     Outros = 2
 }
+

@@ -24,7 +24,7 @@ public class ResidenceService : IResidenceService
         {
             ResidenceValidator validator = new ResidenceValidator();
             validator.Validate(request);
-            
+
             ResidenceMapper residenceMapper = new ResidenceMapper();
             Residence entity = residenceMapper.Mapper(request);
 
@@ -38,6 +38,32 @@ public class ResidenceService : IResidenceService
                 throw new SigenValidationException("Já existe uma residência cadastrada com o mesmo número e complemento nessa localidade.");
 
             await _residenceRepository.InsertResidence(entity);
+        }
+        catch (SigenValidationException ex)
+        {
+            throw new SigenValidationException(ex.Message);
+        }
+    }
+    
+    public async Task<List<GetResidenceListResponse>> GetResidenceList(GetResidenceListRequest request)
+    {
+        try
+        {
+            ResidenceValidator validator = new ResidenceValidator();
+            validator.Validate(request);
+
+            ResidenceMapper residenceMapper = new ResidenceMapper();
+            List<GetResidenceListResponse> response = await _residenceRepository.GetResidenceListByFilters(
+                request.CodigoDaLocalidade,
+                request.NomeDoMorador,
+                request.NumeroDaCasa,
+                request.NumeroDoComplemento,
+                request.Order,
+                request.OrderType,
+                request.Page
+            );
+
+            return response;
         }
         catch (SigenValidationException ex)
         {

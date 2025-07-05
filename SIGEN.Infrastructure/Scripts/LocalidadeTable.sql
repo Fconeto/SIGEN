@@ -1,6 +1,6 @@
 CREATE TABLE Localidade (
     LocalidadeId BIGINT PRIMARY KEY IDENTITY(1,1),
-    CodigoDaLocalidade BIGINT NOT NULL,
+    CodigoDaLocalidade BIGINT NOT NULL UNIQUE,
     Nome NVARCHAR(255) NOT NULL,
     Categoria NVARCHAR(50) NOT NULL,
     DataDeRegistro DATETIME NOT NULL,
