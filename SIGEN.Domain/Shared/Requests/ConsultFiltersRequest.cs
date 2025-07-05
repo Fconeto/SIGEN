@@ -2,7 +2,7 @@ using SIGEN.Domain.Shared.Enums;
 
 namespace SIGEN.Domain.Shared.Requests;
 
-public class GetResidenceListRequest
+public class ConsultFiltersRequest
 {
     public required long CodigoDaLocalidade { get; set; }
     public string? NomeDoMorador { get; set; }

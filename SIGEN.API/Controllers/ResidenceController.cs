@@ -37,9 +37,9 @@ public class ResidenceController : ControllerBase
     
     [HttpGet("getresidencelist")]
     [Authorize]
-    [ProducesResponseType(typeof(GetResidenceListResponse), StatusCodes.Status201Created)]
+    [ProducesResponseType(typeof(GetResidenceListResponse), StatusCodes.Status200OK)]
     [ProducesResponseType(StatusCodes.Status400BadRequest)]
-    public async Task<IActionResult> GetResidenceList ([FromQuery] GetResidenceListRequest request)
+    public async Task<IActionResult> GetResidenceList ([FromQuery] ConsultFiltersRequest request)
     {
         List<GetResidenceListResponse> result = await _residenceService.GetResidenceList(request);
 

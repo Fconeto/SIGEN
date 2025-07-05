@@ -45,14 +45,13 @@ public class ResidenceService : IResidenceService
         }
     }
     
-    public async Task<List<GetResidenceListResponse>> GetResidenceList(GetResidenceListRequest request)
+    public async Task<List<GetResidenceListResponse>> GetResidenceList(ConsultFiltersRequest request)
     {
         try
         {
             ResidenceValidator validator = new ResidenceValidator();
             validator.Validate(request);
 
-            ResidenceMapper residenceMapper = new ResidenceMapper();
             List<GetResidenceListResponse> response = await _residenceRepository.GetResidenceListByFilters(
                 request.CodigoDaLocalidade,
                 request.NomeDoMorador,

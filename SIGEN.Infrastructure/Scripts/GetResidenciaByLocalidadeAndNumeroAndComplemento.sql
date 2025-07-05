@@ -7,6 +7,6 @@ BEGIN
     SELECT * 
     FROM Residencia 
     WHERE CodigoDaLocalidade = @CodigoDaLocalidade 
-      AND Numero = @Numero 
+      AND (@Numero IS NULL OR Numero = @Numero )
       AND Complemento = @Complemento;
 END

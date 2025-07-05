@@ -68,25 +68,25 @@ public class ResidenceRepository : IResidenceRepository
     Order order,
     OrderType orderType,
     int page
-)
-{
-    using (var connection = new SqlConnection(_connectionString))
+    )
     {
-        var parameters = new DynamicParameters();
-        parameters.Add("@CodigoDaLocalidade", codigoDaLocalidade);
-        parameters.Add("@NomeDoMorador", nomeDoMorador);
-        parameters.Add("@NumeroDaCasa", numeroDaCasa);
-        parameters.Add("@NumeroDoComplemento", numeroDoComplemento);
-        parameters.Add("@Order", (int)order);
-        parameters.Add("@OrderType", (int)orderType);
-        parameters.Add("@Page", page);
+        using (var connection = new SqlConnection(_connectionString))
+        {
+            var parameters = new DynamicParameters();
+            parameters.Add("@CodigoDaLocalidade", codigoDaLocalidade);
+            parameters.Add("@NomeDoMorador", nomeDoMorador);
+            parameters.Add("@NumeroDaCasa", numeroDaCasa);
+            parameters.Add("@NumeroDoComplemento", numeroDoComplemento);
+            parameters.Add("@Order", (int)order);
+            parameters.Add("@OrderType", (int)orderType);
+            parameters.Add("@Page", page);
 
-        var result = await connection.QueryAsync<GetResidenceListResponse>(
-            "GetResidenceListByFilters",
-            parameters,
-            commandType: CommandType.StoredProcedure
-        );
-        return result.ToList();
+            var result = await connection.QueryAsync<GetResidenceListResponse>(
+                "GetResidenceListByFilters",
+                parameters,
+                commandType: CommandType.StoredProcedure
+            );
+            return result.ToList();
+        }
     }
-}
 }
