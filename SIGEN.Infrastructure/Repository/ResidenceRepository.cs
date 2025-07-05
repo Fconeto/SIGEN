@@ -61,31 +61,32 @@ public class ResidenceRepository : IResidenceRepository
     }
     
     public async Task<List<GetResidenceListResponse>> GetResidenceListByFilters(
-        long codigoDaLocalidade,
-        string? nomeDoMorador,
-        int? numeroDaCasa,
-        string? numeroDoComplemento,
-        Order order,
-        OrderType orderType,
-        int page
-    )
+    long codigoDaLocalidade,
+    string? nomeDoMorador,
+    int? numeroDaCasa,
+    string? numeroDoComplemento,
+    Order order,
+    OrderType orderType,
+    int page
+)
+{
+    using (var connection = new SqlConnection(_connectionString))
     {
-        using (var connection = new SqlConnection(_connectionString))
-        {
-            var parameters = new DynamicParameters();
-            parameters.Add("@CodigoDaLocalidade", codigoDaLocalidade);
-            parameters.Add("@NomeDoMorador", nomeDoMorador);
-            parameters.Add("@NumeroDaCasa", numeroDaCasa);
-            parameters.Add("@NumeroDoComplemento", numeroDoComplemento);
-            parameters.Add("@Order", (int)order);
-            parameters.Add("@OrderType", (int)orderType);
-            parameters.Add("@Page", page);
+        var parameters = new DynamicParameters();
+        parameters.Add("@CodigoDaLocalidade", codigoDaLocalidade);
+        parameters.Add("@NomeDoMorador", nomeDoMorador);
+        parameters.Add("@NumeroDaCasa", numeroDaCasa);
+        parameters.Add("@NumeroDoComplemento", numeroDoComplemento);
+        parameters.Add("@Order", (int)order);
+        parameters.Add("@OrderType", (int)orderType);
+        parameters.Add("@Page", page);
 
-            return await connection.QueryFirstOrDefaultAsync<List<GetResidenceListResponse>>(
-                "GetResidenceListByFilters",
-                parameters,
-                commandType: CommandType.StoredProcedure
-            );
-        }
+        var result = await connection.QueryAsync<GetResidenceListResponse>(
+            "GetResidenceListByFilters",
+            parameters,
+            commandType: CommandType.StoredProcedure
+        );
+        return result.ToList();
     }
+}
 }

@@ -1,11 +1,11 @@
-CREATE PROCEDURE GetResidenceListByFilters
+ALTER PROCEDURE GetResidenceListByFilters
     @CodigoDaLocalidade BIGINT,
     @NomeDoMorador NVARCHAR(255) = NULL,
     @NumeroDaCasa INT = NULL,
     @NumeroDoComplemento NVARCHAR(255) = NULL,
-    @Order INT = 0,         -- 0: Ascending, 1: Descending
-    @OrderType INT = 0,     -- 0: NumeroDoComplemento, 1: NumeroDaCasa, 2: NomeDoMorador
-    @Page INT = 1           -- Página começa em 1
+    @Order INT = 0,        
+    @OrderType INT = 0,     
+    @Page INT = 1           
 AS
 BEGIN
     SET NOCOUNT ON;
@@ -38,8 +38,17 @@ BEGIN
           AND (@NumeroDaCasa IS NULL OR r.Numero = @NumeroDaCasa)
           AND (@NumeroDoComplemento IS NULL OR r.Complemento = @NumeroDoComplemento)
     )
-    SELECT *
-    FROM ResidenciasFiltradas
+    , Total AS (
+        SELECT COUNT(*) AS TotalCount FROM ResidenciasFiltradas
+    )
+    SELECT 
+        rf.*,
+        t.TotalCount,
+        @PageSize AS PageSize,
+        @Page AS PageNumber,
+        CEILING(CAST(t.TotalCount AS FLOAT) / @PageSize) AS TotalPages
+    FROM ResidenciasFiltradas rf
+    CROSS JOIN Total t
     ORDER BY
         CASE WHEN @OrderType = 0 AND @Order = 0 THEN Complemento END ASC,
         CASE WHEN @OrderType = 0 AND @Order = 1 THEN Complemento END DESC,
