@@ -69,6 +69,8 @@ builder.Services.AddScoped<IAuthService, AuthService>();
 builder.Services.AddScoped<IAuthRepository, AuthRepository>();
 builder.Services.AddScoped<IResidenceService, ResidenceService>();
 builder.Services.AddScoped<IResidenceRepository, ResidenceRepository>();
+builder.Services.AddScoped<ISearchService, SearchService>();
+builder.Services.AddScoped<ISearchRepository, SearchRepository>();
 
 var app = builder.Build();
 
