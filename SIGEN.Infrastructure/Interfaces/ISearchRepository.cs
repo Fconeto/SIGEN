@@ -1,5 +1,6 @@
 using SIGEN.Domain.Entities;
 using SIGEN.Domain.Shared.Enums;
+using SIGEN.Domain.Shared.Requests;
 using SIGEN.Domain.Shared.Responses;
 
 namespace SIGEN.Infrastructure.Interfaces;
@@ -15,4 +16,6 @@ public interface ISearchRepository
         OrderType orderType,
         int page
     );
+    Task<Residence> GetPendingSearchByResidenciaId(long residenciaId);
+    Task InsertSearch(Search search);
 }

@@ -1,6 +1,6 @@
 using SIGEN.Domain.Shared.Requests;
-using FluentValidation;
 using SIGEN.Domain.ExeptionsBase;
+using SIGEN.Domain.Shared.Enums;
 
 namespace SIGEN.Application.Validators;
 
@@ -14,4 +14,22 @@ public class SearchValidator
         if (request.Page <= 0)
             throw new SigenValidationException("O número da página deve ser maior que zero.");
     }
+
+    public void Validate(CreateSearchRequest request)
+    {
+        if (string.IsNullOrWhiteSpace(request.NomeDoMorador))
+            throw new SigenValidationException("O nome do morador é obrigatório.");
+
+        if (!Enum.IsDefined(typeof(PendingSearchStatus), request.Pendencia))
+            throw new SigenValidationException("O status da pendência informada é inválido.");
+
+        if (request.NumeroDeHabitantes <= 0)
+            throw new SigenValidationException("O número de habitantes deve ser maior que zero.");
+
+        if (request.TipoDeParede == WallType.Outros && string.IsNullOrWhiteSpace(request.OutrosTipoDeParede))
+            throw new SigenValidationException("O tipo de parede 'Outros' requer uma descrição.");
+
+        if (request.TipoDeTeto == CeilingType.Outros && string.IsNullOrWhiteSpace(request.OutrosTipoDeTeto))
+            throw new SigenValidationException("O tipo de teto 'Outros' requer uma descrição.");
+    }    
 }
