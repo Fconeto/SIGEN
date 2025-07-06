@@ -14,6 +14,7 @@ import {
 } from "@/components/sigen-dialog";
 import { CPF } from "@/domain/entities/document";
 import { API_BASE_URL } from "@/config/api-config";
+import Image from "next/image";
 
 interface LoginForm {
   cpf: string;
@@ -53,7 +54,7 @@ export default function LoginForm() {
     setIsLoading(true);
     try {
       const params = new URLSearchParams({
-        CPF: values.user,
+        CPF: values.cpf,
         Senha: values.password,
       });
 
@@ -99,7 +100,9 @@ export default function LoginForm() {
         </div>
 
         <div className="flex justify-center py-2">
-          <img
+          <Image
+            width={300}
+            height={500}
             src="/images/login-illustration.png"
             alt="Ilustração da tela de Login"
             className="w-68 h-auto"

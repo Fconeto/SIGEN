@@ -1,6 +1,7 @@
 import { UserRole } from "@/domain/entities/user";
 import { GlobalService } from "@/services/global-service";
 import { TokenService } from "@/services/auth/token-service";
+import { AgentTeam } from "@/domain/entities/team";
 
 class AuthService {
     globalService: GlobalService;
@@ -16,7 +17,7 @@ class AuthService {
             id: 'dummy-id',
             name: 'dummy-name',
             role: UserRole.CHIEF_AGENT,
-            email: 'dummy-email'
+            team: AgentTeam.dengue,
         });
         this.tokenService.setAccessToken('dummy');
         return Promise.resolve();
