@@ -34,4 +34,22 @@ public class SearchController : ControllerBase
 
         return Ok(response);
     }
+
+    [HttpPost("create")]
+    [Authorize]
+    [ProducesResponseType(StatusCodes.Status201Created)]
+    [ProducesResponseType(StatusCodes.Status400BadRequest)]
+    public async Task<IActionResult> CreateSearch([FromBody] CreateSearchRequest request)
+    {
+        await _searchService.CreateSearch(request);
+
+        Response response = new Response
+        {
+            IsSuccess = true,
+            Message = "Cadastro realizado com sucesso!",
+            Data = null
+        };
+
+        return Created(string.Empty, response);
+    }
 }

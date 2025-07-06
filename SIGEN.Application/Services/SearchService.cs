@@ -17,7 +17,7 @@ public class SearchService : ISearchService
     {
         _searchRepository = searchRepository;
     }
-    
+
     public async Task<List<GetPendingSearchResponse>> GetPendingSearch(ConsultFiltersRequest request)
     {
         try
@@ -36,6 +36,29 @@ public class SearchService : ISearchService
             );
 
             return response;
+        }
+        catch (SigenValidationException ex)
+        {
+            throw new SigenValidationException(ex.Message);
+        }
+    }
+    
+    public async Task CreateSearch(CreateSearchRequest request)
+    {
+        try
+        {
+            SearchValidator validator = new SearchValidator();
+            validator.Validate(request);
+
+            Residence pendingResidence = await _searchRepository.GetPendingSearchByResidenciaId(request.ResidenciaId);
+
+            if (pendingResidence == null)
+                throw new SigenValidationException("Residência informada não possui pesquisa pendente.");
+
+            SearchMapper mapper = new SearchMapper();
+            Search search = mapper.Map(request);
+
+            await _searchRepository.InsertSearch(search);
         }
         catch (SigenValidationException ex)
         {

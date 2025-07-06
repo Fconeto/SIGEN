@@ -6,4 +6,5 @@ namespace SIGEN.Application.Interfaces;
 public interface ISearchService
 {
     Task<List<GetPendingSearchResponse>> GetPendingSearch(ConsultFiltersRequest request);
+    Task CreateSearch(CreateSearchRequest request);
 }
