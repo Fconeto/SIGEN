@@ -31,7 +31,7 @@ interface PITRegisterForm {
 export default function PITRegisterForm () {
   const router = useRouter();
     
-  const mandatorySelection = (_: any, allValues: PITRegisterForm) => {
+  const mandatoryCaptureSelection = (_: any, allValues: PITRegisterForm) => {
     if (!allValues.captureIntra && !allValues.capturePeri)
       return "Selecione ao menos um tipo de captura";
   };
@@ -64,10 +64,10 @@ export default function PITRegisterForm () {
         validators.required("Campo obrigatório"),
       ],
       captureIntra: [
-        mandatorySelection,
+        mandatoryCaptureSelection,
       ],
       capturePeri: [
-        mandatorySelection,
+        mandatoryCaptureSelection,
       ],
       locationOfFind: [
         validators.required("Campo obrigatório"),
