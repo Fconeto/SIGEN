@@ -51,13 +51,13 @@ export default function HomePage() {
             id: "cadastro-pesquisa",
             label: "Cadastro de Pesquisa",
             icon: <FileSearch className="w-5 h-5" />,
-            action: () => router.push("chief-agent/search-register"),
+            action: () => router.push("agent/search-register"),
           },
           {
             id: "cadastro-pit",
             label: "Cadastro de PIT",
             icon: <ClipboardList className="w-5 h-5" />,
-            action: () => {},
+            action: () => router.push("agent/pit-register"),
           },
           {
             id: "pesquisa-pit",

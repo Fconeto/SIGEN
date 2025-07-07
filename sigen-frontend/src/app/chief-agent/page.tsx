@@ -67,7 +67,7 @@ export default function HomePage() {
             id: "cadastro-pit",
             label: "Cadastro de PIT",
             icon: <ClipboardList className="w-5 h-5" />,
-            action: () => {},
+            action: () => router.push("chief-agent/pit-register"),
           },
           {
             id: "pesquisa-pit",
