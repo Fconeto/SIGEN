@@ -67,6 +67,8 @@ builder.Services.AddEndpointsApiExplorer();
 // Injeção de dependências
 builder.Services.AddScoped<IAuthService, AuthService>();
 builder.Services.AddScoped<IAuthRepository, AuthRepository>();
+builder.Services.AddScoped<IPITService, PITService>();
+builder.Services.AddScoped<IPITRepository, PITRepository>();
 builder.Services.AddScoped<IResidenceService, ResidenceService>();
 builder.Services.AddScoped<IResidenceRepository, ResidenceRepository>();
 builder.Services.AddScoped<ISearchService, SearchService>();

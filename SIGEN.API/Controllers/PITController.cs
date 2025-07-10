@@ -1,6 +1,6 @@
-using Application.Interfaces;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
+using SIGEN.Application.Interfaces;
 using SIGEN.Domain.Shared.Requests;
 using SIGEN.Domain.Shared.Responses;
 namespace SIGEN.API.Controllers;
@@ -15,7 +15,7 @@ public class PITController : ControllerBase
     {
         _pitService = pitService;
     }
-    [HttpPost("createpit")]
+    [HttpPost("create")]
     [Authorize]
     [ProducesResponseType(typeof(Response), StatusCodes.Status200OK)]
     [ProducesResponseType(StatusCodes.Status400BadRequest)]

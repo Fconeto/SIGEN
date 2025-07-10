@@ -10,22 +10,23 @@ public class PITMapper
         return new PIT
         {
             NumeracaoDoPit = request.NumeracaoDoPit,
+            AgenteId = request.AgenteId,
             Cres = request.Cres,
             Municipio = request.Municipio,
             CodigoDaLocalidade = request.CodigoDaLocalidade,
             NumeroDaCasa = request.NumeroDaCasa,
-            OndeEncontrou = request.OndeEncontrou,
-            LocalOndeEntrou = request.LocalOndeEntrou,
+            CapturaIntra = request.CapturaIntra,
+            CapturaPeri = request.CapturaPeri,
+            LocalOndeEncontrou = request.LocalOndeEncontrou,
             NomeDoMorador = request.NomeDoMorador,
             NomeDoCapturador = request.NomeDoCapturador,
             TipoDoInseto = request.TipoDoInseto,
             OutroTipoDeInseto = request.OutroTipoDeInseto,
             NomeDoRecebedor = request.NomeDoRecebedor,
-            PesquisaId = request.PesquisaId,
             DataDeRegistro = DateTime.UtcNow,
             DataDeAtualizacao = DateTime.UtcNow,
             CriadoPor = request.AgenteId ?? default(long),
-            AtualizadoPor = request.AgenteId ?? default(long)
+            AtualizadoPor = request.AgenteId ?? default(long),
         };
     }
 }

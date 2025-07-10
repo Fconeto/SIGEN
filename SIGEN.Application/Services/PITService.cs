@@ -1,4 +1,4 @@
-using Application.Interfaces;
+using SIGEN.Application.Interfaces;
 using SIGEN.Application.Mappers;
 using SIGEN.Application.Validators;
 using SIGEN.Domain.Entities;
@@ -26,11 +26,6 @@ public class PITService : IPITService
 
             PITMapper pitMapper = new PITMapper();
             PIT entity = pitMapper.Mapper(request);
-
-            PIT existingPIT = await _pitRepository.GetPITByNumeracaoDoPitAndPesquisaId(
-                entity.NumeracaoDoPit,
-                entity.PesquisaId
-            );
 
             await _pitRepository.InsertPIT(entity);
         }

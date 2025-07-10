@@ -1,0 +1,23 @@
+CREATE TABLE PIT (
+    PitId BIGINT IDENTITY(1,1) PRIMARY KEY,
+    AgenteId BIGINT NULL,
+    NumeracaoDoPit BIGINT NOT NULL,
+    Cres NVARCHAR(255) NOT NULL,
+    Municipio NVARCHAR(255) NOT NULL,
+    CodigoDaLocalidade BIGINT NOT NULL,
+    NumeroDaCasa INT NOT NULL,
+    CapturaIntra BIT NOT NULL,
+    CapturaPeri BIT NOT NULL,
+    LocalOndeEntrou NVARCHAR(255) NULL,
+    NomeDoMorador NVARCHAR(255) NULL,
+    NomeDoCapturador NVARCHAR(255) NOT NULL,
+    TipoDeInseto INT NOT NULL,
+    OutroTipoDeInseto NVARCHAR(255) NULL,
+    NomeDoRecebedor NVARCHAR(255) NOT NULL,
+    PesquisaId BIGINT NULL,
+    DataDeRegistro DATETIME NOT NULL,
+    DataDeAtualizacao DATETIME NOT NULL,
+    CriadoPor BIGINT NOT NULL,
+    AtualizadoPor BIGINT NOT NULL,
+    CONSTRAINT FK_PIT_Pesquisa FOREIGN KEY (PesquisaId) REFERENCES Pesquisa(PesquisaId)
+);

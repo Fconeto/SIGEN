@@ -1,6 +1,6 @@
 using SIGEN.Domain.Shared.Requests;
 
-namespace Application.Interfaces;
+namespace SIGEN.Application.Interfaces;
 
 public interface IPITService
 {
