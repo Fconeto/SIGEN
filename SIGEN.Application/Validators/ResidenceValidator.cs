@@ -1,5 +1,4 @@
 using SIGEN.Domain.Shared.Requests;
-using FluentValidation;
 using SIGEN.Domain.ExeptionsBase;
 
 namespace SIGEN.Application.Validators;
