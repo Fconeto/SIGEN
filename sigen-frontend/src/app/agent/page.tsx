@@ -6,10 +6,14 @@ import {
   SprayCanIcon as Spray,
   Search,
   Home,
+  SearchCheck,
 } from "lucide-react";
 import { SigenAppLayout } from "@/components/sigen-app-layout";
+import { useRouter } from "next/navigation";
 
 export default function HomePage() {
+  const router = useRouter();
+
   return (
     <SigenAppLayout
       headerTitle="Página Inicial"
@@ -47,8 +51,8 @@ export default function HomePage() {
           {
             id: "pesquisa-pit",
             label: "Pesquisa de PIT",
-            icon: <Search className="w-5 h-5" />,
-            action: () => {},
+            icon: <SearchCheck className="w-5 h-5" />,
+            action: () => router.push("agent/pit-search"),
           },
         ]}
       />
