@@ -13,6 +13,9 @@ public class SearchValidator
 
         if (request.Page <= 0)
             throw new SigenValidationException("O número da página deve ser maior que zero.");
+
+        if (!Enum.IsDefined(typeof(Order), request.Order) || !Enum.IsDefined(typeof(OrderType), request.OrderType))
+            throw new SigenValidationException("Tipo de ordenação inválido.");
     }
 
     public void Validate(CreateSearchRequest request)

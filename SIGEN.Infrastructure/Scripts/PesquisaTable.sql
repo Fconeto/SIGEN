@@ -1,6 +1,7 @@
 CREATE TABLE Pesquisa (
     PesquisaId BIGINT IDENTITY(1,1) PRIMARY KEY,
     ResidenciaId BIGINT NOT NULL,
+    AgenteId BIGINT NULL,
     MatriculaDoAgente BIGINT NOT NULL,
     DataDaVisita DATE NOT NULL,
     Pendencia INT NOT NULL,
