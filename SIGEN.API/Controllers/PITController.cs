@@ -15,11 +15,11 @@ public class PITController : ControllerBase
     {
         _pitService = pitService;
     }
+
     [HttpPost("create")]
     [Authorize]
     [ProducesResponseType(typeof(Response), StatusCodes.Status200OK)]
     [ProducesResponseType(StatusCodes.Status400BadRequest)]
-
     public async Task<IActionResult> CreatePIT([FromBody] PITRegisterRequest request)
     {
         await _pitService.CreatePIT(request);
@@ -29,6 +29,25 @@ public class PITController : ControllerBase
             IsSuccess = true,
             Message = "Cadastro de PIT realizado com sucesso!",
             Data = null
+        };
+
+        return Ok(response);
+    }
+
+    [HttpGet("consult")]
+    [Authorize]
+    [ProducesResponseType(typeof(Response), StatusCodes.Status200OK)]
+    [ProducesResponseType(StatusCodes.Status400BadRequest)]
+    public async Task<IActionResult> ConsultPIT([FromQuery] ConsultFiltersRequest request)
+    {
+        
+        SearchPITResponse result = await _pitService.ConsultPIT(request);
+
+        Response response = new Response
+        {
+            IsSuccess = true,
+            Message = "Consulta de PIT realizada com sucesso!",
+            Data = result
         };
 
         return Ok(response);

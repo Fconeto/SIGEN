@@ -3,6 +3,8 @@ using Dapper;
 using Microsoft.Data.SqlClient;
 using Microsoft.Extensions.Configuration;
 using SIGEN.Domain.Entities;
+using SIGEN.Domain.Shared.Requests;
+using SIGEN.Domain.Shared.Responses;
 using SIGEN.Infrastructure.Interfaces;
 
 namespace SIGEN.Infrastructure.Repository;
@@ -45,6 +47,50 @@ public class PITRepository : IPITRepository
                 parameters,
                 commandType: CommandType.StoredProcedure
             );
+        }
+    }
+
+    public async Task<List<GetConsultPITListResponse>> GetPendingPITByFilters(ConsultFiltersRequest request)
+    {
+        using (var connection = new SqlConnection(_connectionString))
+        {
+            var parameters = new DynamicParameters();
+            parameters.Add("@CodigoDaLocalidade", request.CodigoDaLocalidade);
+            parameters.Add("@NomeDoMorador", request.NomeDoMorador);
+            parameters.Add("@NumeroDaCasa", request.NumeroDaCasa);
+            parameters.Add("@NumeroDoComplemento", request.NumeroDoComplemento);
+            parameters.Add("@Order", (int)request.Order);
+            parameters.Add("@OrderType", (int)request.OrderType);
+            parameters.Add("@Page", request.Page);
+            parameters.Add("@Year", DateTime.Now.Year);
+
+            return (await connection.QueryAsync<GetConsultPITListResponse>(
+                "GetPendingPITByFilters",
+                parameters,
+                commandType: CommandType.StoredProcedure
+            )).ToList();
+        }
+    }
+
+    public async Task<List<GetConsultPITListResponse>> GetPITByFilters(ConsultFiltersRequest request)
+    {
+        using (var connection = new SqlConnection(_connectionString))
+        {
+            var parameters = new DynamicParameters();
+            parameters.Add("@CodigoDaLocalidade", request.CodigoDaLocalidade);
+            parameters.Add("@NomeDoMorador", request.NomeDoMorador);
+            parameters.Add("@NumeroDaCasa", request.NumeroDaCasa);
+            parameters.Add("@NumeroDoComplemento", request.NumeroDoComplemento);
+            parameters.Add("@Order", (int)request.Order);
+            parameters.Add("@OrderType", (int)request.OrderType);
+            parameters.Add("@Page", request.Page);
+            parameters.Add("@Year", DateTime.Now.Year);
+
+            return (await connection.QueryAsync<GetConsultPITListResponse>(
+                "GetPITByFilters",
+                parameters,
+                commandType: CommandType.StoredProcedure
+            )).ToList();
         }
     }
 }

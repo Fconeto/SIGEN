@@ -4,7 +4,20 @@ CREATE PROCEDURE GetResidenciaByLocalidadeAndNumeroAndComplemento
     @Complemento NVARCHAR(255)
 AS
 BEGIN
-    SELECT * 
+    SELECT ResidenciaId AS Id,
+           CodigoDaLocalidade,
+           TipoDoImovel,
+           NomeDoMorador,
+           Numero,
+           Complemento,
+           NumeroDoQuarteirao,
+           ComplementoDoQuarteirao,
+           Demolida,
+           Inabitado,
+           DataDeRegistro,
+           DataDeAtualizacao,
+           CriadoPor,
+           AtualizadoPor
     FROM Residencia 
     WHERE CodigoDaLocalidade = @CodigoDaLocalidade 
       AND (@Numero IS NULL OR Numero = @Numero )

@@ -38,4 +38,16 @@ public class PITValidator
         if (string.IsNullOrWhiteSpace(request.NomeDoRecebedor))
             throw new SigenValidationException("Nome do recebedor é obrigatório.");
     }
+
+    public void Validate(ConsultFiltersRequest request)
+    {
+        if (request.CodigoDaLocalidade <= 0)
+            throw new SigenValidationException("Código da localidade é obrigatório e deve ser um número positivo.");
+
+        if (request.Page <= 0)
+            throw new SigenValidationException("O número da página deve ser maior que zero.");
+
+        if (!Enum.IsDefined(typeof(Order), request.Order) || !Enum.IsDefined(typeof(OrderType), request.OrderType))
+            throw new SigenValidationException("Tipo de ordenação inválido.");
+    }
 }
