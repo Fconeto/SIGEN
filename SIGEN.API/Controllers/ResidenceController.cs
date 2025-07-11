@@ -17,7 +17,7 @@ public class ResidenceController : ControllerBase
         _residenceService = residenceService;
     }
 
-    [HttpPost("createresidence")]
+    [HttpPost("create")]
     [Authorize]
     [ProducesResponseType(typeof(ResidenceCreateResponse), StatusCodes.Status201Created)]
     [ProducesResponseType(StatusCodes.Status400BadRequest)]
@@ -35,7 +35,7 @@ public class ResidenceController : ControllerBase
         return Created(string.Empty, response);
     }
     
-    [HttpGet("getresidencelist")]
+    [HttpGet("consult")]
     [Authorize]
     [ProducesResponseType(typeof(GetResidenceListResponse), StatusCodes.Status200OK)]
     [ProducesResponseType(StatusCodes.Status400BadRequest)]

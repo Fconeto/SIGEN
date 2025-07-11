@@ -19,7 +19,7 @@ namespace SIGEN.API.Middlewares
         public JwtValidationMiddleware(RequestDelegate next, IConfiguration configuration)
         {
             _next = next;
-            _jwtSecret = configuration["Jwt:Key"] ?? "sua_chave_secreta_temporaria_1234567890";
+            _jwtSecret = configuration["Jwt:Key"] ?? "chave_secreta_temporaria_1234567890";
             _jwtIssuer = configuration["Jwt:Issuer"] ?? "SIGEN";
             _jwtAudience = configuration["Jwt:Audience"] ?? "SIGENUsers";
         }
