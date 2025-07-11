@@ -9,7 +9,7 @@ import { SigenLoadingButton } from "@/components/sigen-loading-button";
 import { BugType } from "@/domain/entities/bug";
 import { useForm, validators } from "@/hooks/useform";
 import { useRouter } from "next/navigation";
-import { useState } from "react";
+import { useState, useEffect } from "react";
 
 interface PITRegisterForm {
   PITNumber: number;
@@ -30,10 +30,15 @@ interface PITRegisterForm {
 
 export default function PITRegisterForm () {
   const router = useRouter();
-    
-  const mandatoryCaptureSelection = (_: any, allValues: PITRegisterForm) => {
-    if (!allValues.captureIntra && !allValues.capturePeri)
+  const [captureBug, setCaptureBug] = useState(false);
+  const [captureError, setCaptureError] = useState<string | undefined>(undefined);
+  const [firstCapture, setFirstCapture] = useState(false);
+
+  const mandatoryCaptureSelection = () => {
+    if (!captureBug) {
       return "Selecione ao menos um tipo de captura";
+    }
+    return undefined;
   };
 
   const { values, errors, handleChange, validateForm, resetForm } = useForm(
@@ -56,36 +61,75 @@ export default function PITRegisterForm () {
     {
       PITNumber: [
         validators.required("Campo obrigatório"),
+        (value) =>
+          value && !/^\d+$/.test(String(value))
+            ? "O campo Numeração do PIT deve conter apenas números"
+            : undefined,
       ],
       locationCode: [
         validators.required("Campo obrigatório"),
+        (value) =>
+          value && !/^\d+$/.test(String(value))
+            ? "O campo Código da Localidade deve conter apenas números"
+            : undefined,
       ],
       residenceNumber: [
         validators.required("Campo obrigatório"),
+        (value) =>
+          value && !/^\d+$/.test(String(value))
+            ? "O campo Número da Residência deve conter apenas números"
+            : undefined,
       ],
-      captureIntra: [
-        mandatoryCaptureSelection,
-      ],
-      capturePeri: [
-        mandatoryCaptureSelection,
-      ],
+      captureIntra: [mandatoryCaptureSelection],
+      capturePeri: [mandatoryCaptureSelection],
       locationOfFind: [
         validators.required("Campo obrigatório"),
       ],
+      nomeMorador: [
+        (value) =>
+          value && /\d/.test(String(value))
+            ? "O campo Nome do morador deve conter apenas letras"
+            : undefined,
+      ],
       nomeCapturador: [
         validators.required("Campo obrigatório"),
+        (value) =>
+          value && /\d/.test(String(value))
+            ? "O campo Nome do Capturador deve conter apenas letras"
+            : undefined,
       ],
       bugType: [
         validators.required("Campo obrigatório"),
       ],
       nomeAgente: [
         validators.required("Campo obrigatório"),
+        (value) =>
+          value && /\d/.test(String(value))
+            ? "O campo Nome do Recebedor deve conter apenas letras"
+            : undefined,
       ],
       registerDate: [
         validators.required("Campo obrigatório"),
       ],
     }
   );
+
+  const validateCaptureSelection = () => {
+    if (values.captureIntra || values.capturePeri) {
+      setCaptureBug(true);
+      setCaptureError(undefined);
+    } else {
+      setCaptureBug(false);
+      if (firstCapture) {
+        setCaptureError("Selecione ao menos um tipo de captura");
+      }
+      setFirstCapture(true);
+    }
+  }
+
+  useEffect(() => {
+    validateCaptureSelection();
+  }, [values.captureIntra, values.capturePeri]);
 
   const [isLoading, setIsLoading] = useState(false);
   const [, setDialog] = useState<SigenDialogProps>({
@@ -96,6 +140,8 @@ export default function PITRegisterForm () {
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
+
+    validateCaptureSelection()
 
     if (!validateForm()) {
       setDialog({
@@ -169,14 +215,16 @@ export default function PITRegisterForm () {
             id="CRES"
             label="CRES:"
             error={errors.CRES}
-            children={<p className="inline text-sm px-2">Sobral</p>}
-          />
+          >
+           {<p className="inline text-sm px-2">Sobral</p>}
+          </SigenFormField>
             <SigenFormField
             id="city"
             label="Município:"
             error={errors.city}
-            children={<p className="inline text-sm px-2">Ipu</p>}
-          />
+          >
+            {<p className="inline text-sm px-2">Ipu</p>}
+          </SigenFormField>
           
           <SigenFormField
             id="locationCode"
@@ -209,7 +257,7 @@ export default function PITRegisterForm () {
           <SigenFormField
             id="capture"
             label="Captura"
-            error={errors.captureIntra}
+            error={captureError}
           >
             <div className="flex items-center flex-wrap pl-1 pt-2">
               <hr></hr>
@@ -335,10 +383,13 @@ export default function PITRegisterForm () {
             label="Data do Registro:"
             error={errors.registerDate}
           >
-            <SigenDateInput 
+            <input
               id="registerDate"
-              value={values.registerDate}
-              aria-invalid={!!errors.registerDate}
+              type="text"
+              value={values.registerDate instanceof Date ? values.registerDate.toLocaleDateString() : ''}
+              readOnly
+              className="bg-gray-100 text-gray-700 rounded px-2 py-1 w-full"
+              tabIndex={-1}
             />
           </SigenFormField>
 
