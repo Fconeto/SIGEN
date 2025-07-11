@@ -33,6 +33,11 @@ interface SearchForm {
 export default function SearchRegisterForm() {
   const router = useRouter();
 
+  const mandatoryCaptureSelection = (_: any, allValues: SearchForm) => {
+  if (!allValues.captureIntra && !allValues.capturePeri)
+    return "Selecione ao menos um tipo de captura";
+  };
+
   const { values, errors, handleChange, validateForm, resetForm } = useForm(
     {
       pendencyState: undefined,
@@ -78,7 +83,12 @@ export default function SearchRegisterForm() {
             ? "O campo não deve conter números"
             : undefined,
       ],
-      captureIntra: [],
+      captureIntra: [
+        mandatoryCaptureSelection,
+      ],
+      capturePeri: [
+        mandatoryCaptureSelection,
+      ],
       positiveAttachments:[ validators.required("Campo obrigatório"),
         (value) =>
           value && !/^\d+$/.test(String(value))
@@ -113,61 +123,55 @@ export default function SearchRegisterForm() {
     message: "",
   });
 
-const handleSubmit = async (e: React.FormEvent) => {
-  console.log("--- DEBUG: Função handleSubmit iniciada! ---"); 
-  e.preventDefault();
+  const handleSubmit = async (e: React.FormEvent) => {
+    e.preventDefault();
 
-  const isFormValid = validateForm();
-  console.log("--- DEBUG: Resultado da validação:", isFormValid);
-  if (!validateForm()) {
-    console.log("--- DEBUG: Erros de validação encontrados:", errors);
-    console.log("--- DEBUG: Validação falhou. A função será interrompida aqui. ---");
-    setDialog({
-        isOpen: true,
-        type: 'error',
-        message: 'Por favor, preencha os campos obrigatórios.'
-    });
-    return;
-  }
-
-  setIsLoading(true);
-
-  try {
-    const response = await fetch('/api/search/create', {
-      method: 'POST',
-      headers: {
-        'Content-Type': 'application/json',
-      },
-      body: JSON.stringify(values), 
-    });
-    
-    console.log("--- DEBUG: Resposta da API recebida. Status:", response.status);
-
-    if (response.ok) {
+    if (!validateForm()) {
       setDialog({
-        isOpen: true,
-        type: 'success',
-        message: 'Cadastro realizado com sucesso!',
+          isOpen: true,
+          type: 'error',
+          message: 'Por favor, preencha os campos obrigatórios.'
       });
-      resetForm();
-    } else {
-      const errorData = await response.json();
-      setDialog({
-        isOpen: true,
-        type: 'error',
-        message: errorData.message || 'Ocorreu um erro ao realizar o cadastro.',
-      });
+      return;
     }
-  } catch {
-    setDialog({
-        isOpen: true,
-        type: 'error',
-        message: 'Não foi possível conectar ao servidor. Tente novamente mais tarde.'
-    });
-  } finally {
-    setIsLoading(false);
-  }
-};
+
+    setIsLoading(true);
+
+    try {
+      const response = await fetch('/api/search/create', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify(values), 
+      });
+      
+      if (response.ok) {
+        setDialog({
+          isOpen: true,
+          type: 'success',
+          message: 'Cadastro realizado com sucesso!',
+        });
+        resetForm();
+      } else {
+        const errorData = await response.json();
+        setDialog({
+          isOpen: true,
+          type: 'error',
+          message: errorData.message || 'Ocorreu um erro ao realizar o cadastro.',
+        });
+      }
+    } catch {
+      setDialog({
+          isOpen: true,
+          type: 'error',
+          message: 'Não foi possível conectar ao servidor. Tente novamente mais tarde.'
+      });
+    } finally {
+      setIsLoading(false);
+    }
+  };
+
   return (
     <>
       <SigenAppLayout

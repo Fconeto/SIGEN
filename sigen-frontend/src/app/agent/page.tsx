@@ -6,10 +6,15 @@ import {
   SprayCanIcon as Spray,
   Search,
   Home,
+  FileText,
+  FileSearch,
 } from "lucide-react";
 import { SigenAppLayout } from "@/components/sigen-app-layout";
+import { useRouter } from "next/navigation";
 
 export default function HomePage() {
+  const router = useRouter();
+
   return (
     <SigenAppLayout
       headerTitle="Página Inicial"
@@ -22,9 +27,13 @@ export default function HomePage() {
             id: "cadastro-residencia",
             label: "Cadastro de Residência",
             icon: <Home className="w-5 h-5" />,
-            action: () => {
-              router.push("/agent/register-house");
-            },
+            action: () => router.push("/agent/register-house"),
+          },
+           {
+            id: "consulta-residencia",
+            label: "Consulta de Residência",
+            icon: <FileText className="w-5 h-5" />,
+            action: () => router.push("/agent/residence-consult"),
           },
           {
             id: "pesquisa",
@@ -39,10 +48,16 @@ export default function HomePage() {
             action: () => {},
           },
           {
+            id: "cadastro-pesquisa",
+            label: "Cadastro de Pesquisa",
+            icon: <FileSearch className="w-5 h-5" />,
+            action: () => router.push("agent/search-register"),
+          },
+          {
             id: "cadastro-pit",
             label: "Cadastro de PIT",
             icon: <ClipboardList className="w-5 h-5" />,
-            action: () => {},
+            action: () => router.push("agent/pit-register"),
           },
           {
             id: "pesquisa-pit",
