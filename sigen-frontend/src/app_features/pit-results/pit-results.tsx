@@ -16,7 +16,7 @@ interface PITSearchForm {
   complementNumber: number;
 }
 
-export default function PITSearchForm() {
+export default function PITResults() {
   const router = useRouter();
 
     const { values, errors, handleChange, validateForm, resetForm } = useForm(
@@ -55,7 +55,7 @@ const handleSubmit = async (e: React.FormEvent) => {
       })
     );
 
-    const queryString = new URLSearchParams(searchParams).toString();
+    const queryString = new URLSearchParams(searchParams as Record<string, string>).toString();
 
     // try {
     //   const response = await fetch(`/api/pit/consult?${queryString}`);
@@ -98,65 +98,7 @@ const handleSubmit = async (e: React.FormEvent) => {
         onBackClick={() => router.back()}
       >
         <form onSubmit={handleSubmit} className="space-y-2 mt-8">
-          <SigenFormField
-            id="locationCode"
-            label="Código da localidade:"
-            error={errors.locationCode}
-          >
-            <SigenInput 
-              id="locationCode"
-              value={values.locationCode}
-              onChange={(e) => handleChange("locationCode", e.target.value)}
-              aria-invalid={!!errors.locationCode}
-              placeholder="Digite o código da localidade"
-            />
-          </SigenFormField>
-
-          <SigenFormField
-            id="nomeMorador"
-            label="Nome do morador:"
-            error={errors.nomeMorador}
-          >
-            <SigenInput 
-              id="nomeMorador"
-              value={values.nomeMorador}
-              onChange={(e) => handleChange("nomeMorador", e.target.value)}
-              aria-invalid={!!errors.nomeMorador}
-              placeholder="Digite o nome do morador"
-            />
-          </SigenFormField>
-
-          <SigenFormField
-            id="houseNumber"
-            label="Número da casa:"
-            error={errors.houseNumber}
-          >
-            <SigenInput 
-              id="houseNumber"
-              value={values.houseNumber}
-              onChange={(e) => handleChange("houseNumber", e.target.value)}
-              aria-invalid={!!errors.houseNumber}
-              placeholder="Digite o número da casa"
-            />
-          </SigenFormField>
-
-          <SigenFormField
-            id="complementNumber"
-            label="Número do complemento:"
-            error={errors.complementNumber}
-          >
-            <SigenInput 
-              id="complementNumber"
-              value={values.complementNumber}
-              onChange={(e) => handleChange("complementNumber", e.target.value)}
-              aria-invalid={!!errors.complementNumber}
-              placeholder="Digite o número do complemento"
-            />
-          </SigenFormField>
-
-          <SigenLoadingButton type="submit" loading={isLoading}>
-            Confirmar
-          </SigenLoadingButton>
+          
         </form>
       </SigenAppLayout>
     </>

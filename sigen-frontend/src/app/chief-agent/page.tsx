@@ -48,9 +48,7 @@ export default function HomePage() {
             id: "consulta-residencia",
             label: "Consulta de Residência",
             icon: <FileText className="w-5 h-5" />,
-            action: () => {
-              router.push("chief-agent/residence-consult");
-            },
+            action: () => router.push("chief-agent/residence-consult"),
           },
           {
             id: "pesquisa",
@@ -75,12 +73,6 @@ export default function HomePage() {
             label: "Pesquisa de PIT",
             icon: <SearchCheck className="w-5 h-5" />,
             action: () => router.push("chief-agent/pit-search"),
-          },
-          {
-            id: "consulta-residencia",
-            label: "Consulta de Residência",
-            icon: <FileText className="w-5 h-5" />,
-            action: () => {},
           },
           {
             id: "cadastro-pesquisa",
