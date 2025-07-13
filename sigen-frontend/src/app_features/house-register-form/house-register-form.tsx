@@ -11,12 +11,8 @@ import { SigenDropdown } from "@/components/sigen-dropdown";
 import { useState } from "react";
 import { SigenDialog, type SigenDialogProps } from "@/components/sigen-dialog";
 import { useRouter } from "next/navigation";
-import { SigenLabel } from "@/components/sigen-label";
-import {
-  House,
-  PropertySituation,
-  PropertyType,
-} from "@/domain/entities/house";
+
+import { PropertySituation, PropertyType } from "@/domain/entities/house";
 
 interface HouseForm {
   locationCode: string;

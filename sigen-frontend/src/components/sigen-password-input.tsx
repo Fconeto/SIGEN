@@ -1,11 +1,8 @@
-"use client";
-
 import type React from "react";
 
 import { useState } from "react";
 import { Eye, EyeOff } from "lucide-react";
 import { Button } from "@/components/ui/button";
-import { Input } from "@/components/ui/input";
 import { cn } from "@/lib/utils";
 import { SigenInput } from "./sigen-input";
 

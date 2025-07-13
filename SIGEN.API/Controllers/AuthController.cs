@@ -1,8 +1,9 @@
 using Microsoft.AspNetCore.Mvc;
-using SIGEN.Application.Services;
-using SIGEN.Domain.Shared;
-using RegisterRequestAPI = SIGEN.API.Requests.RegisterRequest;
-using SIGEN.API.Mappers;
+using SIGEN.Application.Interfaces;
+using SIGEN.Domain.Shared.Requests;
+using SIGEN.Domain.Shared.Responses;
+using Application.Interfaces;
+using Microsoft.AspNetCore.Authorization;
 
 namespace SIGEN.API.Controllers;
 
@@ -17,27 +18,48 @@ public class AuthController : ControllerBase
         _authService = authService;
     }
 
-    [HttpPost("login")]
-    public async Task<IActionResult> Login([FromBody] LoginRequest request)
+    // <summary>
+    // Endpoint para realizar o login do agente.
+    // </summary>
+    // <param name="request">Dados de login do agente.</param>
+    // <returns>Retorna um token de autenticação se o login for bem-sucedido.</returns>
+    [HttpGet("login")]
+    [ProducesResponseType(typeof(Response), StatusCodes.Status200OK)]
+    [ProducesResponseType(typeof(Response), StatusCodes.Status401Unauthorized)]
+    public async Task<IActionResult> Login([FromQuery] LoginRequest request)
     {
-        var domainRequest = new SIGEN.Domain.Shared.LoginRequest();
-        domainRequest.Email = request.Email;
-        domainRequest.Password = request.Password;
-        var result = await _authService.LoginAsync(domainRequest);
-        if (result.IsSuccess)
+        LoginResponse result = await _authService.LoginAsync(request);
+
+        Response response = new Response
         {
-            return Ok(result);
-        }
-        return Unauthorized(result);
+            IsSuccess = true,
+            Message = "Login realizado com sucesso!",
+            Data = result
+        };
+        
+        return Ok(response);
     }
 
+    // <summary>
+    // Endpoint para registrar um novo agente.
+    // </summary>
+    // <param name="request">Dados do agente a ser registrado.</param>
+    // <returns>Retorna uma resposta de sucesso ou erro.</returns>
     [HttpPost("register")]
-
-    public async Task<IActionResult> Register([FromBody] RegisterRequestAPI request)
+    [Authorize]
+    [ProducesResponseType(typeof(Response), StatusCodes.Status201Created)]
+    [ProducesResponseType(typeof(Response), StatusCodes.Status400BadRequest)]
+    public async Task<IActionResult> Register([FromBody] RegisterRequest request)
     {
-        RegisterRequest registerRequest = AuthMapper.RegisterMapper(request);
-        var result = _authService.RegisterAsync(registerRequest);
+        await _authService.RegisterAsync(request);
+
+        Response response = new Response
+        {
+            IsSuccess = true,
+            Message = "Cadastro de agente realizado com sucesso!",
+            Data = null
+        };
         
-        return Ok(result);
+        return Ok(response);
     }
 }

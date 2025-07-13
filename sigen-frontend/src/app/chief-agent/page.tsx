@@ -1,9 +1,6 @@
 "use client";
 
-import { useState } from "react";
 import MenuScreen from "@/app_features/menu-screen/menu-screen";
-import { Button } from "@/components/ui/button";
-import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import {
   Calendar,
   ClipboardList,
@@ -12,6 +9,7 @@ import {
   Search,
   Users,
   Home,
+  FileSearch,
 } from "lucide-react";
 import { SigenAppLayout } from "@/components/sigen-app-layout";
 import { useRouter } from "next/navigation";
@@ -46,6 +44,14 @@ export default function HomePage() {
             action: () => router.push("chief-agent/register-house"),
           },
           {
+            id: "consulta-residencia",
+            label: "Consulta de Residência",
+            icon: <FileText className="w-5 h-5" />,
+            action: () => {
+              router.push("chief-agent/residence-consult");
+            },
+          },
+          {
             id: "pesquisa",
             label: "Pesquisa",
             icon: <Search className="w-5 h-5" />,
@@ -61,7 +67,7 @@ export default function HomePage() {
             id: "cadastro-pit",
             label: "Cadastro de PIT",
             icon: <ClipboardList className="w-5 h-5" />,
-            action: () => {},
+            action: () => router.push("chief-agent/pit-register"),
           },
           {
             id: "pesquisa-pit",
@@ -74,6 +80,12 @@ export default function HomePage() {
             label: "Consulta de Residência",
             icon: <FileText className="w-5 h-5" />,
             action: () => {},
+          },
+          {
+            id: "cadastro-pesquisa",
+            label: "Cadastro de Pesquisa",
+            icon: <FileSearch className="w-5 h-5" />,
+            action: () => router.push("chief-agent/search-register"),
           },
         ]}
       />
