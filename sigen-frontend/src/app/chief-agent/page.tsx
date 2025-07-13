@@ -58,6 +58,18 @@ export default function HomePage() {
             action: () => {},
           },
           {
+            id: "pesquisa",
+            label: "Pesquisas Pendentes",
+            icon: <Search className="w-5 h-5" />,
+            action: () => router.push("chief-agent/search-consult"),
+          },
+          {
+            id: "borrifacao-pending",
+            label: "Borrifação Pendentes",
+            icon: <Spray className="w-5 h-5" />,
+            action: () => router.push("chief-agent/spray-consult"),
+          },
+          {
             id: "borrifacao",
             label: "Borrifação",
             icon: <Spray className="w-5 h-5" />,
@@ -73,12 +85,6 @@ export default function HomePage() {
             id: "pesquisa-pit",
             label: "Pesquisa de PIT",
             icon: <Search className="w-5 h-5" />,
-            action: () => {},
-          },
-          {
-            id: "consulta-residencia",
-            label: "Consulta de Residência",
-            icon: <FileText className="w-5 h-5" />,
             action: () => {},
           },
           {

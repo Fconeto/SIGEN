@@ -6,14 +6,14 @@ import { SigenPagination } from '@/components/sigen-pagination'
 import { useRouter } from 'next/navigation';
 import React, { useEffect, useMemo, useState } from 'react';
 
-interface ResidenceInfos {
+export interface ResidenceInfos {
   id: string;
   complement: string;
   numeroCasa: string;
   nomeMorador: string;
 }
 
-type SortKey = keyof ResidenceInfos;
+export type SortKey = keyof ResidenceInfos;
 
 export default function ResidenceInfos() {
   const router = useRouter();

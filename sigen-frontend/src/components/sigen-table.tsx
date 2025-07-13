@@ -1,25 +1,26 @@
 import type React from "react";
-import { ArrowDown, ArrowUp, Eye } from "lucide-react"
+import { ArrowDown, ArrowUp, Eye } from "lucide-react";
 import { cn } from "@/lib/utils";
 
 interface ResidenceInfos {
-  id: string
-  complement: string
-  numeroCasa: string
-  nomeMorador: string
+  id: string;
+  complement: string;
+  numeroCasa: string;
+  nomeMorador: string;
 }
 
 type SortKey = keyof ResidenceInfos;
 
 interface ResidenceTableProps {
-  residences: ResidenceInfos[]
-  complementId?: string
-  viewResidence?: (id: string) => void
-  className?: string
-  onSort: (key: SortKey) => void; 
-  sortConfig: { key: SortKey; direction: string } | null; 
+  residences: ResidenceInfos[];
+  complementId?: string;
+  viewResidence?: (id: string) => void;
+  className?: string;
+  onSort: (key: SortKey) => void;
+  sortConfig: { key: SortKey; direction: string } | null;
+  actionIcon?: React.ReactNode;
+  actionColor?: "gray" | "green" | "red" | "blue";
 }
-
 
 export function SigenTable({
   residences,
@@ -28,19 +29,30 @@ export function SigenTable({
   className,
   onSort,
   sortConfig,
+  actionIcon = <Eye size={15} />,
+  actionColor = "gray",
 }: ResidenceTableProps) {
   const getSortIcon = (key: SortKey) => {
     if (!sortConfig || sortConfig.key !== key) {
       return <span className="h-4 w-4 flex-shrink-0" />;
     }
-    if (sortConfig.direction === 'ascending') {
+    if (sortConfig.direction === "ascending") {
       return <ArrowUp className="h-4 w-4 flex-shrink-0" />;
     }
     return <ArrowDown className="h-4 w-4 flex-shrink-0" />;
   };
-  
+
+  const bgColor = {
+    gray: "bg-gray-100 hover:bg-gray-200 text-gray-600 hover:text-gray-800",
+    green: "bg-green-600 hover:bg-green-700 text-white",
+    red: "bg-red-100 hover:bg-red-200 text-red-600 hover:text-red-800",
+    blue: "bg-blue-100 hover:bg-blue-200 text-blue-600 hover:text-blue-800",
+  }[actionColor];
+
   return (
-    <div className={cn("bg-white rounded-lg shadow-sm overflow-hidden", className)}>
+    <div
+      className={cn("bg-white rounded-lg shadow-sm overflow-hidden", className)}
+    >
       {complementId && (
         <div className="bg-gray-200 px-4 py-3 border-b border-gray-300">
           <h3 className="text-sm font-medium text-gray-700">{complementId}</h3>
@@ -52,24 +64,30 @@ export function SigenTable({
           <thead>
             <tr className="bg-gray-50 border-b border-gray-200">
               <th className="px-4 py-3 text-left w-31">
-                  <button 
-                    onClick={() => onSort('complement')} 
-                    className="flex w-full items-center gap-2 text-xs font-medium text-gray-600 tracking-wider hover:text-gray-900"
-                  >
-                    <span className="truncate">Nº COMPLEMENTO</span> 
-                    {getSortIcon('complement')}
-                  </button>
-              </th>              
+                <button
+                  onClick={() => onSort("complement")}
+                  className="flex w-full items-center gap-2 text-xs font-medium text-gray-600 tracking-wider hover:text-gray-900"
+                >
+                  <span className="truncate">Nº COMPLEMENTO</span>
+                  {getSortIcon("complement")}
+                </button>
+              </th>
               <th className="w-22 px-4 py-3 text-left text-xs font-medium text-gray-600 tracking-wider">
-                <button onClick={() => onSort('numeroCasa')} className="truncate flex items-center gap-2 hover:text-gray-900">
+                <button
+                  onClick={() => onSort("numeroCasa")}
+                  className="truncate flex items-center gap-2 hover:text-gray-900"
+                >
                   Nº CASA
-                  {getSortIcon('numeroCasa')}
+                  {getSortIcon("numeroCasa")}
                 </button>
               </th>
               <th className="px-4 py-3 text-left text-xs font-medium text-gray-600 tracking-wider">
-                 <button onClick={() => onSort('nomeMorador')} className="flex items-center gap-2 hover:text-gray-900">
+                <button
+                  onClick={() => onSort("nomeMorador")}
+                  className="flex items-center gap-2 hover:text-gray-900"
+                >
                   MORADOR
-                  {getSortIcon('nomeMorador')}
+                  {getSortIcon("nomeMorador")}
                 </button>
               </th>
               <th className="px-4 py-3 text-center text-xs font-medium text-gray-600 uppercase tracking-wider w-16">
@@ -94,7 +112,7 @@ export function SigenTable({
                   )}
                 >
                   <td className="truncate px-4 py-3 text-sm text-center text-gray-900">
-                      {residence.complement}
+                    {residence.complement}
                   </td>
                   <td className="truncate px-4 py-3 text-sm text-gray-900">
                     {residence.numeroCasa}
@@ -105,10 +123,13 @@ export function SigenTable({
                   <td className="px-4 py-3 text-center">
                     <button
                       onClick={() => viewResidence?.(residence.id)}
-                      className="inline-flex items-center justify-center w-8 h-8 rounded-full bg-gray-100 hover:bg-gray-200 text-gray-600 hover:text-gray-800 transition-colors"
-                      title="Visualizar detalhes"
+                      className={cn(
+                        "inline-flex items-center justify-center w-8 h-8 rounded-full transition-colors",
+                        bgColor
+                      )}
+                      title="Ação"
                     >
-                      <Eye size={15} />
+                      {actionIcon}
                     </button>
                   </td>
                 </tr>
