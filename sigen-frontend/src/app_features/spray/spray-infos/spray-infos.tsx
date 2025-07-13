@@ -139,8 +139,11 @@ export default function SprayPendingResults() {
       });
     }
 
-    return sortedItems;
-  }, [sprayPendings, sortConfig]);
+    const startIndex = (currentPage - 1) * ITEMS_PER_PAGE;
+    const endIndex = startIndex + ITEMS_PER_PAGE;
+
+    return sortedItems.slice(startIndex, endIndex);
+  }, [sprayPendings, currentPage, sortConfig]);
 
   const handleSort = (key: SortKey) => {
     let direction: "ascending" | "descending" = "ascending";
