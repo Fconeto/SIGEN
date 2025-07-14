@@ -44,15 +44,37 @@ export default function HouseRegistrationForm() {
       uninhabited: false,
     } as HouseForm,
     {
-      locationCode: [validators.required("Campo obrigatório")],
+      locationCode: [
+        validators.required("Campo obrigatório"),
+        (value) =>
+          value && !/^\d+$/.test(value)
+            ? "O campo Código da Localidade deve conter apenas números"
+            : undefined,
+      ],
       category: [validators.required("Campo obrigatório")],
       propertyType: [validators.required("Campo obrigatório")],
       situation: [validators.required("Campo obrigatório")],
-      number: [validators.required("Campo obrigatório")],
+      number: [validators.required("Campo obrigatório"),
+        (value) =>
+          value && !/^\d+$/.test(value)
+            ? "O campo Número deve conter apenas números"
+            : undefined,
+      ],
       complement: [],
-      quarterNumber: [validators.required("Campo obrigatório")],
+      quarterNumber: [
+        validators.required("Campo obrigatório"),
+        (value) =>
+          value && !/^\d+$/.test(value)
+            ? "O campo Número do quarteirão deve conter apenas números"
+            : undefined,
+      ],
       quarterComplement: [validators.required("Campo obrigatório")],
-      residentName: [],
+      residentName: [
+        (value) =>
+          value && /\d/.test(String(value))
+            ? "O campo Nome do morador deve conter apenas letras"
+            : undefined,
+      ],
     }
   );
   const [isLoading, setIsLoading] = useState(false);
