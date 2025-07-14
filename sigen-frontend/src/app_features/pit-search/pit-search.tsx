@@ -57,37 +57,37 @@ const handleSubmit = async (e: React.FormEvent) => {
 
     const queryString = new URLSearchParams(searchParams).toString();
 
-    // try {
-    //   const response = await fetch(`/api/pit/consult?${queryString}`);
+    try {
+      const response = await fetch(`/api/pit/consult?${queryString}`);
 
-    //   if (!response.ok) {
-    //     const errorData = await response.json().catch(() => ({ message: 'Não foi possível encontrar resultados.' }));
-    //     throw new Error(errorData.message);
-    //   }
+      if (!response.ok) {
+        const errorData = await response.json().catch(() => ({ message: 'Não foi possível encontrar resultados.' }));
+        throw new Error(errorData.message);
+      }
       
-    //   const results = await response.json();
-    //   if (results.length === 0) {
-    //     setDialog({
-    //       isOpen: true,
-    //       type: 'info',
-    //       message: 'Nenhum resultado encontrado para os filtros informados.',
-    //       onConfirm: () => setDialog({ ...dialog, isOpen: false }),
-    //     });
-    //     return; 
-    //   }
+      const results = await response.json();
+      if (results.length === 0) {
+        setDialog({
+          isOpen: true,
+          type: 'info',
+          message: 'Nenhum resultado encontrado para os filtros informados.',
+          onConfirm: () => setDialog({ ...dialog, isOpen: false }),
+        });
+        return; 
+      }
 
-       router.push(`/chief-agent/pit-results?${queryString}`);
+       router.push(`./pit-results?${queryString}`);
 
-    // } catch (error: any) {
-    //   setDialog({
-    //     isOpen: true,
-    //     type: 'error',
-    //     message: error.message || 'Ocorreu um erro ao realizar a busca. Tente novamente.',
-    //     onConfirm: () => setDialog({ ...dialog, isOpen: false }),
-    //   });
-    // } finally {
-    //   setIsLoading(false);
-    // }
+    } catch (error: any) {
+      setDialog({
+        isOpen: true,
+        type: 'error',
+        message: error.message || 'Ocorreu um erro ao realizar a busca. Tente novamente.',
+        onConfirm: () => setDialog({ ...dialog, isOpen: false }),
+      });
+    } finally {
+      setIsLoading(false);
+    }
   };
 
   return(
