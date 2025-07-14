@@ -16,7 +16,7 @@ public class ResidenceRepository : IResidenceRepository
         _connectionString = configuration.GetConnectionString("DefaultConnection");
     }
 
-    public async Task InsertResidence(Residence residence)
+    public async Task<long> InsertResidence(Residence residence)
     {
         using (var connection = new SqlConnection(_connectionString))
         {
@@ -35,11 +35,13 @@ public class ResidenceRepository : IResidenceRepository
             parameters.Add("@CriadoPor", residence.CriadoPor);
             parameters.Add("@AtualizadoPor", residence.AtualizadoPor);
 
-            await connection.ExecuteAsync(
+            long result = await connection.QueryFirstOrDefaultAsync<long>(
                 "InsertResidencia",
                 parameters,
                 commandType: CommandType.StoredProcedure
             );
+
+            return result;
         }
     }
 

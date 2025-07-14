@@ -75,6 +75,8 @@ builder.Services.AddScoped<ISearchService, SearchService>();
 builder.Services.AddScoped<ISearchRepository, SearchRepository>();
 builder.Services.AddScoped<ISprayService, SprayService>();
 builder.Services.AddScoped<ISprayRepository, SprayRepository>();
+builder.Services.AddScoped<ILocalityService, LocalityService>();
+builder.Services.AddScoped<ILocalityRepository, LocalityRepository>();
 
 var app = builder.Build();
 

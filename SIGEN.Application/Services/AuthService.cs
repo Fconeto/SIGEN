@@ -28,6 +28,8 @@ namespace SIGEN.Application.Services
                 AgentValidator validator = new AgentValidator();
                 validator.Validate(request);
 
+                request.CPF = request.CPF.Replace(".", "").Replace("-", "");
+
                 Agent agente = await _authRepository.GetAgenteByCPF(request.CPF);
 
                 if (agente == null)
@@ -81,6 +83,13 @@ namespace SIGEN.Application.Services
             {
                 AgentValidator validator = new AgentValidator();
                 validator.Validate(request);
+
+                request.CPF = request.CPF.Replace(".", "").Replace("-", "");
+
+                Agent agente = await _authRepository.GetAgenteByCPF(request.CPF);
+
+                if (agente != null)
+                    throw new SigenValidationException("Já existe um agente cadastrado com o CPF informado.");
 
                 request.Senha = ComputeSha256Hash(request.Senha);
 

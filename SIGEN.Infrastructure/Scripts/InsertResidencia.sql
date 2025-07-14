@@ -14,7 +14,17 @@ CREATE PROCEDURE InsertResidencia
     @AtualizadoPor BIGINT
 AS
 BEGIN
-    INSERT INTO Residencia (TipoDoImovel, NomeDoMorador, Numero, CodigoDaLocalidade, Complemento, NumeroDoQuarteirao, ComplementoDoQuarteirao, Demolida, Inabitado, DataDeRegistro, DataDeAtualizacao, CriadoPor, AtualizadoPor)
-    VALUES (@TipoDoImovel, @NomeDoMorador, @Numero, @CodigoDaLocalidade, @Complemento, @NumeroDoQuarteirao, @ComplementoDoQuarteirao, @Demolida, @Inabitado, @DataDeRegistro, @DataDeAtualizacao, @CriadoPor, @AtualizadoPor);
+    SET NOCOUNT ON;
+    INSERT INTO Residencia (
+        TipoDoImovel, NomeDoMorador, Numero, CodigoDaLocalidade, Complemento,
+        NumeroDoQuarteirao, ComplementoDoQuarteirao, Demolida, Inabitado,
+        DataDeRegistro, DataDeAtualizacao, CriadoPor, AtualizadoPor
+    )
+    OUTPUT INSERTED.ResidenciaId
+    VALUES (
+        @TipoDoImovel, @NomeDoMorador, @Numero, @CodigoDaLocalidade, @Complemento,
+        @NumeroDoQuarteirao, @ComplementoDoQuarteirao, @Demolida, @Inabitado,
+        @DataDeRegistro, @DataDeAtualizacao, @CriadoPor, @AtualizadoPor
+    );
 END
 GO

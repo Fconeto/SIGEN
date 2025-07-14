@@ -18,7 +18,7 @@ public class ResidenceService : IResidenceService
         _residenceRepository = residenceRepository;
     }
 
-    public async Task CreateResidence(ResidenceCreateRequest request)
+    public async Task<long> CreateResidence(ResidenceCreateRequest request)
     {
         try
         {
@@ -37,7 +37,7 @@ public class ResidenceService : IResidenceService
             if (existingResidence != null)
                 throw new SigenValidationException("Já existe uma residência cadastrada com o mesmo número e complemento nessa localidade.");
 
-            await _residenceRepository.InsertResidence(entity);
+            return await _residenceRepository.InsertResidence(entity);
         }
         catch (SigenValidationException ex)
         {
