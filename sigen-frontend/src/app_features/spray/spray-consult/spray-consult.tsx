@@ -28,16 +28,21 @@ export default function SprayConsult() {
       numeroCasa: "",
     } as SprayConsult,
     {
-      locationId: [validators.required("Campo obrigatório")],
-      nomeMorador: [
+      locationId: [
+        validators.required("Campo obrigatório"),
         (value) =>
-          /\d/.test(value) ? "O campo nome não pode conter números" : undefined,
+          value && !/^\d+$/.test(value)
+            ? "O campo Código da Localidade deve conter apenas números"
+            : undefined,
+      ],
+      nomeMorador: [
+        (value) => /\d/.test(value) ? "O campo nome não pode conter números" :  undefined,
       ],
       numeroComplemento: [],
       numeroCasa: [
         (value) =>
           value && !/^\d+$/.test(value)
-            ? "O campo número da casa não pode conter letras ou caracteres diferente de um número"
+            ? "O campo Número da Casa deve conter apenas números"
             : undefined,
       ],
     }
