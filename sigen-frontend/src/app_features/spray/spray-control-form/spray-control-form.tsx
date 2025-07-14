@@ -10,7 +10,7 @@ import { SigenInput } from "@/components/sigen-input";
 import { SigenDropdown } from "@/components/sigen-dropdown";
 import { useState } from "react";
 import { SigenDialog, type SigenDialogProps } from "@/components/sigen-dialog";
-import { useRouter } from "next/navigation";
+import { useRouter, useSearchParams } from "next/navigation";
 import { SigenDateInput } from "@/components/sigen-date-picker";
 
 interface SprayControlForm {
@@ -22,6 +22,9 @@ interface SprayControlForm {
 
 export default function SprayControlForm() {
   const router = useRouter();
+
+  const searchParams = useSearchParams();
+  const id = searchParams.get("id");
 
   const { values, errors, handleChange, validateForm, resetForm } = useForm(
     {
@@ -107,12 +110,9 @@ export default function SprayControlForm() {
               value={values.pendency}
               onValueChange={(v) => handleChange("pendency", v)}
               options={[
-                { value: "nenhuma", label: "Nenhuma" },
-                { value: "equipamento", label: "Equipamento" },
-                { value: "inseticida", label: "Inseticida" },
-                { value: "acesso", label: "Acesso" },
-                { value: "clima", label: "Clima" },
-                { value: "outros", label: "Outros" },
+                { value: "Nenhuma", label: "Nenhuma" },
+                { value: "Recusa", label: "Recusa" },
+                { value: "Fechado", label: "Fechado" },
               ]}
             />
           </SigenFormField>

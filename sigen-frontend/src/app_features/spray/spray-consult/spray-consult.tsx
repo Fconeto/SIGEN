@@ -4,33 +4,29 @@ import type React from "react";
 import { useForm, validators } from "@/hooks/useform";
 import { SigenAppLayout } from "@/components/sigen-app-layout";
 import { useState } from "react";
-import {
-  SigenDialog,
-  SigenDialogProps,
-} from "@/components/sigen-dialog";
+import { SigenDialog, type SigenDialogProps } from "@/components/sigen-dialog";
 import { useRouter } from "next/navigation";
 import { SigenFormField } from "@/components/sigen-form-field";
 import { SigenInput } from "@/components/sigen-input";
-import { SigenDropdown } from "@/components/sigen-dropdown";
 import { SigenLoadingButton } from "@/components/sigen-loading-button";
 
-interface ResidenceConsult {
+interface SprayConsult {
   locationId: string;
   nomeMorador: string;
   numeroComplemento: string;
   numeroCasa: string;
 }
 
-export default function ResidenceConsult(){
+export default function SprayConsult() {
   const router = useRouter();
-  
+
   const { values, errors, handleChange, validateForm, setValues } = useForm(
     {
       locationId: "",
       nomeMorador: "",
       numeroComplemento: "",
       numeroCasa: "",
-    } as ResidenceConsult,
+    } as SprayConsult,
     {
       locationId: [
         validators.required("Campo obrigatório"),
@@ -61,39 +57,44 @@ export default function ResidenceConsult(){
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
-
     if (!validateForm()) {
       return;
     }
-    
-    setIsLoading(true);
 
+    setIsLoading(true);
     const searchParams = {
       locationId: values.locationId,
       ...(values.nomeMorador && { nomeMorador: values.nomeMorador }),
-      ...(values.numeroComplemento && { numeroComplemento: values.numeroComplemento }),
+      ...(values.numeroComplemento && {
+        numeroComplemento: values.numeroComplemento,
+      }),
       ...(values.numeroCasa && { numeroCasa: values.numeroCasa }),
     };
 
-    await new Promise((r) => setTimeout(r, 1000)); 
-
+    await new Promise((r) => setTimeout(r, 1000));
     console.log("Form Data:", values);
     setIsLoading(false);
-    
+
     const queryString = new URLSearchParams(searchParams).toString();
-    router.push(`/chief-agent/residence-infos?${queryString}`);  };
-  
+    router.push(`./spray-infos?${queryString}`);
+  };
+
   return (
     <>
       <SigenAppLayout
-        headerTitle="Consulta de Residência"
+        headerTitle="Borrifações Pendentes"
         showBackButton
         onBackClick={() => router.back()}
       >
         <form onSubmit={handleSubmit} className="space-y-2 p-6">
           <SigenFormField
             id="locationId"
-            label={<>Código da Localidade <span className="text-red-500 font-semibold">*</span></>}
+            label={
+              <>
+                Código da Localidade{" "}
+                <span className="text-red-500 font-semibold">*</span>
+              </>
+            }
             error={errors.locationId}
           >
             <SigenInput
@@ -120,20 +121,6 @@ export default function ResidenceConsult(){
           </SigenFormField>
 
           <SigenFormField
-            id="numeroComplemento"
-            label="Número do complemento:"
-            error={errors.numeroComplemento}
-          >
-            <SigenInput
-              id="numeroComplemento"
-              value={values.numeroComplemento}
-              onChange={(e) => handleChange("numeroComplemento", e.target.value)}
-              aria-invalid={!!errors.numeroComplemento}
-              placeholder="Digite o número do complemento"
-            />
-          </SigenFormField>
-
-          <SigenFormField
             id="numeroCasa"
             label="Número da Casa:"
             error={errors.numeroCasa}
@@ -147,11 +134,28 @@ export default function ResidenceConsult(){
             />
           </SigenFormField>
 
+          <SigenFormField
+            id="numeroComplemento"
+            label="Número do Complemento:"
+            error={errors.numeroComplemento}
+          >
+            <SigenInput
+              id="numeroComplemento"
+              value={values.numeroComplemento}
+              onChange={(e) =>
+                handleChange("numeroComplemento", e.target.value)
+              }
+              aria-invalid={!!errors.numeroComplemento}
+              placeholder="Digite o número do complemento"
+            />
+          </SigenFormField>
+
           <SigenLoadingButton type="submit" loading={isLoading}>
             Confirmar
           </SigenLoadingButton>
         </form>
       </SigenAppLayout>
+
       <SigenDialog
         isOpen={dialog.isOpen}
         onClose={() => setDialog((prev) => ({ ...prev, isOpen: false }))}

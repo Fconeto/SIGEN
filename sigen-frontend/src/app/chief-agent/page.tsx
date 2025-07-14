@@ -53,15 +53,15 @@ export default function HomePage() {
           },
           {
             id: "pesquisa",
-            label: "Pesquisa",
+            label: "Pesquisas Pendentes",
             icon: <Search className="w-5 h-5" />,
-            action: () => {},
+            action: () => router.push("chief-agent/search-consult"),
           },
           {
-            id: "borrifacao",
-            label: "Borrifação",
+            id: "borrifacao-pending",
+            label: "Borrifação Pendentes",
             icon: <Spray className="w-5 h-5" />,
-            action: () => router.push("chief-agent/spray-control"),
+            action: () => router.push("chief-agent/spray-consult"),
           },
           {
             id: "cadastro-pit",
@@ -74,18 +74,6 @@ export default function HomePage() {
             label: "Pesquisa de PIT",
             icon: <Search className="w-5 h-5" />,
             action: () => {},
-          },
-          {
-            id: "consulta-residencia",
-            label: "Consulta de Residência",
-            icon: <FileText className="w-5 h-5" />,
-            action: () => {},
-          },
-          {
-            id: "cadastro-pesquisa",
-            label: "Cadastro de Pesquisa",
-            icon: <FileSearch className="w-5 h-5" />,
-            action: () => router.push("chief-agent/search-register"),
           },
         ]}
       />

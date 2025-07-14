@@ -261,7 +261,7 @@ export default function HouseRegistrationForm() {
               id="uninhabited"
               checked={values.uninhabited}
               onChange={(e) => handleChange("uninhabited", e.target.checked)}
-              className="h-4 w-4 border-gray-300 rounded"
+              className="h-4 w-4 border-gray-300 rounded ml-1"
             />
           </SigenFormField>
 

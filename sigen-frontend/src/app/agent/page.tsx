@@ -29,29 +29,23 @@ export default function HomePage() {
             icon: <Home className="w-5 h-5" />,
             action: () => router.push("/agent/register-house"),
           },
-           {
+          {
             id: "consulta-residencia",
             label: "Consulta de Residência",
             icon: <FileText className="w-5 h-5" />,
             action: () => router.push("/agent/residence-consult"),
           },
           {
-            id: "pesquisa",
-            label: "Pesquisa",
+            id: "pesquisa-pending",
+            label: "Pesquisas Pendentes",
             icon: <Search className="w-5 h-5" />,
-            action: () => {},
+            action: () => router.push("agent/search-consult"),
           },
           {
-            id: "borrifacao",
-            label: "Borrifação",
+            id: "borrifacao-pending",
+            label: "Borrifações pendentes",
             icon: <Spray className="w-5 h-5" />,
-            action: () => {},
-          },
-          {
-            id: "cadastro-pesquisa",
-            label: "Cadastro de Pesquisa",
-            icon: <FileSearch className="w-5 h-5" />,
-            action: () => router.push("agent/search-register"),
+            action: () => router.push("/agent/spray-consult"),
           },
           {
             id: "cadastro-pit",
