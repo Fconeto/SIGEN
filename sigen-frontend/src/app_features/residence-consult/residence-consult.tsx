@@ -81,7 +81,7 @@ export default function ResidenceConsult(){
     setIsLoading(false);
     
     const queryString = new URLSearchParams(searchParams).toString();
-    router.push(`/chief-agent/residence-infos?${queryString}`);  };
+    router.push(`./residence-infos?${queryString}`);  };
   
   return (
     <>

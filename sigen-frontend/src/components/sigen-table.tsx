@@ -2,18 +2,18 @@ import type React from "react";
 import { ArrowDown, ArrowUp, Eye } from "lucide-react";
 import { cn } from "@/lib/utils";
 
-interface ResidenceInfos {
+interface TableResidence {
   id: string;
   complement: string;
   numeroCasa: string;
   nomeMorador: string;
 }
 
-type SortKey = keyof ResidenceInfos;
+type SortKey = keyof TableResidence;
 
 interface ResidenceTableProps {
-  residences: ResidenceInfos[];
-  complementId?: string;
+  residences: TableResidence[];
+  complementId?: string; // 1. Adicionado de volta o prop opcional
   viewResidence?: (id: string) => void;
   className?: string;
   onSort: (key: SortKey) => void;
@@ -24,7 +24,7 @@ interface ResidenceTableProps {
 
 export function SigenTable({
   residences,
-  complementId,
+  complementId, // 2. Adicionado de volta na desestruturação dos props
   viewResidence,
   className,
   onSort,
@@ -103,13 +103,10 @@ export function SigenTable({
                 </td>
               </tr>
             ) : (
-              residences.map((residence, index) => (
+              residences.map((residence) => (
                 <tr
                   key={residence.id}
-                  className={cn(
-                    "hover:bg-gray-50 transition-colors",
-                    index % 2 === 0 ? "bg-white" : "bg-gray-25"
-                  )}
+                  className="hover:bg-gray-50 transition-colors"
                 >
                   <td className="truncate px-4 py-3 text-sm text-center text-gray-900">
                     {residence.complement}
