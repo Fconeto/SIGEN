@@ -1,7 +1,6 @@
 CREATE TABLE Borrifacao (
     BorrifacaoId BIGINT IDENTITY(1,1) PRIMARY KEY,
     AgenteId BIGINT NULL,
-    MatriculaDoAgente BIGINT NOT NULL,
     DataDoPreenchimento DATE NOT NULL,
     Pendencia INT NOT NULL,
     TipoDeInseticida NVARCHAR(255) NOT NULL,

@@ -72,7 +72,6 @@ public class SearchRepository : ISearchRepository
             var parameters = new DynamicParameters();
             parameters.Add("@ResidenciaId", search.ResidenciaId);
             parameters.Add("@AgenteId", search.AgenteId);
-            parameters.Add("@MatriculaDoAgente", search.MatriculaDoAgente);
             parameters.Add("@DataDaVisita", search.DataDaVisita);
             parameters.Add("@Pendencia", (int)search.Pendencia);
             parameters.Add("@NomeDoMorador", search.NomeDoMorador);
