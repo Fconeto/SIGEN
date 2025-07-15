@@ -30,6 +30,18 @@ export default function PITSearchForm() {
         locationCode: [
           validators.required("Campo obrigatório"),
         ],
+        nomeMorador: [
+          (value) =>
+          value && /\d/.test(String(value))
+            ? "O campo Nome do morador não deve conter números"
+            : undefined,
+        ],
+        houseNumber: [
+          (value) =>
+          value && !/^\d+$/.test(String(value))
+            ? "O campo Número da casa deve conter apenas números"
+            : undefined,
+       ],
       }
     );
     const [isLoading, setIsLoading] = useState(false);
