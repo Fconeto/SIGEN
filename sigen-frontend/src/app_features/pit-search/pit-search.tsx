@@ -40,55 +40,36 @@ export default function PITSearchForm() {
     });
   
 const handleSubmit = async (e: React.FormEvent) => {
-    e.preventDefault();
-    if (!validateForm()) {
-      return;
-    }
-    
-    setIsLoading(true);
-    
-    const searchParams = Object.fromEntries(
-      Object.entries(values).filter(([key, value]) => {
-        if (typeof value === 'string') return value.trim() !== '';
-        if (typeof value === 'number') return value > 0;
-        return !!value;
-      })
-    );
+  e.preventDefault();
 
-    const queryString = new URLSearchParams(searchParams).toString();
+  if (!validateForm()) {
+    return;
+  }
+  
+  setIsLoading(true);
 
-    try {
-      const response = await fetch(`/api/pit/consult?${queryString}`);
-
-      if (!response.ok) {
-        const errorData = await response.json().catch(() => ({ message: 'Não foi possível encontrar resultados.' }));
-        throw new Error(errorData.message);
-      }
-      
-      const results = await response.json();
-      if (results.length === 0) {
-        setDialog({
-          isOpen: true,
-          type: 'info',
-          message: 'Nenhum resultado encontrado para os filtros informados.',
-          onConfirm: () => setDialog({ ...dialog, isOpen: false }),
-        });
-        return; 
-      }
-
-       router.push(`./pit-results?${queryString}`);
-
-    } catch (error: any) {
-      setDialog({
-        isOpen: true,
-        type: 'error',
-        message: error.message || 'Ocorreu um erro ao realizar a busca. Tente novamente.',
-        onConfirm: () => setDialog({ ...dialog, isOpen: false }),
-      });
-    } finally {
-      setIsLoading(false);
-    }
+  const searchParams: { [key: string]: any } = {
+    locationCode: values.locationCode,
+    ...(values.nomeMorador && { nomeMorador: values.nomeMorador }),
+    ...(values.houseNumber && { houseNumber: values.houseNumber }),
+    ...(values.complementNumber && { complementNumber: values.complementNumber }),
   };
+
+  await new Promise((r) => setTimeout(r, 1000)); 
+
+  console.log("Form Data:", values);
+  setIsLoading(false);
+  
+  const filteredSearchParams = Object.entries(searchParams).reduce((acc, [key, value]) => {
+    if (value) {
+      acc[key] = value;
+    }
+    return acc;
+  }, {} as { [key: string]: any });
+
+  const queryString = new URLSearchParams(filteredSearchParams).toString();
+  router.push(`./pit-results?${queryString}`);
+};
 
   return(
     <>

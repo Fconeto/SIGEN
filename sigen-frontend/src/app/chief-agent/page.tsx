@@ -54,7 +54,7 @@ export default function HomePage() {
             id: "pesquisa",
             label: "Pesquisa",
             icon: <Search className="w-5 h-5" />,
-            action: () => {},
+            action: () => router.push("chief-agent/search-register"),
           },
           {
             id: "borrifacao",

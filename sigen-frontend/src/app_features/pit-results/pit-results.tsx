@@ -87,8 +87,8 @@ export default function PITResults() {
     setCurrentPage(1);
   };
 
-  const addPit = (id: string) => router.push(`./pit-search/${id}`);
-  const viewPit = (id: string) => router.push(`./spray-consult-form/${id}`);
+  const addPit = (id: string) => router.push(`./search-register/${id}`);
+  const viewPit = (id: string) => router.push(`./spray-consult-form/${id}`); // Tela de consulta ainda para implementar
 
   if (loading) return <div>Carregando...</div>;
   

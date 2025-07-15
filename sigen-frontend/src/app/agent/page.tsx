@@ -7,6 +7,7 @@ import {
   Search,
   Home,
   SearchCheck,
+  FileText,
 } from "lucide-react";
 import { SigenAppLayout } from "@/components/sigen-app-layout";
 import { useRouter } from "next/navigation";
@@ -31,10 +32,16 @@ export default function HomePage() {
             },
           },
           {
+            id: "residence-consult",
+            label: "Consulta de Residência",
+            icon: <FileText className="w-5 h-5" />,
+            action: () => router.push("agent/residence-consult"),
+          },
+          {
             id: "pesquisa",
             label: "Pesquisa",
             icon: <Search className="w-5 h-5" />,
-            action: () => {},
+            action: () => router.push("agent/search-register"),
           },
           {
             id: "borrifacao",
