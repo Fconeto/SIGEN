@@ -1,0 +1,232 @@
+"use client";
+
+import type React from "react";
+import { useForm, validators } from "@/hooks/useform";
+import { SigenAppLayout } from "@/components/sigen-app-layout";
+import { useState } from "react";
+import {
+  SigenDialog,
+  SigenDialogProps,
+} from "@/components/sigen-dialog";
+import { useRouter } from "next/navigation";
+import { SigenFormField } from "@/components/sigen-form-field";
+import { SigenInput } from "@/components/sigen-input";
+import { SigenLoadingButton } from "@/components/sigen-loading-button";
+import { WorkPhase } from "@/domain/entities/work";
+import { SigenDropdown } from "@/components/sigen-dropdown";
+import { Turma } from "@/domain/entities/class";
+
+interface WeeklyReport {
+  microregional: string;
+  city: string;
+  workPhase: WorkPhase | undefined;
+  week: number;
+  class: Turma | undefined;
+  headGuard: string;
+}
+
+export default function WeeklyReport(){
+  const router = useRouter();
+  
+  const { values, errors, handleChange, validateForm, setValues } = useForm(
+    {
+      microregional: "",
+      city: "",
+      workPhase: undefined,
+      week: 0,
+      class: undefined,
+      headGuard: "",
+    } as WeeklyReport,
+    {
+      microregional: [
+        validators.required("Campo obrigatório"),
+      ],
+      city: [
+        validators.required("Campo obrigatório"),
+      ],
+      workPhase: [
+        validators.required("Campo obrigatório"),
+      ],
+      week: [
+        validators.required("Campo obrigatório"),
+      ],
+      class: [
+        validators.required("Campo obrigatório"),
+      ],
+      headGuard: [
+        validators.required("Campo obrigatório"),
+      ],
+    }
+  );
+
+  const [isLoading, setIsLoading] = useState(false);
+  const [reportData, setReportData] = useState<ReportList[]>([]);
+  
+  const [dialog, setDialog] = useState<SigenDialogProps>({
+    isOpen: false,
+    type: "info",
+    message: "",
+  });
+
+const handleSubmit = async (e: React.FormEvent) => {
+    e.preventDefault();
+    if (!validateForm()) {
+      return;
+    }
+    
+    setIsLoading(true);
+
+    const searchParams = {
+      microregional: values.microregional,
+      city: values.city,
+      workPhase: String(values.workPhase || ''),
+      week: String(values.week || 0),
+      class: String(values.class || ''),
+      headGuard: values.headGuard,
+    };
+    
+    const queryString = new URLSearchParams(searchParams).toString();
+
+    try {
+      const response = await fetch(`/api/report/consult?${queryString}`);
+
+      if (!response.ok) {
+        throw new Error("Erro ao consultar o relatório. Tente novamente.");
+      }
+
+      const data = await response.json();
+
+      if (data.items && data.items.length > 0) {
+        router.push(`./report-results?${queryString}`);
+      } else {
+        setDialog({
+          isOpen: true,
+          type: "info",
+          title: "Sem Resultados",
+          message: "Nenhum dado encontrado para os filtros informados.",
+        });
+      }
+    } catch (error) {
+      const errorMessage = error instanceof Error ? error.message : "Ocorreu um erro inesperado.";
+      setDialog({
+        isOpen: true,
+        type: "error",
+        title: "Erro na Consulta",
+        message: errorMessage,
+      });
+    } finally {
+      setIsLoading(false);
+    }
+  };
+
+  return (
+    <>
+      <SigenAppLayout
+        headerTitle="Relatório Semanal"
+        showBackButton
+        onBackClick={() => router.back()}
+      >
+        <form onSubmit={handleSubmit} className="space-y-2 p-6">
+          <SigenFormField
+            id="microregional"
+            label="Microregional"
+            error={errors.microregional}
+          >
+            <SigenInput
+              id="microregional"
+              value={values.microregional}
+              onChange={(e) => handleChange("microregional", e.target.value)}
+              aria-invalid={!!errors.microregional}
+              placeholder="Digite o microregional"
+            />
+          </SigenFormField>
+
+          <SigenFormField
+            id="city"
+            label="Município"
+            error={errors.city}
+          >
+            <SigenInput
+              id="city"
+              value={values.city}
+              onChange={(e) => handleChange("city", e.target.value)}
+              aria-invalid={!!errors.city}
+              placeholder="Digite o município"
+            />
+          </SigenFormField>
+
+          <SigenFormField
+            id="workPhase"
+            label="Fase de Trabalho:"
+            error={errors.workPhase}
+          >
+            <SigenDropdown
+              value={values.workPhase}
+              onValueChange={(v) => handleChange("workPhase", v)}
+              options={[
+                { value: WorkPhase.AV, label: WorkPhase.AV },
+                { value: WorkPhase.pit, label: WorkPhase.pit }
+              ]}
+            />
+          </SigenFormField>
+
+          <SigenFormField
+            id="week"
+            label="Semana:"
+            error={errors.week}
+          >
+            <SigenInput
+              id="week"
+              type="number"
+              value={values.week}
+              onChange={(e) => handleChange("week", e.target.value)}
+              aria-invalid={!!errors.week}
+              placeholder="Digite o semana"
+            />
+          </SigenFormField>
+
+          <SigenFormField
+            id="class"
+            label="Turma:"
+            error={errors.class}
+          >
+            <SigenDropdown
+              value={values.class}
+              onValueChange={(v) => handleChange("class", v)}
+              options={[
+                { value: Turma.chagas, label: Turma.chagas },
+              ]}
+            />
+          </SigenFormField>
+
+          <SigenFormField
+            id="headGuard"
+            label="Guarda Chefe:"
+            error={errors.headGuard}
+          >
+            <SigenInput
+              id="headGuard"
+              value={values.headGuard}
+              onChange={(e) => handleChange("headGuard", e.target.value)}
+              aria-invalid={!!errors.headGuard}
+              placeholder="Digite o nome do guarda chefe"
+            />
+          </SigenFormField>
+
+          <div className="pt-4">
+            <SigenLoadingButton type="submit" loading={isLoading}>
+              Consultar
+            </SigenLoadingButton>
+          </div>
+        </form>
+      </SigenAppLayout>
+      <SigenDialog
+        isOpen={dialog.isOpen}
+        onClose={() => setDialog((prev) => ({ ...prev, isOpen: false }))}
+        type={dialog.type}
+        title={dialog.title}
+        message={dialog.message}
+      />
+    </>
+  );
+}
