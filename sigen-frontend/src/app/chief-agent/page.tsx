@@ -74,12 +74,6 @@ export default function HomePage() {
             icon: <SearchCheck className="w-5 h-5" />,
             action: () => router.push("chief-agent/pit-search"),
           },
-          {
-            id: "cadastro-pesquisa",
-            label: "Cadastro de Pesquisa",
-            icon: <FileSearch className="w-5 h-5" />,
-            action: () => router.push("chief-agent/search-register"),
-          },
         ]}
       />
     </SigenAppLayout>
