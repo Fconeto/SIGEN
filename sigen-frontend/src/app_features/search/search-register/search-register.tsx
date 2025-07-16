@@ -10,9 +10,10 @@ import { PendencyState } from "@/domain/entities/pendency";
 import { WallType } from "@/domain/entities/wall";
 import { SigenDialogProps } from "@/components/sigen-dialog";
 import { useForm, validators } from "@/hooks/useform";
-import { useRouter } from "next/navigation";
+import { useRouter, useSearchParams } from "next/navigation";
 import { useState } from "react";
 import { SigenLoadingButton } from "@/components/sigen-loading-button";
+import { SigenDialog } from "@/components/sigen-dialog"; 
 
 interface SearchForm {
   pendencyState?: PendencyState | undefined;
@@ -32,6 +33,9 @@ interface SearchForm {
 
 export default function SearchRegisterForm() {
   const router = useRouter();
+
+  const searchParams = useSearchParams();
+  const residenciaId = searchParams.get('residenciaId');
 
   const mandatoryCaptureSelection = (_: any, allValues: SearchForm) => {
   if (!allValues.captureIntra && !allValues.capturePeri)
@@ -117,7 +121,7 @@ export default function SearchRegisterForm() {
   );
 
   const [isLoading, setIsLoading] = useState(false);
-  const [, setDialog] = useState<SigenDialogProps>({
+  const [dialog, setDialog] = useState<SigenDialogProps>({
     isOpen: false,
     type: "info",
     message: "",
@@ -126,49 +130,82 @@ export default function SearchRegisterForm() {
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
 
+    const token = localStorage.getItem('seu_token_jwt');
+
+    if (!token) {
+        setDialog({
+            isOpen: true,
+            type: 'error',
+            message: 'Sessão expirada ou usuário não autenticado. Por favor, faça login novamente.'
+        });
+
+        return;
+    }
+
     if (!validateForm()) {
-      setDialog({
-          isOpen: true,
-          type: 'error',
-          message: 'Por favor, preencha os campos obrigatórios.'
-      });
-      return;
+        setDialog({
+            isOpen: true,
+            type: 'error',
+            message: 'Por favor, preencha os campos obrigatórios.'
+        });
+        return;
+    }
+
+    if (!residenciaId) {
+        setDialog({
+            isOpen: true,
+            type: 'error',
+            message: 'ID da residência não encontrado. Não é possível continuar.'
+        });
+        return;
     }
 
     setIsLoading(true);
 
     try {
-      const response = await fetch('/api/search/create', {
-        method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
-        },
-        body: JSON.stringify(values), 
-      });
-      
-      if (response.ok) {
-        setDialog({
-          isOpen: true,
-          type: 'success',
-          message: 'Cadastro realizado com sucesso!',
+        const response = await fetch('/api/search/create', {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json',
+                'Authorization': `Bearer ${token}` 
+            },
+            body: JSON.stringify({
+                ...values,
+                residenciaId: residenciaId,
+            }),
         });
-        resetForm();
-      } else {
-        const errorData = await response.json();
-        setDialog({
-          isOpen: true,
-          type: 'error',
-          message: errorData.message || 'Ocorreu um erro ao realizar o cadastro.',
-        });
-      }
+
+        if (response.ok) {
+            setDialog({
+                isOpen: true,
+                type: 'success',
+                message: 'Cadastro realizado com sucesso!',
+            });
+            setTimeout(() => {
+                router.push('/');
+            }, 2000);
+        } else if (response.status === 401 || response.status === 403) {
+            setDialog({
+                isOpen: true,
+                type: 'error',
+                message: 'Você não tem permissão para realizar esta ação.',
+            });
+        } else {
+            const errorData = await response.json();
+            setDialog({
+                isOpen: true,
+                type: 'error',
+                message: errorData.message || 'Ocorreu um erro ao realizar o cadastro.',
+            });
+        }
     } catch {
-      setDialog({
-          isOpen: true,
-          type: 'error',
-          message: 'Não foi possível conectar ao servidor. Tente novamente mais tarde.'
-      });
+        setDialog({
+            isOpen: true,
+            type: 'error',
+            message: 'Não foi possível conectar ao servidor. Tente novamente mais tarde.'
+        });
     } finally {
-      setIsLoading(false);
+        setIsLoading(false);
     }
   };
 
@@ -394,6 +431,12 @@ export default function SearchRegisterForm() {
           </div>
         </form>
       </SigenAppLayout>
+      <SigenDialog
+        isOpen={dialog.isOpen}
+        type={dialog.type}
+        message={dialog.message}
+        onClose={() => setDialog({ ...dialog, isOpen: false })}
+      />
     </>
   )
 }
