@@ -15,6 +15,7 @@ import {
 import { CPF } from "@/domain/entities/document";
 import { API_BASE_URL } from "@/config/api-config";
 import Image from "next/image";
+import { useRouter } from "next/navigation";
 
 interface LoginForm {
   cpf: string;
@@ -22,6 +23,8 @@ interface LoginForm {
 }
 
 export default function LoginForm() {
+  const router = useRouter();
+
   const { values, errors, handleChange, validateForm, resetForm } = useForm(
     {
       cpf: "",
@@ -65,18 +68,22 @@ export default function LoginForm() {
           mode: "cors",
         }
       );
-      const data = await response.json();
-      if (response.ok && data.token) {
-        setDialog({
-          isOpen: true,
-          type: "success",
-          message: "Login realizado com sucesso!",
-        });
+      const responseData = await response.json();
+      
+      if (response.ok && responseData.isSuccess) {
+      localStorage.setItem('authToken', responseData.data.token);
+      localStorage.setItem('authUser', JSON.stringify(responseData.data));
+
+      if (responseData.data.tipoDeUsuario === 1) {
+        router.push('/chief-agent/page');
       } else {
+        router.push('/agent/page');
+      }
+    } else {
         setDialog({
           isOpen: true,
           type: "error",
-          message: data.message || "Usuário ou senha inválidos.",
+          message: responseData.message || "Usuário ou senha inválidos.",
         });
       }
     } catch (error) {
