@@ -15,7 +15,7 @@ import {
 import { CPF } from "@/domain/entities/document";
 import { API_BASE_URL } from "@/config/api-config";
 import Image from "next/image";
-import { useRouter } from "next/navigation";
+import { useRouter } from "next/navigation"; 
 
 interface LoginForm {
   cpf: string;
@@ -23,8 +23,7 @@ interface LoginForm {
 }
 
 export default function LoginForm() {
-  const router = useRouter();
-
+  const router = useRouter(); 
   const { values, errors, handleChange, validateForm, resetForm } = useForm(
     {
       cpf: "",
@@ -48,53 +47,51 @@ export default function LoginForm() {
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
 
-    setDialog(defaultDialogs.error);
-
     if (!validateForm()) {
       return;
     }
 
     setIsLoading(true);
     try {
-      const params = new URLSearchParams({
-        CPF: values.cpf,
-        Senha: values.password,
+      const response = await fetch(`${API_BASE_URL}/api/auth/login`, {
+        method: "POST", 
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify({ 
+          cpf: values.cpf,
+          senha: values.password,
+        }),
       });
 
-      const response = await fetch(
-        `${API_BASE_URL}/api/auth/login?${params.toString()}`,
-        {
-          method: "GET",
-          mode: "cors",
-        }
-      );
-      const responseData = await response.json();
-      
-      if (response.ok && responseData.isSuccess) {
-      localStorage.setItem('authToken', responseData.data.token);
-      localStorage.setItem('authUser', JSON.stringify(responseData.data));
+      const result = await response.json();
 
-      if (responseData.data.tipoDeUsuario === 1) {
-        router.push('/chief-agent/page');
+      if (response.ok && result.isSuccess) {
+        localStorage.setItem("userData", JSON.stringify(result.data));
+        
+        const userType = result.data.tipoDeUsuario;
+        if (userType === 0) {
+          router.push("/agent"); 
+        } else if (userType === 1) {
+          router.push("/chief-agent"); 
+        } else {
+          throw new Error("Tipo de usuário desconhecido.");
+        }
       } else {
-        router.push('/agent/page');
-      }
-    } else {
         setDialog({
           isOpen: true,
           type: "error",
-          message: responseData.message || "Usuário ou senha inválidos.",
+          message: result.message || "CPF ou senha inválidos.",
         });
       }
     } catch (error) {
       setDialog({
         isOpen: true,
         type: "error",
-        message: "Erro ao conectar ao servidor.",
+        message: "Não foi possível conectar ao servidor. Tente novamente.",
       });
     } finally {
       setIsLoading(false);
-      resetForm();
     }
   };
 
