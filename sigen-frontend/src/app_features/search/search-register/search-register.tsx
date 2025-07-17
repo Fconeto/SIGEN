@@ -151,7 +151,7 @@ export default function SearchRegisterForm() {
         method: "POST",
         headers: {
           "Content-Type": "application/json",
-          Authorization: `Bearer ${token}`,
+          "Authorization": `Bearer ${token}`,
         },
         body: JSON.stringify({
           agentId: GlobalService.getInstance().getUser()?.id,
