@@ -7,6 +7,7 @@ import { SigenAppLayout } from "@/components/sigen-app-layout";
 import { SigenPasswordInput } from "@/components/sigen-password-input";
 import { SigenInput } from "@/components/sigen-input";
 import { useState } from "react";
+import Cookies from "js-cookie";
 import {
   defaultDialogs,
   SigenDialog,
@@ -15,6 +16,7 @@ import {
 import { CPF } from "@/domain/entities/document";
 import { API_BASE_URL } from "@/config/api-config";
 import Image from "next/image";
+import { useRouter } from "next/navigation"; 
 
 interface LoginForm {
   cpf: string;
@@ -22,6 +24,7 @@ interface LoginForm {
 }
 
 export default function LoginForm() {
+  const router = useRouter(); 
   const { values, errors, handleChange, validateForm, resetForm } = useForm(
     {
       cpf: "",
@@ -45,49 +48,50 @@ export default function LoginForm() {
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
 
-    setDialog(defaultDialogs.error);
-
     if (!validateForm()) {
       return;
     }
 
     setIsLoading(true);
     try {
-      const params = new URLSearchParams({
-        CPF: values.cpf,
-        Senha: values.password,
+      const response = await fetch(`${API_BASE_URL}/api/auth/login?cpf=${values.cpf}&senha=${values.password}`, {
+        method: "GET", 
+        headers: {
+          "Content-Type": "application/json",
+        },
       });
 
-      const response = await fetch(
-        `${API_BASE_URL}/api/auth/login?${params.toString()}`,
-        {
-          method: "GET",
-          mode: "cors",
+      const result = await response.json();
+
+      if (response.ok && result.isSuccess) {
+        localStorage.setItem("userData", JSON.stringify(result.data));
+        // Salva o token JWT em cookie seguro
+        if (result.data.token) {
+          Cookies.set("authToken", result.data.token, { expires: 7, secure: true, sameSite: "strict" });
         }
-      );
-      const data = await response.json();
-      if (response.ok && data.token) {
-        setDialog({
-          isOpen: true,
-          type: "success",
-          message: "Login realizado com sucesso!",
-        });
+        const userType = result.data.tipoDeUsuario;
+        if (userType === 0) {
+          router.push("/agent"); 
+        } else if (userType === 1) {
+          router.push("/chief-agent"); 
+        } else {
+          throw new Error("Tipo de usuário desconhecido.");
+        }
       } else {
         setDialog({
           isOpen: true,
           type: "error",
-          message: data.message || "Usuário ou senha inválidos.",
+          message: result.message || "CPF ou senha inválidos.",
         });
       }
     } catch (error) {
       setDialog({
         isOpen: true,
         type: "error",
-        message: "Erro ao conectar ao servidor.",
+        message: "Não foi possível conectar ao servidor. Tente novamente.",
       });
     } finally {
       setIsLoading(false);
-      resetForm();
     }
   };
 

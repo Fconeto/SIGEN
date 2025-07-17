@@ -5,6 +5,7 @@ import { SigenAppLayout } from "@/components/sigen-app-layout";
 import { useRouter, useSearchParams } from "next/navigation";
 import { useState, useMemo, useEffect } from "react";
 import * as XLSX from 'xlsx';
+import Cookies from 'js-cookie';
 import { API_BASE_URL } from "@/config/api-config";
 import { SigenDialog, SigenDialogProps } from "@/components/sigen-dialog";
 
@@ -54,7 +55,7 @@ export default function WeeklyReportResults() {
 
       try {
         const queryString = searchParams.toString();        
-        const token = localStorage.getItem('authToken');
+        const token = Cookies.get('authToken');
 
         const response = await fetch(`${API_BASE_URL}/api/report/consult?${queryString}`, {
           headers: {

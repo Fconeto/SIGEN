@@ -12,17 +12,25 @@ import {
   FileSearch,
   SearchCheck,
 } from "lucide-react";
+
+import Cookies from "js-cookie";
 import { SigenAppLayout } from "@/components/sigen-app-layout";
 import { useRouter } from "next/navigation";
 
 export default function HomePage() {
   const router = useRouter();
 
+  const handleLogout = () => {
+    localStorage.removeItem("userData");
+    Cookies.remove("authToken");
+    router.push("/auth/login");
+  };
+
   return (
     <SigenAppLayout
       headerTitle="Página Inicial"
       showLogoutButton
-      onLogoutClick={() => console.log("Sair")}
+      onLogoutClick={handleLogout}
     >
       <MenuScreen
         menuConfigurations={[
