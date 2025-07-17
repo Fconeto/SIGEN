@@ -36,7 +36,7 @@ export default function HomePage() {
             id: "relatorio-semanal",
             label: "Relatório semanal",
             icon: <Calendar className="w-5 h-5" />,
-            action: () => {},
+            action: () => router.push("chief-agent/weekly-report"),
           },
           {
             id: "cadastro-residencia",
