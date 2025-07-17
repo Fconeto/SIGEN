@@ -40,6 +40,7 @@ BEGIN
         CriadoPor,
         AtualizadoPor
     )
+    OUTPUT INSERTED.PesquisaId
     VALUES (
         @ResidenciaId,
         @DataDaVisita,

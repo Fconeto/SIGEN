@@ -12,17 +12,25 @@ import {
   FileSearch,
   SearchCheck,
 } from "lucide-react";
+
+import Cookies from "js-cookie";
 import { SigenAppLayout } from "@/components/sigen-app-layout";
 import { useRouter } from "next/navigation";
 
 export default function HomePage() {
   const router = useRouter();
 
+  const handleLogout = () => {
+    localStorage.removeItem("userData");
+    Cookies.remove("authToken");
+    router.push("/auth/login");
+  };
+
   return (
     <SigenAppLayout
       headerTitle="Página Inicial"
       showLogoutButton
-      onLogoutClick={() => console.log("Sair")}
+      onLogoutClick={handleLogout}
     >
       <MenuScreen
         menuConfigurations={[
@@ -36,7 +44,7 @@ export default function HomePage() {
             id: "relatorio-semanal",
             label: "Relatório semanal",
             icon: <Calendar className="w-5 h-5" />,
-            action: () => {},
+            action: () => router.push("chief-agent/weekly-report"),
           },
           {
             id: "cadastro-residencia",
@@ -73,12 +81,6 @@ export default function HomePage() {
             label: "Pesquisa de PIT",
             icon: <SearchCheck className="w-5 h-5" />,
             action: () => router.push("chief-agent/pit-search"),
-          },
-          {
-            id: "cadastro-pesquisa",
-            label: "Cadastro de Pesquisa",
-            icon: <FileSearch className="w-5 h-5" />,
-            action: () => router.push("chief-agent/search-register"),
           },
         ]}
       />

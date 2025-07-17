@@ -7,6 +7,7 @@ import { SigenAppLayout } from "@/components/sigen-app-layout";
 import { SigenPasswordInput } from "@/components/sigen-password-input";
 import { SigenInput } from "@/components/sigen-input";
 import { useState } from "react";
+import Cookies from "js-cookie";
 import {
   defaultDialogs,
   SigenDialog,
@@ -53,22 +54,21 @@ export default function LoginForm() {
 
     setIsLoading(true);
     try {
-      const response = await fetch(`${API_BASE_URL}/api/auth/login`, {
-        method: "POST", 
+      const response = await fetch(`${API_BASE_URL}/api/auth/login?cpf=${values.cpf}&senha=${values.password}`, {
+        method: "GET", 
         headers: {
           "Content-Type": "application/json",
         },
-        body: JSON.stringify({ 
-          cpf: values.cpf,
-          senha: values.password,
-        }),
       });
 
       const result = await response.json();
 
       if (response.ok && result.isSuccess) {
         localStorage.setItem("userData", JSON.stringify(result.data));
-        
+        // Salva o token JWT em cookie seguro
+        if (result.data.token) {
+          Cookies.set("authToken", result.data.token, { expires: 7, secure: true, sameSite: "strict" });
+        }
         const userType = result.data.tipoDeUsuario;
         if (userType === 0) {
           router.push("/agent"); 

@@ -383,16 +383,13 @@ export default function PITRegisterForm () {
             label="Data do Registro:"
             error={errors.registerDate}
           >
-            <input
+            <SigenDateInput 
               id="registerDate"
-              type="text"
-              value={values.registerDate instanceof Date ? values.registerDate.toLocaleDateString() : ''}
-              readOnly
-              className="bg-gray-100 text-gray-700 rounded px-2 py-1 w-full"
-              tabIndex={-1}
+              value={values.registerDate}
+              aria-invalid={!!errors.registerDate}
             />
           </SigenFormField>
-
+          
           <div className="pt-4">
             <SigenLoadingButton type="submit" loading={isLoading}>
               Cadastrar

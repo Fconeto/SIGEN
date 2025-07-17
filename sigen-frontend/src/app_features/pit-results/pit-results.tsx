@@ -7,6 +7,7 @@ import { useRouter } from "next/navigation";
 import React, { useEffect, useMemo, useState } from "react";
 import { Eye, Plus } from "lucide-react";
 import type { ResidenceInfos as BaseResidenceInfos } from "@/domain/entities/residences";
+import ResidenceInfos from "../residence-infos/residence-infos";
 
 type ResidenceInfos = BaseResidenceInfos;
 type SortKey = keyof Omit<ResidenceInfos, "status">;
@@ -87,8 +88,8 @@ export default function PITResults() {
     setCurrentPage(1);
   };
 
-  const addPit = (id: string) => router.push(`./search-register/${id}`);
-  const viewPit = (id: string) => router.push(`./spray-consult-form/${id}`); // Tela de consulta ainda para implementar
+  const addPit = (id: string) => router.push(`./pit-search-register?id=${id}`);
+  const viewPit = (id: string) => router.push(`./spray-consult-form/${id}`);
 
   if (loading) return <div>Carregando...</div>;
   
