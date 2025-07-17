@@ -9,4 +9,6 @@ public interface IPITRepository
     Task InsertPIT(PIT pit);
     Task<List<GetConsultPITListResponse>> GetPendingPITByFilters(ConsultFiltersRequest request);
     Task<List<GetConsultPITListResponse>> GetPITByFilters(ConsultFiltersRequest consultFiltersRequest);
+    Task InsertSearchPIT(SearchPIT searchPIT);
+    Task UpdatePesquisaPITById(long id, long? pitId);
 }

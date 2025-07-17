@@ -93,4 +93,41 @@ public class PITRepository : IPITRepository
             )).ToList();
         }
     }
+    public async Task InsertSearchPIT(SearchPIT searchPIT)
+    {
+        using (var connection = new SqlConnection(_connectionString))
+        {
+            var parameters = new DynamicParameters();
+            parameters.Add("@PITId", searchPIT.PITId);
+            parameters.Add("@Data", searchPIT.Data);
+            parameters.Add("@Pendencia", (int)searchPIT.Pendencia);
+            parameters.Add("@NomeDoMorador", searchPIT.NomeDoMorador);
+            parameters.Add("@NumeroDeHabitantes", searchPIT.NumeroDeHabitantes);
+            parameters.Add("@TipoDeParede", (int)searchPIT.TipoDeParede);
+            parameters.Add("@TipoDeTeto", (int)searchPIT.TipoDeTeto);
+            parameters.Add("@CapturaIntra", searchPIT.CapturaIntra);
+            parameters.Add("@CapturaPeri", searchPIT.CapturaPeri);
+            parameters.Add("@AnexosPositivos", searchPIT.AnexosPositivos);
+            parameters.Add("@AnexosNegativos", searchPIT.AnexosNegativos);
+            parameters.Add("@NumGatos", searchPIT.NumGatos);
+            parameters.Add("@NumCachorros", searchPIT.NumCachorros);
+
+            await connection.ExecuteAsync(
+                "InsertSearchPIT",
+                parameters,
+                commandType: CommandType.StoredProcedure
+            );
+        }
+    }
+    public async Task UpdatePesquisaPITById(long pesquisaId, long? pitId)
+    {
+        using (var connection = new SqlConnection(_connectionString))
+        {
+            await connection.ExecuteAsync("UpdatePesquisaPITById", new
+            {
+                PesquisaId = pesquisaId,
+                PITId = pitId
+            }, commandType: CommandType.StoredProcedure);
+        }
+    }
 }
