@@ -19,6 +19,7 @@ import { CPF } from "@/domain/entities/document";
 import { API_BASE_URL } from "@/config/api-config";
 import { run } from "node:test";
 import { GlobalService } from "@/services/global-service";
+import Cookies from 'js-cookie';
 
 interface AgentForm {
   agentId: string;
@@ -99,11 +100,14 @@ export default function AgentRegistrationForm() {
     setIsLoading(true);
 
     try {
-      const agentId = GlobalService.getInstance().getUser()?.id;
+      const agentId = localStorage.getItem("agentId") || 0;
+
+      const token = Cookies.get('authToken');
       const response = await fetch(`${API_BASE_URL}/api/Auth/register`, {
         method: "POST",
         headers: {
           "Content-Type": "application/json",
+          "Authorization": `Bearer ${token}`,
         },
         body: JSON.stringify({
           agenteId: agentId,

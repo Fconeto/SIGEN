@@ -10,12 +10,13 @@ import { PendencyState, PendencyStateLabels } from "@/domain/entities/pendency";
 import { WallType, WallTypeLabels } from "@/domain/entities/wall";
 import { SigenDialog, SigenDialogProps } from "@/components/sigen-dialog";
 import { useForm, validators } from "@/hooks/useform";
-import { useRouter } from "next/navigation";
+import { useRouter, useSearchParams } from "next/navigation";
 import { useState } from "react";
 import { SigenLoadingButton } from "@/components/sigen-loading-button";
 import { TokenService } from "@/services/auth/token-service";
 import { GlobalService } from "@/services/global-service";
 import { API_BASE_URL } from "@/config/api-config";
+import Cookies from "js-cookie";
 
 interface SearchForm {
   pendencyState?: number | undefined;
@@ -35,6 +36,7 @@ interface SearchForm {
 
 export default function SearchRegisterForm() {
   const router = useRouter();
+  const searchParams = useSearchParams();
 
   const mandatoryCaptureSelection = (_: any, allValues: SearchForm) => {
   if (!allValues.captureIntra && !allValues.capturePeri)
@@ -146,7 +148,7 @@ export default function SearchRegisterForm() {
     setIsLoading(true);
 
     try {
-      const token = TokenService.getInstance().getAccessToken();
+      const token = Cookies.get('authToken');
       const response = await fetch(`${API_BASE_URL}/api/search/create`, {
         method: "POST",
         headers: {
@@ -154,20 +156,22 @@ export default function SearchRegisterForm() {
           "Authorization": `Bearer ${token}`,
         },
         body: JSON.stringify({
-          agentId: GlobalService.getInstance().getUser()?.id,
-          pendencyState: values.pendencyState,
-          nomeMorador: values.nomeMorador,
-          numberOfPeople: Number(values.numberOfPeople),
-          wallType: values.wallType,
-          otherWallType: values.otherWallType,
-          ceilingType: values.ceilingType,
-          otherCeilingType: values.otherCeilingType,
-          captureIntra: values.captureIntra,
-          capturePeri: values.capturePeri,
-          positiveAttachments: Number(values.positiveAttachments),
-          negativeAttachments: Number(values.negativeAttachments),
-          numberOfCats: Number(values.numberOfCats),
-          numberOfDogs: Number(values.numberOfDogs),
+          residenciaId: searchParams.get("id"),
+          agentId: localStorage.getItem("agentId") || 0,
+          data: new Date().toISOString(),
+          pendencia: values.pendencyState,
+          nomeDoMorador: values.nomeMorador,
+          numeroDeHabitantes: Number(values.numberOfPeople),
+          tipoDeParede: values.wallType,
+          outrosTipoDeParede: values.otherWallType,
+          tipoDeTeto: values.ceilingType,
+          outrosTipoDeTeto: values.otherCeilingType,
+          capturaIntra: values.captureIntra,
+          capturaPeri: values.capturePeri,
+          anexosPositivos: Number(values.positiveAttachments),
+          anexosNegativos: Number(values.negativeAttachments),
+          numGatos: Number(values.numberOfCats),
+          numCachorros: Number(values.numberOfDogs),
         }),
       });
       

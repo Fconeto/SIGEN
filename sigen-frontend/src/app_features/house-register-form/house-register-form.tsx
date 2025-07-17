@@ -19,6 +19,7 @@ import {
 import { API_BASE_URL } from "@/config/api-config";
 import { GlobalService } from "@/services/global-service";
 import { TokenService } from "@/services/auth/token-service";
+import Cookies from "js-cookie";
 
 interface Locality {
   localidadeId: number;
@@ -104,7 +105,17 @@ export default function HouseRegistrationForm() {
   useEffect(() => {
     async function fetchLocalities() {
       try {
-        const response = await fetch(`${API_BASE_URL}/api/Locality/consultlocality`);
+        const token = Cookies.get('authToken');
+
+        const response = await fetch(`${API_BASE_URL}/api/Locality/consultlocality`,
+          {
+            method: "GET",
+            headers: {
+              "Content-Type": "application/json", 
+              "Authorization": `Bearer ${token}`
+            },
+          }
+        );
 
         const res = await response.json();
 
@@ -164,8 +175,8 @@ export default function HouseRegistrationForm() {
         inabitado: values.uninhabited,
       };
 
+      const token = Cookies.get('authToken');
 
-      const token = TokenService.getInstance().getAccessToken();
        const res = await fetch(`${API_BASE_URL}/api/Residence/create`, {
         method: "POST",
         headers: {
