@@ -5,6 +5,8 @@ import { SigenAppLayout } from "@/components/sigen-app-layout";
 import { useRouter, useSearchParams } from "next/navigation";
 import { useState, useMemo, useEffect } from "react";
 import * as XLSX from 'xlsx';
+import { API_BASE_URL } from "@/config/api-config";
+import { SigenDialog, SigenDialogProps } from "@/components/sigen-dialog";
 
 interface ReportItem {
   codigoDaLocalidade: number;
@@ -32,6 +34,12 @@ export default function WeeklyReportResults() {
   const [isLoading, setIsLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
 
+  const [dialog, setDialog] = useState<SigenDialogProps>({
+    isOpen: false,
+    type: "info",
+    message: "",
+  });
+
   useEffect(() => {
     const fetchData = async () => {
       const queryString = searchParams.toString();
@@ -45,15 +53,41 @@ export default function WeeklyReportResults() {
       setError(null);
 
       try {
-        const response = await fetch(`/api/report/consult?${queryString}`);
+        const queryString = searchParams.toString();        
+        const token = localStorage.getItem('authToken');
+
+        const response = await fetch(`${API_BASE_URL}/api/report/consult?${queryString}`, {
+          headers: {
+            'Authorization': `Bearer ${token}`,
+          },
+        });
+
         if (!response.ok) {
-          throw new Error("Falha ao buscar os dados do relatório.");
+          throw new Error("Erro ao consultar o relatório. Tente novamente.");
         }
         const data = await response.json();
-        setReportData(data.items || []);
 
+        if (data.data.items && data.data.items.length > 0) {
+          setReportData((data.data && data.data.items) ? data.data.items : []);
+        } 
+        else {
+          setDialog({
+            isOpen: true,
+            type: "info",
+            title: "Sem Resultados",
+            message: "Nenhum dado encontrado para os filtros informados.",
+          });
+        }
+        
       } catch (err) {
         setError(err instanceof Error ? err.message : "Ocorreu um erro desconhecido.");
+        const errorMessage = err instanceof Error ? err.message : "Ocorreu um erro inesperado.";
+        setDialog({
+          isOpen: true,
+          type: "error",
+          title: "Erro na Consulta",
+          message: errorMessage,
+        });
       } finally {
         setIsLoading(false);
       }
@@ -189,133 +223,142 @@ export default function WeeklyReportResults() {
   };
 
   return (
-    <SigenAppLayout
-      headerTitle="Relatório Semanal"
-      showBackButton
-      onBackClick={() => router.back()}
-      maxWidth="full"
-      padding="none"
-    >
-      <div className="p-6">
-        <div className="flex justify-between items-center mb-4">
-          <h2 className="text-xl font-semibold">Relatório Semanal</h2>
-          <button
-            className="bg-yellow-500 hover:bg-yellow-600 text-white px-4 py-2 rounded text-sm font-medium"
-            onClick={handleGenerateSheet}
-          >
-            Gerar planilha
-          </button>
-        </div>
+    <>
+      <SigenAppLayout
+        headerTitle="Relatório Semanal"
+        showBackButton
+        onBackClick={() => router.back()}
+        maxWidth="full"
+        padding="none"
+      >
+        <div className="p-6">
+          <div className="flex justify-between items-center mb-4">
+            <h2 className="text-xl font-semibold">Relatório Semanal</h2>
+            <button
+              className="bg-yellow-500 hover:bg-yellow-600 text-white px-4 py-2 rounded text-sm font-medium"
+              onClick={handleGenerateSheet}
+            >
+              Gerar planilha
+            </button>
+          </div>
 
-        <div className="overflow-x-auto border border-gray-300 rounded">
-          <table className="min-w-full bg-white text-sm">
+          <div className="overflow-x-auto border border-gray-300 rounded">
+            <table className="min-w-full bg-white text-sm">
 
-            <thead className="bg-gray-100 text-xs font-medium">
-              <tr>
-                <th rowSpan={2} className="border border-gray-300 p-2 align-middle">Data</th>
-                <th rowSpan={2} className="border border-gray-300 p-2 align-middle">Localidade</th>
-                <th rowSpan={2} className="border border-gray-300 p-2 align-middle">Conclusão</th>
-                <th rowSpan={2} className="border border-gray-300 p-2 align-middle">Localidade Positiva</th>
-                <th rowSpan={2} className="border border-gray-300 p-2 align-middle">Número de Habitantes</th>
-                <th colSpan={3} className="border border-gray-300 p-2">Casas Trabalhadas</th>
-                <th colSpan={3} className="border border-gray-300 p-2">Casas Pendentes</th>
-                <th colSpan={3} className="border border-gray-300 p-2">Anexos Trabalhados</th>
-                <th colSpan={3} className="border border-gray-300 p-2">Unidades Domiciliares</th>
-                <th colSpan={3} className="border border-gray-300 p-2">Triatomíneos Capturados</th>
-                <th rowSpan={2} className="border border-gray-300 p-2 align-middle">Homens Dia Trabalhando</th>
-                <th rowSpan={2} className="border border-gray-300 p-2 align-middle">Cães</th>
-                <th rowSpan={2} className="border border-gray-300 p-2 align-middle">Gatos</th>
-              </tr>
-              <tr>
-                <th className="border border-gray-300 p-1">Positivas</th>
-                <th className="border border-gray-300 p-1">Negativas</th>
-                <th className="border border-gray-300 p-1">Total</th>
-                <th className="border border-gray-300 p-1">Fechadas</th>
-                <th className="border border-gray-300 p-1">Recusadas</th>
-                <th className="border border-gray-300 p-1">Total</th>
-                <th className="border border-gray-300 p-1">Positivas</th>
-                <th className="border border-gray-300 p-1">Negativas</th>
-                <th className="border border-gray-300 p-1">Total</th>
-                <th className="border border-gray-300 p-1">Positivas</th>
-                <th className="border border-gray-300 p-1">Negativas</th>
-                <th className="border border-gray-300 p-1">Total</th>
-                <th className="border border-gray-300 p-1">Intra</th>
-                <th className="border border-gray-300 p-1">Peri</th>
-                <th className="border border-gray-300 p-1">Total</th>
-              </tr>
-            </thead>
-
-            <tbody className="text-center">
-              {reportData.map((item) => (
-                <tr key={item.codigoDaLocalidade} className="hover:bg-gray-50">
-                  <td className="border border-gray-300 p-2">{new Date(item.data).toLocaleDateString("pt-BR", {timeZone: 'UTC'})}</td>
-                  <td className="border border-gray-300 p-2 text-left">{item.nome} - {item.categoria}</td>
-                  <td className="border border-gray-300 p-2">
-                    <input 
-                      type="checkbox"
-                      className="h-4 w-4 accent-green-600"
-                      checked={item.conclusao}
-                      onChange={() => handleToggleConclusion(item.codigoDaLocalidade)} 
-                    />
-                  </td>
-                  <td className="border border-gray-300 p-2">
-                    <input
-                      type="checkbox"
-                      className="h-4 w-4"
-                      checked={item.localidadePositiva}
-                      readOnly
-                    />
-                  </td>
-                  <td className="border border-gray-300 p-2">{item.numeroHabitantes}</td>
-                  <td className="border border-gray-300 p-2">{item.casasTrabalhadas.positivas}</td>
-                  <td className="border border-gray-300 p-2">{item.casasTrabalhadas.negativas}</td>
-                  <td className="border border-gray-300 p-2">{item.casasTrabalhadas.total}</td>
-                  <td className="border border-gray-300 p-2">{item.casasPendentes.fechadas}</td>
-                  <td className="border border-gray-300 p-2">{item.casasPendentes.recusadas}</td>
-                  <td className="border border-gray-300 p-2">{item.casasPendentes.total}</td>
-                  <td className="border border-gray-300 p-2">{item.anexosTrabalhados.positivas}</td>
-                  <td className="border border-gray-300 p-2">{item.anexosTrabalhados.negativas}</td>
-                  <td className="border border-gray-300 p-2">{item.anexosTrabalhados.total}</td>
-                  <td className="border border-gray-300 p-2">{item.unidadesDomiciliares.positivas}</td>
-                  <td className="border border-gray-300 p-2">{item.unidadesDomiciliares.negativas}</td>
-                  <td className="border border-gray-300 p-2">{item.unidadesDomiciliares.total}</td>
-                  <td className="border border-gray-300 p-2">{item.triatomineosCapturados.intra}</td>
-                  <td className="border border-gray-300 p-2">{item.triatomineosCapturados.peri}</td>
-                  <td className="border border-gray-300 p-2">{item.triatomineosCapturados.total}</td>
-                  <td className="border border-gray-300 p-2">{item.homensTrabalhando}</td>
-                  <td className="border border-gray-300 p-2">{item.caes}</td>
-                  <td className="border border-gray-300 p-2">{item.gatos}</td>
-                </tr>
-              ))}
-            </tbody>
-
-            <tfoot className="bg-gray-100 font-bold text-center">
+              <thead className="bg-gray-100 text-xs font-medium">
                 <tr>
-                    <td colSpan={4} className="border border-gray-300 p-2 text-right">Total</td>
-                    <td className="border border-gray-300 p-2">{totals.numeroHabitantes}</td>
-                    <td className="border border-gray-300 p-2">{totals.casasTrabalhadas.positivas}</td>
-                    <td className="border border-gray-300 p-2">{totals.casasTrabalhadas.negativas}</td>
-                    <td className="border border-gray-300 p-2">{totals.casasTrabalhadas.total}</td>
-                    <td className="border border-gray-300 p-2">{totals.casasPendentes.fechadas}</td>
-                    <td className="border border-gray-300 p-2">{totals.casasPendentes.recusadas}</td>
-                    <td className="border border-gray-300 p-2">{totals.casasPendentes.total}</td>
-                    <td className="border border-gray-300 p-2">{totals.anexosTrabalhados.positivas}</td>
-                    <td className="border border-gray-300 p-2">{totals.anexosTrabalhados.negativas}</td>
-                    <td className="border border-gray-300 p-2">{totals.anexosTrabalhados.total}</td>
-                    <td className="border border-gray-300 p-2">{totals.unidadesDomiciliares.positivas}</td>
-                    <td className="border border-gray-300 p-2">{totals.unidadesDomiciliares.negativas}</td>
-                    <td className="border border-gray-300 p-2">{totals.unidadesDomiciliares.total}</td>
-                    <td className="border border-gray-300 p-2">{totals.triatomineosCapturados.intra}</td>
-                    <td className="border border-gray-300 p-2">{totals.triatomineosCapturados.peri}</td>
-                    <td className="border border-gray-300 p-2">{totals.triatomineosCapturados.total}</td>
-                    <td className="border border-gray-300 p-2">{totals.homensTrabalhando}</td>
-                    <td className="border border-gray-300 p-2">{totals.caes}</td>
-                    <td className="border border-gray-300 p-2">{totals.gatos}</td>
+                  <th rowSpan={2} className="border border-gray-300 p-2 align-middle">Data</th>
+                  <th rowSpan={2} className="border border-gray-300 p-2 align-middle">Localidade</th>
+                  <th rowSpan={2} className="border border-gray-300 p-2 align-middle">Conclusão</th>
+                  <th rowSpan={2} className="border border-gray-300 p-2 align-middle">Localidade Positiva</th>
+                  <th rowSpan={2} className="border border-gray-300 p-2 align-middle">Número de Habitantes</th>
+                  <th colSpan={3} className="border border-gray-300 p-2">Casas Trabalhadas</th>
+                  <th colSpan={3} className="border border-gray-300 p-2">Casas Pendentes</th>
+                  <th colSpan={3} className="border border-gray-300 p-2">Anexos Trabalhados</th>
+                  <th colSpan={3} className="border border-gray-300 p-2">Unidades Domiciliares</th>
+                  <th colSpan={3} className="border border-gray-300 p-2">Triatomíneos Capturados</th>
+                  <th rowSpan={2} className="border border-gray-300 p-2 align-middle">Homens Dia Trabalhando</th>
+                  <th rowSpan={2} className="border border-gray-300 p-2 align-middle">Cães</th>
+                  <th rowSpan={2} className="border border-gray-300 p-2 align-middle">Gatos</th>
                 </tr>
-            </tfoot>
-          </table>
+                <tr>
+                  <th className="border border-gray-300 p-1">Positivas</th>
+                  <th className="border border-gray-300 p-1">Negativas</th>
+                  <th className="border border-gray-300 p-1">Total</th>
+                  <th className="border border-gray-300 p-1">Fechadas</th>
+                  <th className="border border-gray-300 p-1">Recusadas</th>
+                  <th className="border border-gray-300 p-1">Total</th>
+                  <th className="border border-gray-300 p-1">Positivas</th>
+                  <th className="border border-gray-300 p-1">Negativas</th>
+                  <th className="border border-gray-300 p-1">Total</th>
+                  <th className="border border-gray-300 p-1">Positivas</th>
+                  <th className="border border-gray-300 p-1">Negativas</th>
+                  <th className="border border-gray-300 p-1">Total</th>
+                  <th className="border border-gray-300 p-1">Intra</th>
+                  <th className="border border-gray-300 p-1">Peri</th>
+                  <th className="border border-gray-300 p-1">Total</th>
+                </tr>
+              </thead>
+
+              <tbody className="text-center">
+                {reportData.map((item) => (
+                  <tr key={item.codigoDaLocalidade} className="hover:bg-gray-50">
+                    <td className="border border-gray-300 p-2">{new Date(item.data).toLocaleDateString("pt-BR", {timeZone: 'UTC'})}</td>
+                    <td className="border border-gray-300 p-2 text-left">{item.nome} - {item.categoria}</td>
+                    <td className="border border-gray-300 p-2">
+                      <input 
+                        type="checkbox"
+                        className="h-4 w-4 accent-green-600"
+                        checked={item.conclusao}
+                        onChange={() => handleToggleConclusion(item.codigoDaLocalidade)} 
+                      />
+                    </td>
+                    <td className="border border-gray-300 p-2">
+                      <input
+                        type="checkbox"
+                        className="h-4 w-4"
+                        checked={item.localidadePositiva}
+                        readOnly
+                      />
+                    </td>
+                    <td className="border border-gray-300 p-2">{item.numeroHabitantes}</td>
+                    <td className="border border-gray-300 p-2">{item.casasTrabalhadas.positivas}</td>
+                    <td className="border border-gray-300 p-2">{item.casasTrabalhadas.negativas}</td>
+                    <td className="border border-gray-300 p-2">{item.casasTrabalhadas.total}</td>
+                    <td className="border border-gray-300 p-2">{item.casasPendentes.fechadas}</td>
+                    <td className="border border-gray-300 p-2">{item.casasPendentes.recusadas}</td>
+                    <td className="border border-gray-300 p-2">{item.casasPendentes.total}</td>
+                    <td className="border border-gray-300 p-2">{item.anexosTrabalhados.positivas}</td>
+                    <td className="border border-gray-300 p-2">{item.anexosTrabalhados.negativas}</td>
+                    <td className="border border-gray-300 p-2">{item.anexosTrabalhados.total}</td>
+                    <td className="border border-gray-300 p-2">{item.unidadesDomiciliares.positivas}</td>
+                    <td className="border border-gray-300 p-2">{item.unidadesDomiciliares.negativas}</td>
+                    <td className="border border-gray-300 p-2">{item.unidadesDomiciliares.total}</td>
+                    <td className="border border-gray-300 p-2">{item.triatomineosCapturados.intra}</td>
+                    <td className="border border-gray-300 p-2">{item.triatomineosCapturados.peri}</td>
+                    <td className="border border-gray-300 p-2">{item.triatomineosCapturados.total}</td>
+                    <td className="border border-gray-300 p-2">{item.homensTrabalhando}</td>
+                    <td className="border border-gray-300 p-2">{item.caes}</td>
+                    <td className="border border-gray-300 p-2">{item.gatos}</td>
+                  </tr>
+                ))}
+              </tbody>
+
+              <tfoot className="bg-gray-100 font-bold text-center">
+                  <tr>
+                      <td colSpan={4} className="border border-gray-300 p-2 text-right">Total</td>
+                      <td className="border border-gray-300 p-2">{totals.numeroHabitantes}</td>
+                      <td className="border border-gray-300 p-2">{totals.casasTrabalhadas.positivas}</td>
+                      <td className="border border-gray-300 p-2">{totals.casasTrabalhadas.negativas}</td>
+                      <td className="border border-gray-300 p-2">{totals.casasTrabalhadas.total}</td>
+                      <td className="border border-gray-300 p-2">{totals.casasPendentes.fechadas}</td>
+                      <td className="border border-gray-300 p-2">{totals.casasPendentes.recusadas}</td>
+                      <td className="border border-gray-300 p-2">{totals.casasPendentes.total}</td>
+                      <td className="border border-gray-300 p-2">{totals.anexosTrabalhados.positivas}</td>
+                      <td className="border border-gray-300 p-2">{totals.anexosTrabalhados.negativas}</td>
+                      <td className="border border-gray-300 p-2">{totals.anexosTrabalhados.total}</td>
+                      <td className="border border-gray-300 p-2">{totals.unidadesDomiciliares.positivas}</td>
+                      <td className="border border-gray-300 p-2">{totals.unidadesDomiciliares.negativas}</td>
+                      <td className="border border-gray-300 p-2">{totals.unidadesDomiciliares.total}</td>
+                      <td className="border border-gray-300 p-2">{totals.triatomineosCapturados.intra}</td>
+                      <td className="border border-gray-300 p-2">{totals.triatomineosCapturados.peri}</td>
+                      <td className="border border-gray-300 p-2">{totals.triatomineosCapturados.total}</td>
+                      <td className="border border-gray-300 p-2">{totals.homensTrabalhando}</td>
+                      <td className="border border-gray-300 p-2">{totals.caes}</td>
+                      <td className="border border-gray-300 p-2">{totals.gatos}</td>
+                  </tr>
+              </tfoot>
+            </table>
+          </div>
         </div>
-      </div>
-    </SigenAppLayout>
+      </SigenAppLayout>
+      <SigenDialog
+        isOpen={dialog.isOpen}
+        onClose={() => setDialog((prev) => ({ ...prev, isOpen: false }))}
+        type={dialog.type}
+        title={dialog.title}
+        message={dialog.message}
+      />
+    </>
   );
 }

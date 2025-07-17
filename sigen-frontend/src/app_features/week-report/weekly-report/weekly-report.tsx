@@ -15,6 +15,7 @@ import { SigenLoadingButton } from "@/components/sigen-loading-button";
 import { WorkPhase } from "@/domain/entities/work";
 import { SigenDropdown } from "@/components/sigen-dropdown";
 import { Turma } from "@/domain/entities/class";
+import { API_BASE_URL } from "@/config/api-config";
 
 interface WeeklyReport {
   microregional: string;
@@ -61,14 +62,8 @@ export default function WeeklyReport(){
 
   const [isLoading, setIsLoading] = useState(false);
   const [reportData, setReportData] = useState<ReportList[]>([]);
-  
-  const [dialog, setDialog] = useState<SigenDialogProps>({
-    isOpen: false,
-    type: "info",
-    message: "",
-  });
 
-const handleSubmit = async (e: React.FormEvent) => {
+  const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     if (!validateForm()) {
       return;
@@ -76,47 +71,20 @@ const handleSubmit = async (e: React.FormEvent) => {
     
     setIsLoading(true);
 
+    const fase = values.workPhase == WorkPhase.AV ? 0 : 1;
+
     const searchParams = {
       microregional: values.microregional,
-      city: values.city,
-      workPhase: String(values.workPhase || ''),
-      week: String(values.week || 0),
-      class: String(values.class || ''),
-      headGuard: values.headGuard,
+      municipio: values.city,
+      fasedetrabalho: fase.toString(),
+      semana: String(values.week || 0),
+      turma: String(values.class || ''),
+      guardachefe: values.headGuard,
     };
-    
+
     const queryString = new URLSearchParams(searchParams).toString();
 
-    try {
-      const response = await fetch(`/api/report/consult?${queryString}`);
-
-      if (!response.ok) {
-        throw new Error("Erro ao consultar o relatório. Tente novamente.");
-      }
-
-      const data = await response.json();
-
-      if (data.items && data.items.length > 0) {
-        router.push(`./report-results?${queryString}`);
-      } else {
-        setDialog({
-          isOpen: true,
-          type: "info",
-          title: "Sem Resultados",
-          message: "Nenhum dado encontrado para os filtros informados.",
-        });
-      }
-    } catch (error) {
-      const errorMessage = error instanceof Error ? error.message : "Ocorreu um erro inesperado.";
-      setDialog({
-        isOpen: true,
-        type: "error",
-        title: "Erro na Consulta",
-        message: errorMessage,
-      });
-    } finally {
-      setIsLoading(false);
-    }
+    router.push(`./report-results?${queryString}`);
   };
 
   return (
@@ -220,13 +188,6 @@ const handleSubmit = async (e: React.FormEvent) => {
           </div>
         </form>
       </SigenAppLayout>
-      <SigenDialog
-        isOpen={dialog.isOpen}
-        onClose={() => setDialog((prev) => ({ ...prev, isOpen: false }))}
-        type={dialog.type}
-        title={dialog.title}
-        message={dialog.message}
-      />
     </>
   );
 }
