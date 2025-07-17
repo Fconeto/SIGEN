@@ -151,11 +151,23 @@ export default function SearchRegisterForm() {
         method: "POST",
         headers: {
           "Content-Type": "application/json",
-          "Authorization": `Bearer ${token}`,
+          Authorization: `Bearer ${token}`,
         },
         body: JSON.stringify({
           agentId: GlobalService.getInstance().getUser()?.id,
-          ...values,
+          pendencyState: values.pendencyState,
+          nomeMorador: values.nomeMorador,
+          numberOfPeople: Number(values.numberOfPeople),
+          wallType: values.wallType,
+          otherWallType: values.otherWallType,
+          ceilingType: values.ceilingType,
+          otherCeilingType: values.otherCeilingType,
+          captureIntra: values.captureIntra,
+          capturePeri: values.capturePeri,
+          positiveAttachments: Number(values.positiveAttachments),
+          negativeAttachments: Number(values.negativeAttachments),
+          numberOfCats: Number(values.numberOfCats),
+          numberOfDogs: Number(values.numberOfDogs),
         }),
       });
       
