@@ -188,7 +188,7 @@ export default function HouseRegistrationForm() {
 
       const response = await res.json();
 
-      if (!res.ok) throw new Error(response.message || "Erro ao cadastrar agente"); 
+      if (!res.ok) throw new Error(response.message || "Erro ao cadastrar residência"); 
 
       setIsLoading(false);
       setDialog({

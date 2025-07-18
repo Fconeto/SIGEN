@@ -1,28 +1,17 @@
 
+import { Console } from "console";
 import { NextResponse } from "next/server";
 import { NextRequest } from "next/server";
-import { GlobalService } from "./services/global-service";
-import { UserRole } from "./domain/entities/user";
 
-const roleAccessConfig: Record<UserRole, {
-    path: string,
-    allowedPaths: string[]
-}> = {
-    [UserRole.AGENT]: {
-        path: '/agent',
-        allowedPaths: ['/auth/login', '/'],
-    },
-    [UserRole.CHIEF_AGENT]: {
-        path: '/chief-agent',
-        allowedPaths: ['/auth', '/'],
-    },
-}
-
-function isPathAllowed(path: string, role: UserRole): boolean {
-    const config = roleAccessConfig[role]
-    return config.allowedPaths.some((allowedPath) =>
-        path === allowedPath || path.startsWith(allowedPath + '/') || path.startsWith(config.path)
-    )
+function parseJwt(token: string): Record<string, any> | null {
+  try {
+    const base64Url = token.split('.')[1];
+    const base64 = base64Url.replace(/-/g, '+').replace(/_/g, '/');
+    const jsonPayload = Buffer.from(base64, 'base64').toString('utf-8');
+    return JSON.parse(jsonPayload);
+  } catch {
+    return null;
+  }
 }
 
 export function middleware(request: NextRequest) {
@@ -36,10 +25,23 @@ export function middleware(request: NextRequest) {
     }
 
     if (token) {
-        if (isLoginPage || isRootPath) {
+        const payload = parseJwt(token);
+        const tipoDeUsuario = payload?.Hierarquia;
+
+        if (tipoDeUsuario === '0' && path.startsWith('/chief-agent')) {
             return NextResponse.redirect(new URL('/agent', request.url));
         }
-        return;
+        if (tipoDeUsuario === '1' && path.startsWith('/agent')) {
+            return NextResponse.redirect(new URL('/chief-agent', request.url));
+        }
+
+        if (isLoginPage || isRootPath) {
+            if (tipoDeUsuario === '0') {
+                return NextResponse.redirect(new URL('/agent', request.url));
+            } else if (tipoDeUsuario === '1') {
+                return NextResponse.redirect(new URL('/chief-agent', request.url));
+            }
+        }
     }
 }
 

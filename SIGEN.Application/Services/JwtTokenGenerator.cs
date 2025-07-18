@@ -19,9 +19,10 @@ namespace SIGEN.Application.Services
                 Subject = new ClaimsIdentity(new[]
                 {
                     new Claim("NomeDoAgente", agent.NomeDoAgente),
-                    new Claim("Matricula", agent.Matricula.ToString())
+                    new Claim("Matricula", agent.Matricula.ToString()),
+                    new Claim("Hierarquia", ((int)agent.Hierarquia).ToString()),
                 }),
-                Expires = DateTime.UtcNow.AddHours(2),
+                Expires = DateTime.UtcNow.AddHours(10),
                 Issuer = issuer,
                 Audience = audience,
                 SigningCredentials = new SigningCredentials(new SymmetricSecurityKey(key), SecurityAlgorithms.HmacSha256Signature)

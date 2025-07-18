@@ -28,8 +28,8 @@ interface SearchForm {
   otherCeilingType: string;
   captureIntra?: boolean;
   capturePeri?: boolean;
-  positiveAttachments: string;
-  negativeAttachments: string;
+  positiveAttachments: number;
+  negativeAttachments: number;
   numberOfCats: string;
   numberOfDogs: string;
 }
@@ -40,7 +40,7 @@ export default function SearchRegisterForm() {
 
   const mandatoryCaptureSelection = (_: any, allValues: SearchForm) => {
   if (!allValues.captureIntra && !allValues.capturePeri)
-    return "Selecione ao menos um tipo de captura";
+      return "Selecione ao menos um tipo de captura";
   };
 
   const { values, errors, handleChange, validateForm, resetForm } = useForm(
@@ -54,8 +54,8 @@ export default function SearchRegisterForm() {
       otherCeilingType: "",
       captureIntra: false,
       capturePeri: false,
-      positiveAttachments: "",
-      negativeAttachments: "",
+      positiveAttachments: 0,
+      negativeAttachments: 0,
       numberOfCats: "",
       numberOfDogs: "",
     } as SearchForm,
@@ -182,6 +182,12 @@ export default function SearchRegisterForm() {
           message: 'Cadastro realizado com sucesso!',
         });
         resetForm();
+        
+        setTimeout(() => {
+          setDialog({ isOpen: false, type: 'info', message: '' });
+          router.push("/agent"); 
+        }, 2000);
+        
       } else {
         const errorData = await response.json();
         setDialog({
@@ -351,7 +357,8 @@ export default function SearchRegisterForm() {
             )}
           </SigenInputConnector>
 
-          <SigenFormField id="capture" label="Captura">
+          <SigenFormField id="capture" label="Captura"
+            error={errors.captureIntra || errors.capturePeri}>
             <div className="flex items-center flex-wrap pl-1 pt-2">
               <hr></hr>
               <label htmlFor="captureIntra" className="text-sm text-gray-700">
@@ -390,7 +397,7 @@ export default function SearchRegisterForm() {
               id="positiveAttachments"
               value={values.positiveAttachments}
               onChange={(e) =>
-                handleChange("positiveAttachments", e.target.value)
+                handleChange("positiveAttachments", Number(e.target.value))
               }
               mask={{
                 mask: Number,
@@ -410,7 +417,7 @@ export default function SearchRegisterForm() {
               id="negativeAttachments"
               value={values.negativeAttachments}
               onChange={(e) =>
-                handleChange("negativeAttachments", e.target.value)
+                handleChange("negativeAttachments", Number(e.target.value))
               }
               mask={{
                 mask: Number,
