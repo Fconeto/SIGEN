@@ -1,14 +1,20 @@
 "use client";
 
-import type React from "react";
+import React, { useEffect, useState, useMemo } from "react";
 import { useForm, validators } from "@/hooks/useform";
 import { SigenAppLayout } from "@/components/sigen-app-layout";
-import { useState } from "react";
 import { SigenDialog, type SigenDialogProps } from "@/components/sigen-dialog";
 import { useRouter } from "next/navigation";
 import { SigenFormField } from "@/components/sigen-form-field";
 import { SigenInput } from "@/components/sigen-input";
 import { SigenLoadingButton } from "@/components/sigen-loading-button";
+import { SigenCombobox } from "@/components/sigen-combobox";
+
+interface Locality {
+  codigo: string;
+  nome: string;
+  categoria: string;
+}
 
 interface SprayConsult {
   locationId: string;
@@ -20,7 +26,7 @@ interface SprayConsult {
 export default function SprayConsult() {
   const router = useRouter();
 
-  const { values, errors, handleChange, validateForm, setValues } = useForm(
+  const { values, errors, handleChange, validateForm } = useForm(
     {
       locationId: "",
       nomeMorador: "",
@@ -28,15 +34,9 @@ export default function SprayConsult() {
       numeroCasa: "",
     } as SprayConsult,
     {
-      locationId: [
-        validators.required("Campo obrigatório"),
-        (value) =>
-          value && !/^\d+$/.test(value)
-            ? "O campo Código da Localidade deve conter apenas números"
-            : undefined,
-      ],
+      locationId: [validators.required("Campo obrigatório")], 
       nomeMorador: [
-        (value) => /\d/.test(value) ? "O campo nome não pode conter números" :  undefined,
+        (value) => (/\d/.test(value) ? "O campo nome não pode conter números" : undefined),
       ],
       numeroComplemento: [],
       numeroCasa: [
@@ -54,6 +54,44 @@ export default function SprayConsult() {
     type: "info",
     message: "",
   });
+
+  const [localities, setLocalities] = useState<Locality[]>([]);
+  const [isFetchingLocalities, setIsFetchingLocalities] = useState<boolean>(true);
+
+  useEffect(() => {
+    const fetchLocalities = async () => {
+      setIsFetchingLocalities(true);
+      try {
+        const response = await fetch("/api/Locality/consultlocality");
+        if (!response.ok) {
+          throw new Error("Falha ao buscar as localidades.");
+        }
+        const data: Locality[] = await response.json();
+        setLocalities(data);
+      } catch (error) {
+        console.error(error);
+        setDialog({
+          isOpen: true,
+          type: "error",
+          title: "Erro de Rede",
+          message: "Não foi possível carregar a lista de localidades.",
+        });
+      } finally {
+        setIsFetchingLocalities(false);
+      }
+    };
+
+    fetchLocalities();
+  }, []); 
+
+  const localityOptions = useMemo(
+    () =>
+      localities.map((loc) => ({
+        value: loc.codigo,
+        label: `${loc.codigo} - ${loc.nome}`,
+      })),
+    [localities]
+  );
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -97,12 +135,12 @@ export default function SprayConsult() {
             }
             error={errors.locationId}
           >
-            <SigenInput
-              id="locationId"
+            <SigenCombobox 
+              options={localityOptions}
               value={values.locationId}
-              onChange={(e) => handleChange("locationId", e.target.value)}
-              aria-invalid={!!errors.locationId}
-              placeholder="Digite o código da localidade"
+              placeholder="Selecione uma localidade"
+              disabled={isFetchingLocalities}
+              onChange={(value) => handleChange("locationId", value)}
             />
           </SigenFormField>
 
