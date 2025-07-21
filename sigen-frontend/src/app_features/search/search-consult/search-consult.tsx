@@ -9,6 +9,8 @@ import { SigenFormField } from "@/components/sigen-form-field";
 import { SigenInput } from "@/components/sigen-input";
 import { SigenLoadingButton } from "@/components/sigen-loading-button";
 import { SigenCombobox } from "@/components/sigen-combobox";
+import Cookies from "js-cookie";
+import { API_BASE_URL } from "@/config/api-config";
 
 interface Locality {
   codigo: string;
@@ -62,11 +64,29 @@ export default function SprayConsult() {
     const fetchLocalities = async () => {
       setIsFetchingLocalities(true);
       try {
-        const response = await fetch("/api/Locality/consultlocality");
+        const token = Cookies.get("authToken");
+
+        const response = await fetch(`${API_BASE_URL}/api/locality/consultlocality`, 
+          {
+            method: "GET",
+            headers: {
+              "Content-Type": "application/json",
+              "Authorization": `Bearer ${token}`
+            },
+          });
+
         if (!response.ok) {
           throw new Error("Falha ao buscar as localidades.");
         }
-        const data: Locality[] = await response.json();
+
+        const res = await response.json();
+
+        const data: Locality[] = res.data.map((item: any) => ({
+          codigo: item.codigoDaLocalidade,
+          nome: item.nome,
+          categoria: item.categoria,
+        }));
+        
         setLocalities(data);
       } catch (error) {
         console.error(error);
@@ -101,16 +121,15 @@ export default function SprayConsult() {
 
     setIsLoading(true);
     const searchParams = {
-      locationId: values.locationId,
-      ...(values.nomeMorador && { nomeMorador: values.nomeMorador }),
+      CodigoDaLocalidade: values.locationId,
+      ...(values.nomeMorador && { NomeDoMorador: values.nomeMorador }),
       ...(values.numeroComplemento && {
-        numeroComplemento: values.numeroComplemento,
+        NumeroDoComplemento: values.numeroComplemento,
       }),
-      ...(values.numeroCasa && { numeroCasa: values.numeroCasa }),
+      ...(values.numeroCasa && { NumeroDaCasa: values.numeroCasa }),
     };
 
     await new Promise((r) => setTimeout(r, 1000));
-    console.log("Form Data:", values);
     setIsLoading(false);
 
     const queryString = new URLSearchParams(searchParams).toString();

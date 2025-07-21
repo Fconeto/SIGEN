@@ -11,5 +11,5 @@ public enum Turma
 public enum Hierarquia
 {
     AgenteCampo = 0,
-    AgenteChefe = 0,
+    AgenteChefe = 1,
 }

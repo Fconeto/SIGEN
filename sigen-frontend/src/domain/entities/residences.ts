@@ -1,8 +1,8 @@
 export interface ResidenceInfos {
   id: string;
-  complement: string;
-  numeroCasa: string;
-  nomeMorador: string;
+  complemento: string;
+  numero: string;
+  nomeDoMorador: string;
   status: 'pending' | 'completed';
 }
 

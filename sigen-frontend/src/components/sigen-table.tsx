@@ -4,9 +4,9 @@ import { cn } from "@/lib/utils";
 
 interface TableResidence {
   id: string;
-  complement: string;
-  numeroCasa: string;
-  nomeMorador: string;
+  complemento: string;
+  numero: string;
+  nomeDoMorador: string;
 }
 
 type SortKey = keyof TableResidence;
@@ -65,29 +65,29 @@ export function SigenTable({
             <tr className="bg-gray-50 border-b border-gray-200">
               <th className="px-4 py-3 text-left w-31">
                 <button
-                  onClick={() => onSort("complement")}
+                  onClick={() => onSort("complemento")}
                   className="flex w-full items-center gap-2 text-xs font-medium text-gray-600 tracking-wider hover:text-gray-900"
                 >
                   <span className="truncate">Nº COMPLEMENTO</span>
-                  {getSortIcon("complement")}
+                  {getSortIcon("complemento")}
                 </button>
               </th>
               <th className="w-22 px-4 py-3 text-left text-xs font-medium text-gray-600 tracking-wider">
                 <button
-                  onClick={() => onSort("numeroCasa")}
+                  onClick={() => onSort("numero")}
                   className="truncate flex items-center gap-2 hover:text-gray-900"
                 >
                   Nº CASA
-                  {getSortIcon("numeroCasa")}
+                  {getSortIcon("numero")}
                 </button>
               </th>
               <th className="px-4 py-3 text-left text-xs font-medium text-gray-600 tracking-wider">
                 <button
-                  onClick={() => onSort("nomeMorador")}
+                  onClick={() => onSort("nomeDoMorador")}
                   className="flex items-center gap-2 hover:text-gray-900"
                 >
                   MORADOR
-                  {getSortIcon("nomeMorador")}
+                  {getSortIcon("nomeDoMorador")}
                 </button>
               </th>
               <th className="px-4 py-3 text-center text-xs font-medium text-gray-600 uppercase tracking-wider w-16">
@@ -109,13 +109,13 @@ export function SigenTable({
                   className="hover:bg-gray-50 transition-colors"
                 >
                   <td className="truncate px-4 py-3 text-sm text-center text-gray-900">
-                    {residence.complement}
+                    {residence.complemento}
                   </td>
                   <td className="truncate px-4 py-3 text-sm text-gray-900">
-                    {residence.numeroCasa}
+                    {residence.numero}
                   </td>
                   <td className="truncate px-4 py-3 text-sm text-gray-900">
-                    {residence.nomeMorador}
+                    {residence.nomeDoMorador}
                   </td>
                   <td className="px-4 py-3 text-center">
                     <button

@@ -5,19 +5,63 @@ import { SigenTable } from "@/components/sigen-table";
 import { SigenPagination } from "@/components/sigen-pagination";
 import { SigenDialog, type SigenDialogProps } from "@/components/sigen-dialog";
 import { useRouter, useSearchParams } from "next/navigation";
-import { useEffect, useMemo, useState } from "react";
+import { use, useEffect, useMemo, useState } from "react";
 import {
   ResidenceInfos,
   ResidenceSortKey, 
 } from "@/domain/entities/residences";
 import { Plus } from "lucide-react";
 import { API_BASE_URL } from "@/config/api-config";
+import Cookies from "js-cookie";
+
+export interface PendingSearchInfos {
+  atualizadoPor: number;
+  categoriaDaLocalidade: string;
+  codigoDaLocalidade: number;
+  complemento: string;
+  criadoPor: number;
+  dataDeAtualizacao: string;
+  dataDeRegistro: string;
+  id: number;
+  nomeDaLocalidade: string;
+  nomeDoMorador: string;
+  numero: number;
+  pageNumber: number;
+  pageSize: number;
+  totalCount: number;
+  totalPages: number;
+}
+
+const sortResidenceInfos = {
+  id: -1,
+  complemento: 0,
+  numero: 1,
+  nomeDoMorador: 2,
+}
 
 export default function SprayPendingResults() {
   const router = useRouter();
   const searchParams = useSearchParams();
 
-  const [sprayPendings, setSprayPendings] = useState<ResidenceInfos[]>([]);
+  const [sprayPendings, setSprayPendings] = useState<PendingSearchInfos[]>([
+    {
+      atualizadoPor: 0,
+      categoriaDaLocalidade: "",
+      codigoDaLocalidade: 0,
+      complemento: "",
+      criadoPor: 0,
+      dataDeAtualizacao: "",
+      dataDeRegistro: "",
+      id: 0,
+      nomeDaLocalidade: "",
+      nomeDoMorador: "",
+      numero: 0,
+      pageNumber: 1,
+      pageSize: 10,
+      totalCount: 0,
+      totalPages: 1,
+    },
+  ]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
   const [dialog, setDialog] = useState<SigenDialogProps>({
@@ -32,28 +76,32 @@ export default function SprayPendingResults() {
     key: ResidenceSortKey; 
     direction: "ascending" | "descending";
   } | null>({
-    key: "nomeMorador",
+    key: "nomeDoMorador",
     direction: "ascending",
   });
 
   const [currentPage, setCurrentPage] = useState(1);
   const [locationInfo, setLocationInfo] = useState({ code: "", name: "" });
-  const ITEMS_PER_PAGE = 10;
 
   useEffect(() => {
     const fetchData = async () => {
-      const queryString = searchParams.toString();
+      let queryString = searchParams.toString();
 
       setLoading(true);
       setError(null);
-
+      
       try {
-        const token = localStorage.getItem("authToken");
+        
+        if (sortConfig) {
+          queryString += `&page=${currentPage}&order=${sortConfig.direction}&ordertype=${sortResidenceInfos[sortConfig.key]}`;
+        }
+        const token = Cookies.get("authToken");
 
         const response = await fetch(
           `${API_BASE_URL}/api/Search/pending?${queryString}`,
           {
             headers: {
+              "Content-Type": "application/json",
               Authorization: `Bearer ${token}`,
             },
           }
@@ -65,8 +113,12 @@ export default function SprayPendingResults() {
 
         const data = await response.json();
 
-        if (data.data.items && data.data.items.length > 0) {
-          setSprayPendings((data.data && data.data.items) ? data.data.items : []);
+        if (data.data && data.data.length > 0) {
+          setSprayPendings((data && data.data) ? data.data : []);
+          setLocationInfo({
+            code: data.data[0]?.codigoDaLocalidade || "",
+            name: data.data[0]?.nomeDaLocalidade || "",
+          });
         } 
         else {
           setDialog({
@@ -95,39 +147,16 @@ export default function SprayPendingResults() {
   }, [searchParams, currentPage, sortConfig]); 
 
   const paginatedSprayPendings = useMemo(() => {
-    const sortedItems = [...sprayPendings];
-    if (sortConfig !== null) {
-      sortedItems.sort((a, b) => {
-        const aValue = a[sortConfig.key];
-        const bValue = b[sortConfig.key];
+    const sortedItems: ResidenceInfos[] = sprayPendings.map(item => ({
+      id: item.id.toString(),
+      complemento: item.complemento,
+      numero: item.numero.toString(),
+      nomeDoMorador: item.nomeDoMorador,
+      status: "pending",
+    }));
 
-        if (aValue === null && bValue === null) return 0;
-        if (aValue === null) return 1;
-        if (bValue === null) return -1;
-
-        if (sortConfig.key === "complement") {
-          const numA = Number.parseInt(String(aValue), 10);
-          const numB = Number.parseInt(String(bValue), 10);
-          if (Number.isNaN(numA)) return 1;
-          if (Number.isNaN(numB)) return -1;
-          if (numA < numB) return sortConfig.direction === "ascending" ? -1 : 1;
-          if (numA > numB) return sortConfig.direction === "ascending" ? 1 : -1;
-          return 0;
-        }
-
-        const aStr = String(aValue).toLowerCase();
-        const bStr = String(bValue).toLowerCase();
-
-        if (aStr < bStr) return sortConfig.direction === "ascending" ? -1 : 1;
-        if (aStr > bStr) return sortConfig.direction === "ascending" ? 1 : -1;
-        return 0;
-      });
-    }
-    const startIndex = (currentPage - 1) * ITEMS_PER_PAGE;
-    const endIndex = startIndex + ITEMS_PER_PAGE;
-
-    return sortedItems.slice(startIndex, endIndex);
-  }, [sprayPendings, currentPage, sortConfig]);
+    return sortedItems;
+  }, [sprayPendings]);
 
   const handleSort = (key: ResidenceSortKey) => { 
     let direction: "ascending" | "descending" = "ascending";
@@ -146,7 +175,7 @@ export default function SprayPendingResults() {
     router.push(`./search-register/?id=${id}`);
   };
 
-  const totalPages = Math.ceil(sprayPendings.length / ITEMS_PER_PAGE);
+  const totalPages = sprayPendings[0]?.totalPages;
 
   return (
     <>

@@ -14,12 +14,23 @@ export interface House {
 
 
 export enum PropertySituation {
-    demolished = "Demolido",
-    new = "Novo"
+    demolished = 0,
+    new = 1,
 }
 
+export const PropertySituationLabels: Record<PropertySituation, string> = {
+    [PropertySituation.demolished]: 'Demolido',
+    [PropertySituation.new]: 'Novo',
+};
+
 export enum PropertyType {
-    house = "Residência",
-    market = "Comércio",
-    other = "Outro"
+    house = 0,
+    market = 1,
+    other = 2,
 }
+
+export const PropertyTypeLabels: Record<PropertyType, string> = {
+    [PropertyType.house]: 'Residência',
+    [PropertyType.market]: 'Comércio',
+    [PropertyType.other]: 'Outro',
+};

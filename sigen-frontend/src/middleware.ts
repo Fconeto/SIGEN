@@ -1,55 +1,50 @@
+
+import { Console } from "console";
 import { NextResponse } from "next/server";
 import { NextRequest } from "next/server";
-import { GlobalService } from "./services/global-service";
-import { UserRole } from "./domain/entities/user";
 
-const roleAccessConfig: Record<UserRole, {
-    path: string,
-    allowedPaths: string[]
-}> = {
-    [UserRole.AGENT]: {
-        path: '/agent',
-        allowedPaths: ['/auth/login', '/'],
-    },
-    [UserRole.CHIEF_AGENT]: {
-        path: '/chief-agent',
-        allowedPaths: ['/auth', '/'],
-    },
-}
-
-function isPathAllowed(path: string, role: UserRole): boolean {
-    const config = roleAccessConfig[role]
-    return config.allowedPaths.some((allowedPath) =>
-        path === allowedPath || path.startsWith(allowedPath + '/') || path.startsWith(config.path)
-    )
+function parseJwt(token: string): Record<string, any> | null {
+  try {
+    const base64Url = token.split('.')[1];
+    const base64 = base64Url.replace(/-/g, '+').replace(/_/g, '/');
+    const jsonPayload = Buffer.from(base64, 'base64').toString('utf-8');
+    return JSON.parse(jsonPayload);
+  } catch {
+    return null;
+  }
 }
 
 export function middleware(request: NextRequest) {
-    const globalService = GlobalService.getInstance()
-    const isAuthenticated = globalService.isAuthenticated()
-    const user = globalService.getUser()
-    const path = request.nextUrl.pathname
+    const token = request.cookies.get('authToken')?.value;
+    const path = request.nextUrl.pathname;
+    const isRootPath = path === '/';
+    const isLoginPage = path === '/auth/login';
 
-    const isRootPath = path === '/'
-    const isLoginPage = path === '/auth/login'
-
-    if ((!isAuthenticated || !user) && !isLoginPage) {
-        globalService.logout()
-        return NextResponse.redirect(new URL('/auth/login', request.url))
+    if (!token && !isLoginPage) {
+        return NextResponse.redirect(new URL('/auth/login', request.url));
     }
 
-    if (isAuthenticated && user) {
-        const config = roleAccessConfig[user.role]
+    if (token) {
+        const payload = parseJwt(token);
+        const tipoDeUsuario = payload?.Hierarquia;
 
-        if (isLoginPage || isRootPath) {
-            return NextResponse.redirect(new URL(config.path, request.url))
+        if (tipoDeUsuario === '0' && path.startsWith('/chief-agent')) {
+            return NextResponse.redirect(new URL('/agent', request.url));
+        }
+        if (tipoDeUsuario === '1' && path.startsWith('/agent')) {
+            return NextResponse.redirect(new URL('/chief-agent', request.url));
         }
 
-        if (!isPathAllowed(path, user.role)) {
-            return NextResponse.redirect(new URL(config.path, request.url))
+        if (isLoginPage || isRootPath) {
+            if (tipoDeUsuario === '0') {
+                return NextResponse.redirect(new URL('/agent', request.url));
+            } else if (tipoDeUsuario === '1') {
+                return NextResponse.redirect(new URL('/chief-agent', request.url));
+            }
         }
     }
 }
+
 export const config = {
     matcher: [
         "/((?!api|_next/static|_next/image|next|favicon\\.ico|sw|workbox|fallback|.*\\.(?:ico|svg|png|jpg|jpeg|gif|webp|woff|woff2|ttf|eot|json|txt|xml|csv)).*)"
