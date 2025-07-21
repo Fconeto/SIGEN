@@ -19,5 +19,5 @@ public class PIT : BaseEntity
     public TipoDeInsetoEnum TipoDoInseto { get; set; }
     public string? OutroTipoDeInseto { get; set; }
     public string NomeDoRecebedor { get; set; }
-    public long PesquisaId { get; set; }
+    public long? PesquisaId { get; set; }
 }

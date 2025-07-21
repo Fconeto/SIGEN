@@ -6,7 +6,6 @@ using SIGEN.Domain.ExeptionsBase;
 using SIGEN.Domain.Shared.Requests;
 using SIGEN.Domain.Shared.Responses;
 using SIGEN.Infrastructure.Interfaces;
-
 namespace SIGEN.Application.Services;
 
 public class PITService : IPITService
@@ -55,6 +54,29 @@ public class PITService : IPITService
             return searchResponse;
         }
         catch (Exception ex)
+        {
+            throw new SigenValidationException(ex.Message);
+        }
+    }
+
+    public async Task CreateSearchPIT(SearchPITRequest request)
+    {
+        try
+        {
+            SearchPITValidator validator = new SearchPITValidator();
+            validator.Validate(request);
+
+            PIT existingPIT = await _pitRepository.GetPITById(request.PITId);
+
+            if (existingPIT == null || existingPIT.PesquisaId != null)
+                throw new SigenValidationException("PIT não está pendente.");
+
+            SearchPITMapper searchPITMapper = new SearchPITMapper();
+            SearchPIT entity = searchPITMapper.Map(request);
+
+            await _pitRepository.InsertSearchPIT(entity);
+        }
+        catch (SigenValidationException ex)
         {
             throw new SigenValidationException(ex.Message);
         }

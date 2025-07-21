@@ -93,4 +93,64 @@ public class PITRepository : IPITRepository
             )).ToList();
         }
     }
+    public async Task InsertSearchPIT(SearchPIT searchPIT)
+    {
+        using (var connection = new SqlConnection(_connectionString))
+        {
+            var parameters = new DynamicParameters();
+            parameters.Add("@PITId", searchPIT.PITId);
+            parameters.Add("@ResidenciaId", searchPIT.ResidenciaId);
+            parameters.Add("@Data", searchPIT.Data);
+            parameters.Add("@Pendencia", (int)searchPIT.Pendencia);
+            parameters.Add("@NomeDoMorador", searchPIT.NomeDoMorador);
+            parameters.Add("@NumeroDeHabitantes", searchPIT.NumeroDeHabitantes);
+            parameters.Add("@TipoDeParede", (int)searchPIT.TipoDeParede);
+            parameters.Add("@OutroTipoDeParede", searchPIT.OutroTipoDeParede ?? string.Empty);
+            parameters.Add("@TipoDeTeto", (int)searchPIT.TipoDeTeto);
+            parameters.Add("@OutroTipoDeTeto", searchPIT.OutroTipoDeTeto ?? string.Empty);
+            parameters.Add("@CapturaIntra", searchPIT.CapturaIntra);
+            parameters.Add("@CapturaPeri", searchPIT.CapturaPeri);
+            parameters.Add("@AnexosPositivos", searchPIT.AnexosPositivos);
+            parameters.Add("@AnexosNegativos", searchPIT.AnexosNegativos);
+            parameters.Add("@NumGatos", searchPIT.NumGatos);
+            parameters.Add("@NumCachorros", searchPIT.NumCachorros);
+            parameters.Add("@AgenteId", searchPIT.AgenteId);
+            parameters.Add("@DataDeRegistro", DateTime.Now);
+            parameters.Add("@DataDeAtualizacao", DateTime.Now);
+
+            await connection.ExecuteAsync(
+                "InsertPesquisaPIT",
+                parameters,
+                commandType: CommandType.StoredProcedure
+            );
+        }
+    }
+    public async Task UpdatePesquisaPITById(long pesquisaId, long? pitId)
+    {
+        using (var connection = new SqlConnection(_connectionString))
+        {
+            await connection.ExecuteAsync("UpdatePesquisaPITById", new
+            {
+                PesquisaId = pesquisaId,
+                PITId = pitId
+            }, commandType: CommandType.StoredProcedure);
+        }
+    }
+
+    public async Task<PIT> GetPITById(long id)
+    {
+        using (var connection = new SqlConnection(_connectionString))
+        {
+            var parameters = new DynamicParameters();
+            parameters.Add("@PITId", id);
+
+            var result = await connection.QueryFirstOrDefaultAsync<PIT>(
+                "GetPITById",
+                parameters,
+                commandType: CommandType.StoredProcedure
+            );
+
+            return result;
+        }
+    }
 }

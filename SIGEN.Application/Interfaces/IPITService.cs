@@ -7,4 +7,5 @@ public interface IPITService
 {
     Task CreatePIT(PITRegisterRequest request);
     Task<SearchPITResponse> ConsultPIT(ConsultFiltersRequest request);
+    Task CreateSearchPIT(SearchPITRequest request);
 }

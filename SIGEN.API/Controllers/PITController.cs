@@ -40,7 +40,7 @@ public class PITController : ControllerBase
     [ProducesResponseType(StatusCodes.Status400BadRequest)]
     public async Task<IActionResult> ConsultPIT([FromQuery] ConsultFiltersRequest request)
     {
-        
+
         SearchPITResponse result = await _pitService.ConsultPIT(request);
 
         Response response = new Response
@@ -48,6 +48,24 @@ public class PITController : ControllerBase
             IsSuccess = true,
             Message = "Consulta de PIT realizada com sucesso!",
             Data = result
+        };
+
+        return Ok(response);
+    }
+
+    [HttpPost("searchpit")]
+    [Authorize]
+    [ProducesResponseType(typeof(Response), StatusCodes.Status200OK)]
+    [ProducesResponseType(StatusCodes.Status400BadRequest)]
+    public async Task<IActionResult> CreateSearchPIT([FromBody] SearchPITRequest request)
+    {
+        await _pitService.CreateSearchPIT(request);
+
+        Response response = new Response
+        {
+            IsSuccess = true,
+            Message = "Pesquisa de PIT realizada com sucesso!",
+            Data = null
         };
 
         return Ok(response);
