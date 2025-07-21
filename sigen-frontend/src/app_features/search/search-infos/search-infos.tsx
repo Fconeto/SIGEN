@@ -3,148 +3,162 @@
 import { SigenAppLayout } from "@/components/sigen-app-layout";
 import { SigenTable } from "@/components/sigen-table";
 import { SigenPagination } from "@/components/sigen-pagination";
+import { SigenDialog, type SigenDialogProps } from "@/components/sigen-dialog";
 import { useRouter, useSearchParams } from "next/navigation";
-import { useEffect, useMemo, useState } from "react";
-import { ResidenceInfos, SortKey } from "../../residence-infos/residence-infos";
+import { use, useEffect, useMemo, useState } from "react";
+import {
+  ResidenceInfos,
+  ResidenceSortKey, 
+} from "@/domain/entities/residences";
 import { Plus } from "lucide-react";
+import { API_BASE_URL } from "@/config/api-config";
+import Cookies from "js-cookie";
+
+export interface PendingSearchInfos {
+  atualizadoPor: number;
+  categoriaDaLocalidade: string;
+  codigoDaLocalidade: number;
+  complemento: string;
+  criadoPor: number;
+  dataDeAtualizacao: string;
+  dataDeRegistro: string;
+  id: number;
+  nomeDaLocalidade: string;
+  nomeDoMorador: string;
+  numero: number;
+  pageNumber: number;
+  pageSize: number;
+  totalCount: number;
+  totalPages: number;
+}
+
+const sortResidenceInfos = {
+  id: -1,
+  complemento: 0,
+  numero: 1,
+  nomeDoMorador: 2,
+}
 
 export default function SprayPendingResults() {
   const router = useRouter();
   const searchParams = useSearchParams();
-  const [sprayPendings, setSprayPendings] = useState<ResidenceInfos[]>([]);
-  const [loading, setLoading] = useState(false);
+
+  const [sprayPendings, setSprayPendings] = useState<PendingSearchInfos[]>([
+    {
+      atualizadoPor: 0,
+      categoriaDaLocalidade: "",
+      codigoDaLocalidade: 0,
+      complemento: "",
+      criadoPor: 0,
+      dataDeAtualizacao: "",
+      dataDeRegistro: "",
+      id: 0,
+      nomeDaLocalidade: "",
+      nomeDoMorador: "",
+      numero: 0,
+      pageNumber: 1,
+      pageSize: 10,
+      totalCount: 0,
+      totalPages: 1,
+    },
+  ]);
+  const [loading, setLoading] = useState(true);
+  const [error, setError] = useState<string | null>(null);
+  const [dialog, setDialog] = useState<SigenDialogProps>({
+    isOpen: false,
+    type: "info",
+    message: "",
+  });
+
+  const [totalItems, setTotalItems] = useState(0);
+
   const [sortConfig, setSortConfig] = useState<{
-    key: SortKey;
+    key: ResidenceSortKey; 
     direction: "ascending" | "descending";
   } | null>({
-    key: "nomeMorador",
+    key: "nomeDoMorador",
     direction: "ascending",
   });
+
   const [currentPage, setCurrentPage] = useState(1);
   const [locationInfo, setLocationInfo] = useState({ code: "", name: "" });
-  const ITEMS_PER_PAGE = 10;
 
   useEffect(() => {
-    const fetchSprayPendings = async () => {
+    const fetchData = async () => {
+      let queryString = searchParams.toString();
+
       setLoading(true);
+      setError(null);
+      
+      try {
+        
+        if (sortConfig) {
+          queryString += `&page=${currentPage}&order=${sortConfig.direction}&ordertype=${sortResidenceInfos[sortConfig.key]}`;
+        }
+        const token = Cookies.get("authToken");
 
-      await new Promise((resolve) => setTimeout(resolve, 600));
+        const response = await fetch(
+          `${API_BASE_URL}/api/Search/pending?${queryString}`,
+          {
+            headers: {
+              "Content-Type": "application/json",
+              Authorization: `Bearer ${token}`,
+            },
+          }
+        );
 
-      const mockData: ResidenceInfos[] = [
-        {
-          id: "1",
-          complement: "1",
-          numeroCasa: "203A",
-          nomeMorador: "João Moreira da Silva",
-        },
-        {
-          id: "2",
-          complement: "1",
-          numeroCasa: "718",
-          nomeMorador: "Wellington Rocha",
-        },
-        {
-          id: "3",
-          complement: "2",
-          numeroCasa: "201A",
-          nomeMorador: "Eduardo Ximenes Paiva",
-        },
-        {
-          id: "4",
-          complement: "3",
-          numeroCasa: "201",
-          nomeMorador: "Lucas Silva",
-        },
-        {
-          id: "5",
-          complement: "1",
-          numeroCasa: "105",
-          nomeMorador: "Maria Santos",
-        },
-        {
-          id: "6",
-          complement: "4",
-          numeroCasa: "asd",
-          nomeMorador: "Carlos Oliveira",
-        },
-        { id: "7", complement: "5", numeroCasa: "302", nomeMorador: "asd" },
-        {
-          id: "8",
-          complement: "sd",
-          numeroCasa: "150",
-          nomeMorador: "Ana Costa",
-        },
-        {
-          id: "9",
-          complement: "6",
-          numeroCasa: "401",
-          nomeMorador: "Pedro Lima",
-        },
-        {
-          id: "10",
-          complement: "7",
-          numeroCasa: "202",
-          nomeMorador: "Lucia Ferreira",
-        },
-        {
-          id: "11",
-          complement: "8",
-          numeroCasa: "501",
-          nomeMorador: "Roberto Silva",
-        },
-        {
-          id: "12",
-          complement: "9",
-          numeroCasa: "602",
-          nomeMorador: "Fernanda Costa",
-        },
-      ];
-
-      setSprayPendings(mockData);
-
-      const locationId = searchParams.get("locationId") || "0001";
-      setLocationInfo({ code: locationId, name: "CUPIM" });
-
-      setLoading(false);
-    };
-
-    fetchSprayPendings();
-  }, [searchParams]);
-
-  const paginatedSprayPendings = useMemo(() => {
-    const sortedItems = [...sprayPendings];
-    if (sortConfig !== null) {
-      sortedItems.sort((a, b) => {
-        const aValue = a[sortConfig.key];
-        const bValue = b[sortConfig.key];
-
-        if (aValue === null && bValue === null) return 0;
-        if (aValue === null) return 1;
-        if (bValue === null) return -1;
-
-        if (sortConfig.key === "complement") {
-          const numA = Number.parseInt(aValue, 10);
-          const numB = Number.parseInt(bValue, 10);
-          if (numA < numB) return sortConfig.direction === "ascending" ? -1 : 1;
-          if (numA > numB) return sortConfig.direction === "ascending" ? 1 : -1;
-          return 0;
+        if (!response.ok) {
+          throw new Error("Erro ao consultar os dados. Tente novamente.");
         }
 
-        const aStr = String(aValue).toLowerCase();
-        const bStr = String(bValue).toLowerCase();
+        const data = await response.json();
 
-        if (aStr < bStr) return sortConfig.direction === "ascending" ? -1 : 1;
-        if (aStr > bStr) return sortConfig.direction === "ascending" ? 1 : -1;
-        return 0;
-      });
-    }
-   const startIndex = (currentPage - 1) * ITEMS_PER_PAGE;
-   const endIndex = startIndex + ITEMS_PER_PAGE;
+        if (data.data && data.data.length > 0) {
+          setSprayPendings((data && data.data) ? data.data : []);
+          setLocationInfo({
+            code: data.data[0]?.codigoDaLocalidade || "",
+            name: data.data[0]?.nomeDaLocalidade || "",
+          });
+        } 
+        else {
+          setDialog({
+            isOpen: true,
+            type: "info",
+            title: "Sem Resultados",
+            message: "Nenhum dado encontrado para os filtros informados.",
+          });
+        }
+        
+      } catch (err) {
+        setError(err instanceof Error ? err.message : "Ocorreu um erro desconhecido.");
+        const errorMessage = err instanceof Error ? err.message : "Ocorreu um erro inesperado.";
+        setDialog({
+          isOpen: true,
+          type: "error",
+          title: "Erro na Consulta",
+          message: errorMessage,
+        });
+      } finally {
+        setLoading(false);
+      }
+    };
 
-   return sortedItems.slice(startIndex, endIndex);
-  }, [sprayPendings, currentPage, sortConfig]);
+    fetchData();
+  }, [searchParams, currentPage, sortConfig]); 
 
-  const handleSort = (key: SortKey) => {
+  const paginatedSprayPendings = useMemo(() => {
+    const sortedItems: ResidenceInfos[] = sprayPendings.map(item => ({
+      id: item.id.toString(),
+      complemento: item.complemento,
+      numero: item.numero.toString(),
+      nomeDoMorador: item.nomeDoMorador,
+      status: "pending",
+    }));
+
+    return sortedItems;
+  }, [sprayPendings]);
+
+  const handleSort = (key: ResidenceSortKey) => { 
     let direction: "ascending" | "descending" = "ascending";
     if (
       sortConfig &&
@@ -161,56 +175,57 @@ export default function SprayPendingResults() {
     router.push(`./search-register/?id=${id}`);
   };
 
-  if (loading) {
-    return (
+  const totalPages = sprayPendings[0]?.totalPages;
+
+  return (
+    <>
       <SigenAppLayout
         headerTitle="Pesquisa Pendente"
         showBackButton
         onBackClick={() => router.replace("./search-consult")}
         scrollDisable
       >
-        <div className="flex items-center justify-center h-64">
-          <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-gray-800"></div>
-        </div>
+        {loading ? (
+          <div className="flex items-center justify-center h-full">
+            <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-gray-800"></div>
+          </div>
+        ) : error ? (
+          <div className="flex items-center justify-center h-full text-red-500 p-4 text-center">
+            {error}
+          </div>
+        ) : (
+          <div className="flex flex-col h-full">
+            <div className="flex-1 overflow-y-auto p-4">
+              <SigenTable
+                residences={paginatedSprayPendings}
+                viewResidence={handleAddSearch}
+                complementId={`${locationInfo.code} - ${locationInfo.name}`}
+                sortConfig={sortConfig}
+                onSort={handleSort}
+                actionColor="green"
+                actionIcon={<Plus size={15} />}
+              />
+            </div>
+            {totalPages > 1 && (
+              <div className="flex-shrink-0 mt-auto p-4 border-t">
+                <SigenPagination
+                  currentPage={currentPage}
+                  totalPages={totalPages}
+                  onPageChange={setCurrentPage}
+                />
+              </div>
+            )}
+          </div>
+        )}
       </SigenAppLayout>
-    );
-  }
 
-  const totalPages = Math.ceil(sprayPendings.length / ITEMS_PER_PAGE);
-
-  return (
-    <SigenAppLayout
-      headerTitle="Pesquisa Pendente"
-      showBackButton
-      onBackClick={() => router.replace("./search-consult")}
-      scrollDisable
-    >
-      {loading ? (
-        <div className="flex items-center justify-center h-full">
-          <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-gray-800"></div>
-        </div>
-      ) : (
-        <div className="flex flex-col h-full">
-          <div className="flex-1 overflow-y-auto">
-            <SigenTable
-              residences={paginatedSprayPendings}
-              viewResidence={handleAddSearch}
-              complementId={`${locationInfo.code} ${locationInfo.name}`}
-              sortConfig={sortConfig}
-              onSort={handleSort}
-              actionColor="green"
-              actionIcon={<Plus size={15} />}
-            />
-          </div>
-          <div className="flex-shrink-0 mt-4">
-            <SigenPagination
-              currentPage={currentPage}
-              totalPages={totalPages}
-              onPageChange={setCurrentPage}
-            />
-          </div>
-        </div>
-      )}
-    </SigenAppLayout>
+      <SigenDialog
+        isOpen={dialog.isOpen}
+        onClose={() => setDialog((prev) => ({ ...prev, isOpen: false }))}
+        type={dialog.type}
+        title={dialog.title}
+        message={dialog.message}
+      />
+    </>
   );
 }

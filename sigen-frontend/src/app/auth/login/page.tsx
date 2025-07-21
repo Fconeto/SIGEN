@@ -64,10 +64,8 @@ export default function LoginForm() {
       const result = await response.json();
 
       if (response.ok && result.isSuccess) {
-        localStorage.setItem("userData", JSON.stringify(result.data));
-        // Salva o token JWT em cookie seguro
         if (result.data.token) {
-          Cookies.set("authToken", result.data.token, { expires: 7, secure: true, sameSite: "strict" });
+          Cookies.set("authToken", result.data.token, { expires: 0.5, secure: true, sameSite: "strict" });
         }
         const userType = result.data.tipoDeUsuario;
         if (userType === 0) {

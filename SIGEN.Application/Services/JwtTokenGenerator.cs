@@ -22,7 +22,7 @@ namespace SIGEN.Application.Services
                     new Claim("Matricula", agent.Matricula.ToString()),
                     new Claim("Hierarquia", ((int)agent.Hierarquia).ToString()),
                 }),
-                Expires = DateTime.UtcNow.AddHours(10),
+                Expires = DateTime.UtcNow.AddHours(12),
                 Issuer = issuer,
                 Audience = audience,
                 SigningCredentials = new SigningCredentials(new SymmetricSecurityKey(key), SecurityAlgorithms.HmacSha256Signature)
