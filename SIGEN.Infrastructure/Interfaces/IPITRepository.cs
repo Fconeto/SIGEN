@@ -11,4 +11,5 @@ public interface IPITRepository
     Task<List<GetConsultPITListResponse>> GetPITByFilters(ConsultFiltersRequest consultFiltersRequest);
     Task InsertSearchPIT(SearchPIT searchPIT);
     Task UpdatePesquisaPITById(long id, long? pitId);
+    Task<PIT> GetPITById(long id);
 }

@@ -66,12 +66,15 @@ public class PITService : IPITService
             SearchPITValidator validator = new SearchPITValidator();
             validator.Validate(request);
 
+            PIT existingPIT = await _pitRepository.GetPITById(request.PITId);
+
+            if (existingPIT == null || existingPIT.PesquisaId != null)
+                throw new SigenValidationException("PIT não está pendente.");
+
             SearchPITMapper searchPITMapper = new SearchPITMapper();
             SearchPIT entity = searchPITMapper.Map(request);
 
             await _pitRepository.InsertSearchPIT(entity);
-
-            await _pitRepository.UpdatePesquisaPITById(entity.Id, entity.PITId);
         }
         catch (SigenValidationException ex)
         {

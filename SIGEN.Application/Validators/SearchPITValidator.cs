@@ -11,7 +11,7 @@ public class SearchPITValidator
         if (request.AgenteId == null)
             throw new SigenValidationException("O ID do agente é obrigatório.");
 
-        if (request.PITId == null)
+        if (request.PITId == 0)
             throw new SigenValidationException("O ID do PIT deve ser um número positivo.");
 
         if (!Enum.IsDefined(typeof(PendingSearchStatus), request.Pendencia))
@@ -20,11 +20,18 @@ public class SearchPITValidator
         if (request.NumeroDeHabitantes < 0)
             throw new SigenValidationException("O número de habitantes não pode ser negativo.");
 
-        if (!Enum.IsDefined(typeof(PendingSearchStatus), request.TipoDeParede))
+        if (!Enum.IsDefined(typeof(WallType), request.TipoDeParede))
             throw new SigenValidationException("O tipo de parede é obrigatório.");
 
-        if (request.CapturaIntra && request.CapturaPeri == false || request.CapturaPeri && request.CapturaIntra == true)
-            throw new SigenValidationException("Não é possível capturar ambos Intra e Peri ao mesmo tempo.");
+        if (!Enum.IsDefined(typeof(CeilingType), request.TipoDeTeto))
+            throw new SigenValidationException("O tipo de teto é obrigatório.");
+
+        if (request.TipoDeParede == WallType.Outros && string.IsNullOrEmpty(request.OutroTipoDeParede))
+            throw new SigenValidationException("O campo 'Outros Tipo de Parede' é obrigatório quando o tipo de parede é 'Outros'.");
+
+        if (request.TipoDeTeto == CeilingType.Outros && string.IsNullOrEmpty(request.TipoDeTeto.ToString()))
+            throw new SigenValidationException("O campo 'Tipo de Teto' é obrigatório quando o tipo de teto é 'Outros'.");
+
         if (request.AnexosPositivos < 0)
             throw new SigenValidationException("O número de anexos positivos não pode ser negativo.");
 
