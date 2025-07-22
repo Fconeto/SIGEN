@@ -9,13 +9,6 @@ import { SigenInput } from "@/components/sigen-input";
 import { SigenDropdown } from "@/components/sigen-dropdown";
 import { SigenDialog, type SigenDialogProps } from "@/components/sigen-dialog";
 import { useRouter } from "next/navigation";
-
-import {
-  PropertySituation,
-  PropertySituationLabels,
-  PropertyType,
-  PropertyTypeLabels,
-} from "@/domain/entities/house";
 import { API_BASE_URL } from "@/config/api-config";
 import { GlobalService } from "@/services/global-service";
 import { TokenService } from "@/services/auth/token-service";
@@ -29,7 +22,7 @@ interface Locality {
 }
 
 interface LocalityRegister {
-  locationCode: number;
+  locationCode: number | undefined;
   locationName: string;
   locationCategory: string | undefined;
 }
@@ -45,11 +38,11 @@ export default function LocationRegisterForm() {
     message: "",
   });
 
-  const { values, errors, handleChange, validateForm, resetForm, validateField } = useForm(
+  const { values, errors, handleChange, validateForm, resetForm } = useForm(
     {
-      locationCode: 0,
+      locationCode: undefined,
       locationName: "",
-      locationCategory: undefined,
+      locationCategory: "",
     } as LocalityRegister,
     {
       locationCode: [validators.required("Campo obrigatório")],
@@ -57,38 +50,6 @@ export default function LocationRegisterForm() {
       locationCategory: [validators.required("Campo obrigatório")],
     }
   );
-
-  useEffect(() => {
-    async function fetchLocalities() {
-      try {
-        const token = Cookies.get('authToken');
-
-        const response = await fetch(`${API_BASE_URL}/api/Locality/consultlocality`,
-          {
-            method: "GET",
-            headers: {
-              "Content-Type": "application/json", 
-              "Authorization": `Bearer ${token}`
-            },
-          }
-        );
-
-        const res = await response.json();
-
-        if (!response.ok) throw new Error(res.message || "Erro ao carregar localidades");
-
-        setLocalities(res.data as Locality[]);
-      } catch (error: any) {
-        setDialog({
-          isOpen: true,
-          type: "error",
-          title: "Erro",
-          message: error.message || "Não foi possível carregar as localidades.",
-        });
-      }
-    }
-    fetchLocalities();
-  }, []);
 
   useEffect(() => {
     const loc = localities.find(
@@ -127,7 +88,7 @@ export default function LocationRegisterForm() {
 
       const token = Cookies.get('authToken');
 
-       const res = await fetch(`${API_BASE_URL}/api/Residence/create`, {
+       const res = await fetch(`${API_BASE_URL}/api/locality/create`, {
         method: "POST",
         headers: {
           "Content-Type": "application/json", 
@@ -138,7 +99,7 @@ export default function LocationRegisterForm() {
 
       const response = await res.json();
 
-      if (!res.ok) throw new Error(response.message || "Erro ao cadastrar residência"); 
+      if (!res.ok) throw new Error(response.message || "Erro ao cadastrar localidade"); 
 
       setIsLoading(false);
       setDialog({
@@ -150,23 +111,6 @@ export default function LocationRegisterForm() {
 
       resetForm();
 
-      const residenceId = response.data.residenceId;
-
-      // if (!body.demolida) {
-      //   setDialog({
-      //     isOpen: true,
-      //     type: "info",
-      //     title: "Pergunta",
-      //     message: "Deseja realizar a pesquisa dessa residência?",
-      //     onConfirm: () => {
-      //       setDialog({ isOpen: false, type: "info", message: "" });
-      //       router.push(`./search-register?id=${residenceId}`);
-      //     },
-      //     onCancel: () => {
-      //       setDialog({ isOpen: false, type: "info", message: "" });
-      //     },
-      //   });
-      // }
     } catch (error: any) {
       setIsLoading(false);
       setDialog({
@@ -196,9 +140,15 @@ export default function LocationRegisterForm() {
           >
             <SigenInput
               id="locationCode"
+              type="number"
               value={values.locationCode}
-              readOnly
-              tabIndex={-1}
+              mask={{
+                mask: Number,
+                scale: 0,
+              }}
+              onChange={(e) =>
+                handleChange("locationCode", Number(e.target.value))
+              }
               aria-readonly
               placeholder="Digite o código da localidade"
             />
@@ -215,10 +165,6 @@ export default function LocationRegisterForm() {
               onChange={(e) => handleChange("locationName", e.target.value)}
               aria-invalid={!!errors.locationName}
               placeholder="Digite o nome da localidade"
-              mask={{
-                mask: Number,
-                scale: 0,
-              }}
             />
           </SigenFormField>
 
