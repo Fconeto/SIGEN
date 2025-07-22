@@ -10,7 +10,7 @@ public class SprayMapper
     {
         return new Spray
         {
-            DataDoPreenchimento = DateOnly.FromDateTime(DateTime.Now),
+            DataDoPreenchimento = request.DataDoPreenchimento.ToDateTime(new TimeOnly(0, 0)),
             MatriculaDoAgente = agenteMatricula,
             Pendencia = request.Pendencia,
             TipoDeInseticida = request.TipoDeInseticida,

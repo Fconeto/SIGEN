@@ -1,36 +1,62 @@
 "use client";
 
-import type React from "react";
-
+import React, { useEffect, useState } from "react";
 import { useForm, validators } from "@/hooks/useform";
 import { SigenFormField } from "@/components/sigen-form-field";
 import { SigenLoadingButton } from "@/components/sigen-loading-button";
 import { SigenAppLayout } from "@/components/sigen-app-layout";
 import { SigenInput } from "@/components/sigen-input";
 import { SigenDropdown } from "@/components/sigen-dropdown";
-import { useState } from "react";
 import { SigenDialog, type SigenDialogProps } from "@/components/sigen-dialog";
 import { useRouter } from "next/navigation";
 
-import { PropertySituation, PropertyType } from "@/domain/entities/house";
+import {
+  PropertySituation,
+  PropertySituationLabels,
+  PropertyType,
+  PropertyTypeLabels,
+} from "@/domain/entities/house";
+import { API_BASE_URL } from "@/config/api-config";
+import { GlobalService } from "@/services/global-service";
+import { TokenService } from "@/services/auth/token-service";
+import Cookies from "js-cookie";
+
+interface Locality {
+  localidadeId: number;
+  codigoDaLocalidade: number;
+  nome: string;
+  categoria: string;
+  dataDeRegistro: string;
+  dataDeAtualizacao: string;
+  criadoPor: number;
+  atualizadoPor: number;
+}
 
 interface HouseForm {
-  locationCode: string;
-  category: string;
-  propertyType: PropertyType | undefined;
-  situation: PropertySituation | undefined;
+  locationCode: string ;
+  category: string | undefined;
+  propertyType: number | undefined;
+  situation: number | undefined;
   number: string;
   complement: string;
   quarterNumber: string;
   quarterComplement: string;
   residentName: string;
-  uninhabited: false;
+  uninhabited: boolean;
 }
 
 export default function HouseRegistrationForm() {
   const router = useRouter();
 
-  const { values, errors, handleChange, validateForm, resetForm } = useForm(
+  const [localities, setLocalities] = useState<Locality[]>([]);
+  const [isLoading, setIsLoading] = useState(false);
+  const [dialog, setDialog] = useState<SigenDialogProps>({
+    isOpen: false,
+    type: "info",
+    message: "",
+  });
+
+  const { values, errors, handleChange, validateForm, resetForm, validateField } = useForm(
     {
       locationCode: "",
       category: "",
@@ -44,23 +70,81 @@ export default function HouseRegistrationForm() {
       uninhabited: false,
     } as HouseForm,
     {
-      locationCode: [validators.required("Campo obrigatório")],
-      category: [validators.required("Campo obrigatório")],
+      locationCode: [
+       validators.required("Campo obrigatório"),
+         validators.isNumber(
+          "O campo Código da Localidade deve conter apenas números"
+        ),  
+      ],
+      category: [
+        validators.required("Campo obrigatório")
+        ],
       propertyType: [validators.required("Campo obrigatório")],
       situation: [validators.required("Campo obrigatório")],
-      number: [validators.required("Campo obrigatório")],
+      number: [
+        validators.required("Campo obrigatório"),
+        validators.isNumber("O campo Número deve conter apenas números"),
+      ],
       complement: [],
-      quarterNumber: [validators.required("Campo obrigatório")],
+      quarterNumber: [
+        validators.required("Campo obrigatório"),
+        validators.isNumber(
+          "O campo Número do quarteirão deve conter apenas números"
+        ),
+      ],
       quarterComplement: [validators.required("Campo obrigatório")],
-      residentName: [validators.required("Campo obrigatório")],
+      residentName: [
+        validators.condition<HouseForm, "residentName">((value) =>
+          !(/\d/.test(String(value))), 
+          "O campo Nome do morador não deve conter números"
+        ),
+      ],
     }
   );
-  const [isLoading, setIsLoading] = useState(false);
-  const [dialog, setDialog] = useState<SigenDialogProps>({
-    isOpen: false,
-    type: "info",
-    message: "",
-  });
+
+  useEffect(() => {
+    async function fetchLocalities() {
+      try {
+        const token = Cookies.get('authToken');
+
+        const response = await fetch(`${API_BASE_URL}/api/Locality/consultlocality`,
+          {
+            method: "GET",
+            headers: {
+              "Content-Type": "application/json", 
+              "Authorization": `Bearer ${token}`
+            },
+          }
+        );
+
+        const res = await response.json();
+
+        if (!response.ok) throw new Error(res.message || "Erro ao carregar localidades");
+
+        setLocalities(res.data as Locality[]);
+      } catch (error: any) {
+        setDialog({
+          isOpen: true,
+          type: "error",
+          title: "Erro",
+          message: error.message || "Não foi possível carregar as localidades.",
+        });
+      }
+    }
+    fetchLocalities();
+  }, []);
+
+  useEffect(() => {
+    const loc = localities.find(
+      (l) => l.codigoDaLocalidade === Number(values.locationCode)
+    );
+
+    const newCategory = values.locationCode === "" || !loc ? "" : loc.categoria;
+
+    if (values.category !== newCategory) {
+      handleChange("category", newCategory);
+    }
+  }, [values.locationCode, localities]);
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -76,16 +160,72 @@ export default function HouseRegistrationForm() {
     }
 
     setIsLoading(true);
-    await new Promise((r) => setTimeout(r, 2000));
-    console.log("Form Data:", values);
-    setIsLoading(false);
-    setDialog({
-      isOpen: true,
-      type: "success",
-      title: "Sucesso",
-      message: "Residência cadastrada com sucesso!",
-    });
-    resetForm();
+    try {
+      const userId = GlobalService.getInstance().getUser()?.id;
+      const body = {
+        agenteId: userId,
+        codigoDaLocalidade: Number(values.locationCode),
+        tipoDoImovel: values.propertyType,
+        demolida: values.situation === PropertySituation.demolished,
+        numero: Number(values.number),
+        complemento: values.complement,
+        numeroDoQuarteirao: Number(values.quarterNumber),
+        complementoDoQuarteirao: values.quarterComplement,
+        nomeDoMorador: values.residentName,
+        inabitado: values.uninhabited,
+      };
+
+      const token = Cookies.get('authToken');
+
+       const res = await fetch(`${API_BASE_URL}/api/Residence/create`, {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json", 
+          "Authorization": `Bearer ${token}`
+         },
+        body: JSON.stringify(body),
+      }); 
+
+      const response = await res.json();
+
+      if (!res.ok) throw new Error(response.message || "Erro ao cadastrar residência"); 
+
+      setIsLoading(false);
+      setDialog({
+        isOpen: true,
+        type: "success",
+        title: "Sucesso",
+        message: "Residência cadastrada com sucesso!",
+      });
+
+      resetForm();
+
+      const residenceId = response.data.residenceId;
+
+      if (!body.demolida) {
+        setDialog({
+          isOpen: true,
+          type: "info",
+          title: "Pergunta",
+          message: "Deseja realizar a pesquisa dessa residência?",
+          onConfirm: () => {
+            setDialog({ isOpen: false, type: "info", message: "" });
+            router.push(`./search-register?id=${residenceId}`);
+          },
+          onCancel: () => {
+            setDialog({ isOpen: false, type: "info", message: "" });
+          },
+        });
+      }
+    } catch (error: any) {
+      setIsLoading(false);
+      setDialog({
+        isOpen: true,
+        type: "error",
+        title: "Erro",
+        message: error.message || "Erro ao cadastrar residência.",
+      });
+    }
   };
 
   return (
@@ -95,18 +235,24 @@ export default function HouseRegistrationForm() {
         showBackButton
         onBackClick={() => router.back()}
       >
-        <form onSubmit={handleSubmit} className="space-y-2 mt-4">
+        <form
+          onSubmit={handleSubmit}
+          className="space-y-4 mt-4 max-w-md mx-auto"
+        >
           <SigenFormField
             id="locationCode"
             label="Código da Localidade:"
             error={errors.locationCode}
           >
-            <SigenInput
-              id="locationCode"
-              value={values.locationCode}
-              onChange={(e) => handleChange("locationCode", e.target.value)}
-              aria-invalid={!!errors.locationCode}
-              placeholder="Digite o código da localidade"
+            <SigenDropdown
+              value={values.locationCode?.toString()}
+              canDigit
+              onValueChange={(v) => handleChange("locationCode", v)}
+              options={localities.map((loc) => ({
+                value: loc.codigoDaLocalidade.toString(),
+                label: `${loc.codigoDaLocalidade} - ${loc.nome}`,
+              }))}
+              placeholder="Selecione ou digite o código da localidade"
             />
           </SigenFormField>
 
@@ -118,8 +264,10 @@ export default function HouseRegistrationForm() {
             <SigenInput
               id="category"
               value={values.category}
-              onChange={(e) => handleChange("category", e.target.value)}
-              aria-invalid={!!errors.category}
+              readOnly
+              tabIndex={-1}
+              aria-readonly
+              placeholder="Categoria"
             />
           </SigenFormField>
 
@@ -129,13 +277,24 @@ export default function HouseRegistrationForm() {
             error={errors.propertyType}
           >
             <SigenDropdown
+              canDigit={false}
               value={values.propertyType}
               onValueChange={(v) => handleChange("propertyType", v)}
               options={[
-                { value: PropertyType.house, label: PropertyType.house },
-                { value: PropertyType.market, label: PropertyType.market },
-                { value: PropertyType.other, label: PropertyType.other },
+                {
+                  value: PropertyType.house,
+                  label: PropertyTypeLabels[PropertyType.house],
+                },
+                {
+                  value: PropertyType.market,
+                  label: PropertyTypeLabels[PropertyType.market],
+                },
+                {
+                  value: PropertyType.other,
+                  label: PropertyTypeLabels[PropertyType.other],
+                },
               ]}
+              placeholder="Selecione o tipo de imóvel"
             />
           </SigenFormField>
 
@@ -145,18 +304,22 @@ export default function HouseRegistrationForm() {
             error={errors.situation}
           >
             <SigenDropdown
-              value={values.situation}
-              onValueChange={(v) => handleChange("situation", v)}
+              canDigit={false}
+              value={values.situation?.toString()}
+              onValueChange={(v) =>
+                handleChange("situation", Number(v) as PropertySituation)
+              }
               options={[
                 {
-                  value: PropertySituation.new,
-                  label: PropertySituation.new,
+                  value: PropertySituation.demolished.toString(),
+                  label: PropertySituationLabels[PropertySituation.demolished],
                 },
                 {
-                  value: PropertySituation.demolished,
-                  label: PropertySituation.demolished,
+                  value: PropertySituation.new.toString(),
+                  label: PropertySituationLabels[PropertySituation.new],
                 },
               ]}
+              placeholder="Selecione a situação"
             />
           </SigenFormField>
 
@@ -164,6 +327,10 @@ export default function HouseRegistrationForm() {
             <SigenInput
               id="number"
               value={values.number}
+              mask={{
+                mask: Number,
+                scale: 0,
+              }}
               onChange={(e) => handleChange("number", e.target.value)}
               aria-invalid={!!errors.number}
               placeholder="Digite o número"
@@ -195,6 +362,10 @@ export default function HouseRegistrationForm() {
               onChange={(e) => handleChange("quarterNumber", e.target.value)}
               aria-invalid={!!errors.quarterNumber}
               placeholder="Digite o número do quarteirão"
+              mask={{
+                mask: Number,
+                scale: 0,
+              }}
             />
           </SigenFormField>
 
@@ -232,30 +403,32 @@ export default function HouseRegistrationForm() {
             id="uninhabited"
             label="Inabitado"
             error={errors.uninhabited}
+            className="flex items-center gap-2 cursor-pointer"
           >
             <SigenInput
               type="checkbox"
-              id="uninhabited"
               checked={values.uninhabited}
               onChange={(e) => handleChange("uninhabited", e.target.checked)}
-              className="h-4 w-4 border-gray-300 rounded"
+              className="h-4 w-4 border-gray-300 rounded ml-1"
             />
           </SigenFormField>
 
-          <div className="pt-4">
-            <SigenLoadingButton type="submit" loading={isLoading}>
-              Confirmar
-            </SigenLoadingButton>
-          </div>
+          <SigenLoadingButton
+            loading={isLoading}
+            type="submit"
+            className="w-full"
+          >
+            Cadastrar Residência
+          </SigenLoadingButton>
         </form>
+
+        <SigenDialog
+          {...dialog}
+          onClose={() =>
+            setDialog({ isOpen: false, type: "info", message: "" })
+          }
+        />
       </SigenAppLayout>
-      <SigenDialog
-        isOpen={dialog.isOpen}
-        onClose={() => setDialog((prev) => ({ ...prev, isOpen: false }))}
-        type={dialog.type}
-        title={dialog.title}
-        message={dialog.message}
-      />
     </>
   );
 }

@@ -5,22 +5,22 @@ import { SigenDropdown } from "@/components/sigen-dropdown";
 import { SigenFormField } from "@/components/sigen-form-field";
 import { SigenInput } from "@/components/sigen-input";
 import { SigenInputConnector } from "@/components/sigen-input-connector";
-import { CeilingType } from "@/domain/entities/ceiling";
-import { PendencyState } from "@/domain/entities/pendency";
-import { WallType } from "@/domain/entities/wall";
+import { CeilingType, CeilingTypeLabels } from "@/domain/entities/ceiling";
+import { PendencyState, PendencyStateLabels } from "@/domain/entities/pendency";
+import { WallType, WallTypeLabels } from "@/domain/entities/wall";
 import { SigenDialogProps } from "@/components/sigen-dialog";
 import { useForm, validators } from "@/hooks/useform";
-import { useRouter } from "next/navigation";
+import { useRouter, useSearchParams } from "next/navigation";
 import { useState } from "react";
 import { SigenLoadingButton } from "@/components/sigen-loading-button";
 
 interface SearchForm {
-  pendencyState?: PendencyState | undefined;
+  pendencyState?: number | undefined;
   nomeMorador: string;
   numberOfPeople: number;
-  wallType: string;
+  wallType: number | undefined;
   otherWallType: string;
-  ceilingType: string;
+  ceilingType: number | undefined;
   otherCeilingType: string;
   captureIntra?: boolean;
   capturePeri?: boolean;
@@ -30,17 +30,25 @@ interface SearchForm {
   numberOfDogs: number;
 }
 
-export default function SearchRegisterForm() {
+export default function SearchRegisterPITForm() {
   const router = useRouter();
+
+  const searchParams = useSearchParams();
+  const id = searchParams.get("id");
+
+  const mandatoryCaptureSelection = (_: any, allValues: SearchForm) => {
+    if (!allValues.captureIntra && !allValues.capturePeri)
+      return "Selecione ao menos um tipo de captura";
+  };
 
   const { values, errors, handleChange, validateForm, resetForm } = useForm(
     {
       pendencyState: undefined,
       nomeMorador: "",
       numberOfPeople: 0,
-      wallType: "",
+      wallType: undefined,
       otherWallType: "",
-      ceilingType: "",
+      ceilingType: undefined,
       otherCeilingType: "",
       captureIntra: false,
       capturePeri: false,
@@ -55,7 +63,7 @@ export default function SearchRegisterForm() {
       wallType:[ validators.required("Campo obrigatório") ],
       otherWallType: [ 
         (value: unknown, allValues: SearchForm) => {
-          if (allValues.wallType === WallType.others && !value) {
+          if (allValues.wallType === WallType.Outros && !value) {
             return "Por favor, especifique o tipo de parede.";
           }
           return undefined;
@@ -68,7 +76,7 @@ export default function SearchRegisterForm() {
       ceilingType:[ validators.required("Campo obrigatório") ],
       otherCeilingType: [ 
         (value: unknown, allValues: SearchForm) => {
-          if (allValues.ceilingType === CeilingType.others && !value) {
+          if (allValues.ceilingType === CeilingType.Outros && !value) {
             return "Por favor, especifique o tipo de telhado.";
           }
           return undefined;
@@ -78,7 +86,12 @@ export default function SearchRegisterForm() {
             ? "O campo não deve conter números"
             : undefined,
       ],
-      captureIntra: [],
+      captureIntra: [
+        mandatoryCaptureSelection,
+      ],
+      capturePeri: [
+        mandatoryCaptureSelection,
+      ],
       positiveAttachments:[ validators.required("Campo obrigatório"),
         (value) =>
           value && !/^\d+$/.test(String(value))
@@ -112,66 +125,69 @@ export default function SearchRegisterForm() {
     type: "info",
     message: "",
   });
+  
+  const handleSubmit = async (e: React.FormEvent) => {
+    e.preventDefault();
 
-const handleSubmit = async (e: React.FormEvent) => {
-  console.log("--- DEBUG: Função handleSubmit iniciada! ---"); 
-  e.preventDefault();
-
-  const isFormValid = validateForm();
-  console.log("--- DEBUG: Resultado da validação:", isFormValid);
-  if (!validateForm()) {
-    console.log("--- DEBUG: Erros de validação encontrados:", errors);
-    console.log("--- DEBUG: Validação falhou. A função será interrompida aqui. ---");
-    setDialog({
-        isOpen: true,
-        type: 'error',
-        message: 'Por favor, preencha os campos obrigatórios.'
-    });
-    return;
-  }
-
-  setIsLoading(true);
-
-  try {
-    const response = await fetch('/api/search/create', {
-      method: 'POST',
-      headers: {
-        'Content-Type': 'application/json',
-      },
-      body: JSON.stringify(values), 
-    });
-    
-    console.log("--- DEBUG: Resposta da API recebida. Status:", response.status);
-
-    if (response.ok) {
-      setDialog({
-        isOpen: true,
-        type: 'success',
-        message: 'Cadastro realizado com sucesso!',
-      });
-      resetForm();
-    } else {
-      const errorData = await response.json();
+    if (!id) {
       setDialog({
         isOpen: true,
         type: 'error',
-        message: errorData.message || 'Ocorreu um erro ao realizar o cadastro.',
+        message: 'ID não encontrado. Por favor, volte e tente novamente.'
       });
+      return;
     }
-  } catch {
-    setDialog({
-        isOpen: true,
-        type: 'error',
-        message: 'Não foi possível conectar ao servidor. Tente novamente mais tarde.'
-    });
-  } finally {
-    setIsLoading(false);
-  }
-};
+
+    if (!validateForm()) {
+      setDialog({
+          isOpen: true,
+          type: 'error',
+          message: 'Por favor, preencha os campos obrigatórios.'
+      });
+      return;
+    }
+
+    setIsLoading(true);
+
+    try {
+      const response = await fetch(`/api/pit/searchpit?id=${id}`, {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify(values), 
+      });
+      
+      if (response.ok) {
+        setDialog({
+          isOpen: true,
+          type: 'success',
+          message: 'Cadastro realizado com sucesso!',
+        });
+        resetForm();
+      } else {
+        const errorData = await response.json();
+        setDialog({
+          isOpen: true,
+          type: 'error',
+          message: errorData.message || 'Ocorreu um erro ao realizar o cadastro.',
+        });
+      }
+    } catch {
+      setDialog({
+          isOpen: true,
+          type: 'error',
+          message: 'Não foi possível conectar ao servidor. Tente novamente mais tarde.'
+      });
+    } finally {
+      setIsLoading(false);
+    }
+  };
+
   return (
     <>
       <SigenAppLayout
-        headerTitle="Cadastro de Pesquisa"
+        headerTitle="Cadastro de Pesquisa (PIT)"
         showBackButton
         onBackClick={() => router.back()}
       >
@@ -185,9 +201,18 @@ const handleSubmit = async (e: React.FormEvent) => {
               value={values.pendencyState}
               onValueChange={(v) => handleChange("pendencyState", v)}
               options={[
-                { value: PendencyState.nenhuma, label: PendencyState.nenhuma },
-                { value: PendencyState.recusa, label: PendencyState.recusa },
-                { value: PendencyState.casaFechada, label: PendencyState.casaFechada },
+                {
+                  value: PendencyState.Nenhuma,
+                  label: PendencyStateLabels[PendencyState.Nenhuma],
+                },
+                {
+                  value: PendencyState.Recusa,
+                  label: PendencyStateLabels[PendencyState.Recusa],
+                },
+                {
+                  value: PendencyState.Fechado,
+                  label: PendencyStateLabels[PendencyState.Fechado],
+                },
               ]}
             />
           </SigenFormField>
@@ -214,13 +239,19 @@ const handleSubmit = async (e: React.FormEvent) => {
             <SigenInput
               id="numberOfPeople"
               value={values.numberOfPeople}
-              onChange={(e) => handleChange("numberOfPeople", e.target.value)}
+              onChange={(e) =>
+                handleChange("numberOfPeople", Number(e.target.value))
+              }
+              mask={{
+                mask: Number,
+                scale: 0,
+              }}
               aria-invalid={!!errors.numberOfPeople}
               placeholder="Digite o número de habitantes"
             />
           </SigenFormField>
-          
-          <SigenInputConnector showLine={values.wallType === WallType.others}>
+
+          <SigenInputConnector showLine={values.wallType === WallType.Outros}>
             <SigenFormField
               id="wallType"
               label="Tipo de parede:"
@@ -230,24 +261,42 @@ const handleSubmit = async (e: React.FormEvent) => {
                 value={values.wallType}
                 onValueChange={(v) => handleChange("wallType", v)}
                 options={[
-                  { value: WallType.plasteredMasonry, label: WallType.plasteredMasonry },
-                  { value: WallType.unplasteredMasonry, label: WallType.unplasteredMasonry },
-                  { value: WallType.clayPlaster, label: WallType.clayPlaster },
-                  { value: WallType.clayNoPlaster, label: WallType.clayNoPlaster },
-                  { value: WallType.wood, label: WallType.wood },
-                  { value: WallType.others, label: WallType.others },
+                  {
+                    value: WallType.AlvenariaComReboco,
+                    label: WallTypeLabels[WallType.AlvenariaComReboco],
+                  },
+                  {
+                    value: WallType.AlvenariaSemReboco,
+                    label: WallTypeLabels[WallType.AlvenariaSemReboco],
+                  },
+                  {
+                    value: WallType.BarroComReboco,
+                    label: WallTypeLabels[WallType.BarroComReboco],
+                  },
+                  {
+                    value: WallType.BarroSemReboco,
+                    label: WallTypeLabels[WallType.BarroSemReboco],
+                  },
+                  {
+                    value: WallType.Madeira,
+                    label: WallTypeLabels[WallType.Madeira],
+                  },
+                  {
+                    value: WallType.Outros,
+                    label: WallTypeLabels[WallType.Outros],
+                  },
                 ]}
               />
             </SigenFormField>
 
-            {values.wallType === WallType.others && (
+            {values.wallType === WallType.Outros && (
               <div className="-mt-3 pl-11">
                 <SigenFormField
                   id="otherWallTye"
                   label="Especifique o tipo de parede:"
                   error={errors.otherWallType}
                 >
-                  <SigenInput 
+                  <SigenInput
                     id="otherWallType"
                     value={values.otherWallType}
                     onChange={(e) =>
@@ -257,11 +306,13 @@ const handleSubmit = async (e: React.FormEvent) => {
                     placeholder="Digite o tipo de parede"
                   />
                 </SigenFormField>
-              </div>  
+              </div>
             )}
           </SigenInputConnector>
 
-          <SigenInputConnector showLine={values.ceilingType === CeilingType.others}>
+          <SigenInputConnector
+            showLine={values.ceilingType === CeilingType.Outros}
+          >
             <SigenFormField
               id="ceilingType"
               label="Tipo de telhado:"
@@ -271,16 +322,31 @@ const handleSubmit = async (e: React.FormEvent) => {
                 value={values.ceilingType}
                 onValueChange={(v) => handleChange("ceilingType", v)}
                 options={[
-                  { value: CeilingType.tile, label: CeilingType.tile },
-                  { value: CeilingType.straw, label: CeilingType.straw },
-                  { value: CeilingType.wood, label: CeilingType.wood },
-                  { value: CeilingType.metalic, label: CeilingType.metalic },
-                  { value: CeilingType.others, label: CeilingType.others },
+                  {
+                    value: CeilingType.Telha,
+                    label: CeilingTypeLabels[CeilingType.Telha],
+                  },
+                  {
+                    value: CeilingType.Palha,
+                    label: CeilingTypeLabels[CeilingType.Palha],
+                  },
+                  {
+                    value: CeilingType.Madeira,
+                    label: CeilingTypeLabels[CeilingType.Metalico],
+                  },
+                  {
+                    value: CeilingType.Metalico,
+                    label: CeilingTypeLabels[CeilingType.Metalico],
+                  },
+                  {
+                    value: CeilingType.Outros,
+                    label: CeilingTypeLabels[CeilingType.Outros],
+                  },
                 ]}
               />
             </SigenFormField>
 
-            {values.ceilingType === CeilingType.others && (
+            {values.ceilingType === CeilingType.Outros && (
               <div className="-mt-3 pl-11">
                 <SigenFormField
                   id="otherCeilingType"
@@ -298,33 +364,37 @@ const handleSubmit = async (e: React.FormEvent) => {
                   />
                 </SigenFormField>
               </div>
-              )}
+            )}
           </SigenInputConnector>
 
-          <SigenFormField
-            id="capture"
-            label="Captura"
-          >
+          <SigenFormField id="capture" label="Captura">
             <div className="flex items-center flex-wrap pl-1 pt-2">
-               <hr></hr>
-              <label htmlFor="captureIntra" className="text-sm text-gray-700">Intra</label>
+              <hr></hr>
+              <label htmlFor="captureIntra" className="text-sm text-gray-700">
+                Intra
+              </label>
               <input
                 type="checkbox"
                 id="captureIntra"
                 checked={values?.captureIntra || false}
-                onChange={(e) => handleChange('captureIntra', e.target.checked)}
-                className="h-4 w-4 rounded border-gray-300 text-indigo-600 focus:ring-indigo-500 ml-1"   
+                onChange={(e) => handleChange("captureIntra", e.target.checked)}
+                className="h-4 w-4 rounded border-gray-300 text-indigo-600 focus:ring-indigo-500 ml-1"
               />
 
-              <label htmlFor="capturePeri" className="text-sm ml-15 text-gray-700">Peri</label>
+              <label
+                htmlFor="capturePeri"
+                className="text-sm ml-15 text-gray-700"
+              >
+                Peri
+              </label>
               <input
                 type="checkbox"
                 id="capturePeri"
                 checked={values?.capturePeri || false}
-                onChange={(e) => handleChange('capturePeri', e.target.checked)}
-                className="h-4 w-4 rounded border-gray-300 text-indigo-600 focus:ring-indigo-500 ml-1"              
-              />     
-            </div>    
+                onChange={(e) => handleChange("capturePeri", e.target.checked)}
+                className="h-4 w-4 rounded border-gray-300 text-indigo-600 focus:ring-indigo-500 ml-1"
+              />
+            </div>
           </SigenFormField>
 
           <SigenFormField
@@ -335,12 +405,18 @@ const handleSubmit = async (e: React.FormEvent) => {
             <SigenInput
               id="positiveAttachments"
               value={values.positiveAttachments}
-              onChange={(e) => handleChange("positiveAttachments", e.target.value)}
+              onChange={(e) =>
+                handleChange("positiveAttachments", Number(e.target.value))
+              }
+              mask={{
+                mask: Number,
+                scale: 0,
+              }}
               aria-invalid={!!errors.positiveAttachments}
               placeholder="Digite o número de anexos positivos"
             />
           </SigenFormField>
-        
+
           <SigenFormField
             id="negativeAttachments"
             label="Anexos Negativos:"
@@ -349,12 +425,18 @@ const handleSubmit = async (e: React.FormEvent) => {
             <SigenInput
               id="negativeAttachments"
               value={values.negativeAttachments}
-              onChange={(e) => handleChange("negativeAttachments", e.target.value)}
+              onChange={(e) =>
+                handleChange("negativeAttachments", Number(e.target.value))
+              }
+              mask={{
+                mask: Number,
+                scale: 0,
+              }}
               aria-invalid={!!errors.negativeAttachments}
               placeholder="Digite o número de anexos negativos"
             />
           </SigenFormField>
-          
+
           <SigenFormField
             id="numberOfCats"
             label="Número de Gatos:"
@@ -363,7 +445,13 @@ const handleSubmit = async (e: React.FormEvent) => {
             <SigenInput
               id="numberOfCats"
               value={values.numberOfCats}
-              onChange={(e) => handleChange("numberOfCats", e.target.value)}
+              onChange={(e) =>
+                handleChange("numberOfCats", Number(e.target.value))
+              }
+              mask={{
+                mask: Number,
+                scale: 0,
+              }}
               aria-invalid={!!errors.numberOfCats}
               placeholder="Digite o número de gatos"
             />
@@ -377,7 +465,13 @@ const handleSubmit = async (e: React.FormEvent) => {
             <SigenInput
               id="numberOfDogs"
               value={values.numberOfDogs}
-              onChange={(e) => handleChange("numberOfDogs", e.target.value)}
+              onChange={(e) =>
+                handleChange("numberOfDogs", Number(e.target.value))
+              }
+              mask={{
+                mask: Number,
+                scale: 0,
+              }}
               aria-invalid={!!errors.numberOfDogs}
               placeholder="Digite o número de cachorros"
             />
@@ -391,5 +485,5 @@ const handleSubmit = async (e: React.FormEvent) => {
         </form>
       </SigenAppLayout>
     </>
-  )
+  );
 }

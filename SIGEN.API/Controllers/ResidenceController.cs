@@ -17,25 +17,25 @@ public class ResidenceController : ControllerBase
         _residenceService = residenceService;
     }
 
-    [HttpPost("createresidence")]
+    [HttpPost("create")]
     [Authorize]
     [ProducesResponseType(typeof(ResidenceCreateResponse), StatusCodes.Status201Created)]
     [ProducesResponseType(StatusCodes.Status400BadRequest)]
     public async Task<IActionResult> CreateResidence([FromBody] ResidenceCreateRequest request)
     {
-        await _residenceService.CreateResidence(request);
+        long residenceId = await _residenceService.CreateResidence(request);
 
         Response response = new Response
         {
             IsSuccess = true,
             Message = "Cadastro de residência realizado com sucesso!",
-            Data = null
+            Data = new { ResidenceId = residenceId }
         };
 
         return Created(string.Empty, response);
     }
     
-    [HttpGet("getresidencelist")]
+    [HttpGet("consult")]
     [Authorize]
     [ProducesResponseType(typeof(GetResidenceListResponse), StatusCodes.Status200OK)]
     [ProducesResponseType(StatusCodes.Status400BadRequest)]

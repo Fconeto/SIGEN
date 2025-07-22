@@ -6,6 +6,7 @@ using SIGEN.Domain.Entities;
 using SIGEN.Domain.ExeptionsBase;
 using SIGEN.Domain.Shared;
 using SIGEN.Domain.Shared.Requests;
+using SIGEN.Domain.Shared.Responses;
 using SIGEN.Infrastructure.Interfaces;
 using System.Security.Cryptography;
 using System.Text;
@@ -20,12 +21,14 @@ namespace SIGEN.Application.Services
             _authRepository = authRepository;
         }
 
-        public async Task<string> LoginAsync(LoginRequest request)
+        public async Task<LoginResponse> LoginAsync(LoginRequest request)
         {
             try
             {
                 AgentValidator validator = new AgentValidator();
                 validator.Validate(request);
+
+                request.CPF = request.CPF.Replace(".", "").Replace("-", "");
 
                 Agent agente = await _authRepository.GetAgenteByCPF(request.CPF);
 
@@ -44,13 +47,15 @@ namespace SIGEN.Application.Services
 
                 await _authRepository.UpdateAgenteTentativas(agente.Id, 0);
 
-                // Gerar JWT real
-                var secretKey = Environment.GetEnvironmentVariable("JWT_SECRET") ?? "sua_chave_secreta_temporaria_1234567890";
+                var secretKey = Environment.GetEnvironmentVariable("JWT_SECRET") ?? "chave_secreta_temporaria_1234567890";
                 var issuer = "SIGEN";
                 var audience = "SIGENUsers";
                 string token = JwtTokenGenerator.GenerateToken(agente, secretKey, issuer, audience);
 
-                return token;
+                AuthMapper authMapper = new AuthMapper();
+                LoginResponse loginResponse = authMapper.Mapper(agente, token);
+
+                return loginResponse;
             }
             catch (SigenValidationException ex)
             {
@@ -78,6 +83,13 @@ namespace SIGEN.Application.Services
             {
                 AgentValidator validator = new AgentValidator();
                 validator.Validate(request);
+
+                request.CPF = request.CPF.Replace(".", "").Replace("-", "");
+
+                Agent agente = await _authRepository.GetAgenteByCPF(request.CPF);
+
+                if (agente != null)
+                    throw new SigenValidationException("Já existe um agente cadastrado com o CPF informado.");
 
                 request.Senha = ComputeSha256Hash(request.Senha);
 

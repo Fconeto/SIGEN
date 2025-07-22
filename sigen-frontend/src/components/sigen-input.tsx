@@ -1,9 +1,8 @@
 import React, { useEffect, useRef } from "react";
-import IMask, { InputMask } from "imask";
+import IMask, { InputMask, MaskedNumberOptions } from "imask";
 import { cn } from "@/lib/utils";
-
 interface SigenInputProps extends React.InputHTMLAttributes<HTMLInputElement> {
-  mask?: string;
+  mask?: string | MaskedNumberOptions | null;
 }
 
 export function SigenInput({ className, mask, ...props }: SigenInputProps) {
@@ -12,7 +11,7 @@ export function SigenInput({ className, mask, ...props }: SigenInputProps) {
 
   useEffect(() => {
     if (inputRef.current && mask) {
-      maskRef.current = IMask(inputRef.current, { mask });
+      maskRef.current = IMask(inputRef.current, mask);
 
       return () => {
         maskRef.current?.destroy();

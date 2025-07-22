@@ -24,11 +24,15 @@ export const validators = {
             v !== values[otherField]
                 ? msg ?? "Valores não coincidem"
                 : undefined,
-    condition: <T>(
-        predicate: (value: T[keyof T]) => boolean,
+    condition: <T, K extends keyof T>(
+        predicate: (value: T[K]) => boolean,
         msg?: string
-    ): ValidatorFn<T> => (value, values) =>
-            predicate(value) ? undefined : msg ?? "Valor inválido",
+    ): ValidatorFn<T> => (value, _values) =>
+            predicate(value as T[K]) ? undefined : msg ?? "Valor inválido",
+    isNumber: (msg = "Deve ser um número") =>
+        <T>(v: T[keyof T], _values: T) =>
+            typeof v === "number" || (!isNaN(Number(v)) && v !== "") ? undefined : msg,
+
 
 };
 
@@ -48,13 +52,19 @@ export function useForm<T extends Record<string, any>>(initialValues: T, validat
         return undefined;
     };
 
-    const handleChange = (field: keyof T, value: string | boolean | Date | undefined) => {
+    const handleChange = <K extends keyof T>(field: K, value: T[K]) => {
         setValues((prev) => {
             const newValues = { ...prev, [field]: value };
             const error = runValidators(field, value);
             setErrors((prevErrors) => ({ ...prevErrors, [field]: error }));
             return newValues;
         });
+    };
+
+    const validateField = (field: keyof T): void => {
+        const value = values[field];
+        const error = runValidators(field, value);
+        setErrors((prevErrors) => ({ ...prevErrors, [field]: error }));
     };
 
     const setFieldError = (field: keyof T, message: string) => {
@@ -93,5 +103,7 @@ export function useForm<T extends Record<string, any>>(initialValues: T, validat
         resetForm,
         validateForm,
         setValues,
+        runValidators,
+        validateField,
     };
 }

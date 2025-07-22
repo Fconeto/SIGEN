@@ -5,15 +5,11 @@ import { SigenTable } from '@/components/sigen-table';
 import { SigenPagination } from '@/components/sigen-pagination'
 import { useRouter } from 'next/navigation';
 import React, { useEffect, useMemo, useState } from 'react';
+import type { ResidenceInfos as BaseResidenceInfos } from "@/domain/entities/residences";
 
-interface ResidenceInfos {
-  id: string;
-  complement: string;
-  numeroCasa: string;
-  nomeMorador: string;
-}
+type ResidenceInfos = Omit<BaseResidenceInfos, 'status'>;
 
-type SortKey = keyof ResidenceInfos;
+export type SortKey = keyof ResidenceInfos;
 
 export default function ResidenceInfos() {
   const router = useRouter();
@@ -65,8 +61,12 @@ export default function ResidenceInfos() {
           if (numA > numB) return sortConfig.direction === 'ascending' ? 1 : -1;
           return 0;
         }
-        if (aValue < bValue) return sortConfig.direction === 'ascending' ? -1 : 1;
-        if (aValue > bValue) return sortConfig.direction === 'ascending' ? 1 : -1;
+
+        const aStr = aValue.toLowerCase();
+        const bStr = bValue.toLowerCase();
+
+        if (aStr < bStr) return sortConfig.direction === 'ascending' ? -1 : 1;
+        if (aStr > bStr) return sortConfig.direction === 'ascending' ? 1 : -1;
         return 0;
       });
     }

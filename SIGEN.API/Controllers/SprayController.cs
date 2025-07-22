@@ -18,6 +18,24 @@ public class SprayController : ControllerBase
         _sprayService = sprayService;
     }
 
+    [HttpGet("pending")]
+    [Authorize]
+    [ProducesResponseType(typeof(GetPendingSprayResponse), StatusCodes.Status200OK)]
+    [ProducesResponseType(StatusCodes.Status400BadRequest)]
+    public async Task<IActionResult> GetPendingSpray([FromQuery] ConsultFiltersRequest request)
+    {
+        List<GetPendingSprayResponse> result = await _sprayService.GetPendingSpray(request);
+
+        Response response = new Response
+        {
+            IsSuccess = true,
+            Message = "Consulta realizada com sucesso!",
+            Data = result
+        };
+
+        return Ok(response);
+    }
+
     [HttpPost("create")]
     [Authorize]
     [ProducesResponseType(StatusCodes.Status201Created)]

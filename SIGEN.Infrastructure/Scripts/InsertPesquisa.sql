@@ -1,7 +1,6 @@
 CREATE PROCEDURE InsertPesquisa
     @ResidenciaId BIGINT,
     @AgenteId BIGINT,
-    @MatriculaDoAgente BIGINT = NULL,
     @DataDaVisita DATE,
     @Pendencia INT,
     @NomeDoMorador NVARCHAR(255),
@@ -20,17 +19,8 @@ AS
 BEGIN
     SET NOCOUNT ON;
 
-    -- Se MatriculaDoAgente for nulo, buscar na tabela Agente pelo AgenteId
-    IF @MatriculaDoAgente IS NULL
-    BEGIN
-        SELECT TOP 1 @MatriculaDoAgente = Matricula
-        FROM Agente
-        WHERE AgenteId = @AgenteId;
-    END
-
     INSERT INTO Pesquisa (
         ResidenciaId,
-        MatriculaDoAgente,
         DataDaVisita,
         Pendencia,
         NomeDoMorador,
@@ -50,9 +40,9 @@ BEGIN
         CriadoPor,
         AtualizadoPor
     )
+    OUTPUT INSERTED.PesquisaId
     VALUES (
         @ResidenciaId,
-        @MatriculaDoAgente,
         @DataDaVisita,
         @Pendencia,
         @NomeDoMorador,

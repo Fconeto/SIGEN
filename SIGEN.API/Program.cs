@@ -11,6 +11,16 @@ using System.Text;
 
 var builder = WebApplication.CreateBuilder(args);
 
+builder.Services.AddCors(options =>
+{
+    options.AddDefaultPolicy(policy =>
+    {
+        policy.WithOrigins("http://localhost:3000")
+              .AllowAnyHeader()
+              .AllowAnyMethod();
+    });
+});
+
 var jwtSettings = builder.Configuration.GetSection("Jwt");
 builder.Services.AddAuthentication(options =>
 {
@@ -67,12 +77,22 @@ builder.Services.AddEndpointsApiExplorer();
 // Injeção de dependências
 builder.Services.AddScoped<IAuthService, AuthService>();
 builder.Services.AddScoped<IAuthRepository, AuthRepository>();
+builder.Services.AddScoped<IPITService, PITService>();
+builder.Services.AddScoped<IPITRepository, PITRepository>();
 builder.Services.AddScoped<IResidenceService, ResidenceService>();
 builder.Services.AddScoped<IResidenceRepository, ResidenceRepository>();
 builder.Services.AddScoped<ISearchService, SearchService>();
 builder.Services.AddScoped<ISearchRepository, SearchRepository>();
+builder.Services.AddScoped<ISprayService, SprayService>();
+builder.Services.AddScoped<ISprayRepository, SprayRepository>();
+builder.Services.AddScoped<ILocalityService, LocalityService>();
+builder.Services.AddScoped<ILocalityRepository, LocalityRepository>();
+builder.Services.AddScoped<IReportService, ReportService>();
+builder.Services.AddScoped<IReportRepository, ReportRepository>();
 
 var app = builder.Build();
+
+app.UseCors();
 
 // Middleware padrão de autenticação e autorização
 app.UseMiddleware<ExceptionHandlingMiddleware>();

@@ -34,13 +34,20 @@ export default function ResidenceConsult(){
     {
       locationId: [
         validators.required("Campo obrigatório"),
+        (value) =>
+          value && !/^\d+$/.test(value)
+            ? "O campo Código da Localidade deve conter apenas números"
+            : undefined,
       ],
       nomeMorador: [
         (value) => /\d/.test(value) ? "O campo nome não pode conter números" :  undefined,
       ],
       numeroComplemento: [],
       numeroCasa: [
-        (value) => !/^\d+$/.test(value) ? "O campo número da casa não pode conter letras ou caracteres diferente de um número" : undefined,
+        (value) =>
+          value && !/^\d+$/.test(value)
+            ? "O campo Número da Casa deve conter apenas números"
+            : undefined,
       ],
     }
   );
@@ -74,7 +81,7 @@ export default function ResidenceConsult(){
     setIsLoading(false);
     
     const queryString = new URLSearchParams(searchParams).toString();
-    router.push(`/chief-agent/residence-infos?${queryString}`);  };
+    router.push(`./residence-infos?${queryString}`);  };
   
   return (
     <>

@@ -28,13 +28,13 @@ public class AuthController : ControllerBase
     [ProducesResponseType(typeof(Response), StatusCodes.Status401Unauthorized)]
     public async Task<IActionResult> Login([FromQuery] LoginRequest request)
     {
-        string result = await _authService.LoginAsync(request);
+        LoginResponse result = await _authService.LoginAsync(request);
 
         Response response = new Response
         {
             IsSuccess = true,
             Message = "Login realizado com sucesso!",
-            Data = new { Token = result }
+            Data = result
         };
         
         return Ok(response);
