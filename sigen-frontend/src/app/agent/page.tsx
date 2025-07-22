@@ -9,6 +9,7 @@ import {
   FileSearch,
   SearchCheck,
   FileText,
+  Map,
 } from "lucide-react";
 
 import Cookies from "js-cookie";
@@ -67,6 +68,12 @@ export default function HomePage() {
             label: "Pesquisa de PIT",
             icon: <SearchCheck className="w-5 h-5" />,
             action: () => router.push("agent/pit-search"),
+          },
+          {
+            id: "location-register",
+            label: "Cadastro de Localidade",
+            icon: <Map className="w-5 h-5" />,
+            action: () => router.push("chief-agent/location-register"),
           },
         ]}
       />
