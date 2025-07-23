@@ -22,6 +22,7 @@ public class ReportController : ControllerBase
     [ProducesResponseType(typeof(Response), StatusCodes.Status400BadRequest)]
     public async Task<IActionResult> ConsultReport([FromQuery] ReportWeeklyRequest request)
     {
+        Console.WriteLine($"[ReportController] Requisição recebida no endpoint ConsultReport");
         var result = await _reportService.GetWeeklyReport(request);
 
         Response response = new Response

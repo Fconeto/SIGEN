@@ -28,6 +28,7 @@ public class AuthController : ControllerBase
     [ProducesResponseType(typeof(Response), StatusCodes.Status401Unauthorized)]
     public async Task<IActionResult> Login([FromQuery] LoginRequest request)
     {
+        Console.WriteLine($"[AuthController] Requisição recebida no endpoint Login");
         LoginResponse result = await _authService.LoginAsync(request);
 
         Response response = new Response
@@ -51,6 +52,7 @@ public class AuthController : ControllerBase
     [ProducesResponseType(typeof(Response), StatusCodes.Status400BadRequest)]
     public async Task<IActionResult> Register([FromBody] RegisterRequest request)
     {
+        Console.WriteLine($"[AuthController] Requisição recebida no endpoint Register");
         await _authService.RegisterAsync(request);
 
         Response response = new Response

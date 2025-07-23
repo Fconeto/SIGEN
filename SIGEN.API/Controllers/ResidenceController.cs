@@ -23,6 +23,7 @@ public class ResidenceController : ControllerBase
     [ProducesResponseType(StatusCodes.Status400BadRequest)]
     public async Task<IActionResult> CreateResidence([FromBody] ResidenceCreateRequest request)
     {
+        Console.WriteLine($"[ResidenceController] Requisição recebida no endpoint CreateResidence");
         long residenceId = await _residenceService.CreateResidence(request);
 
         Response response = new Response
@@ -41,6 +42,7 @@ public class ResidenceController : ControllerBase
     [ProducesResponseType(StatusCodes.Status400BadRequest)]
     public async Task<IActionResult> GetResidenceList ([FromQuery] ConsultFiltersRequest request)
     {
+        Console.WriteLine($"[ResidenceController] Requisição recebida no endpoint GetResidenceList");
         List<GetResidenceListResponse> result = await _residenceService.GetResidenceList(request);
 
         Response response = new Response

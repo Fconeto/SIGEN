@@ -23,6 +23,7 @@ public class SearchController : ControllerBase
     [ProducesResponseType(StatusCodes.Status400BadRequest)]
     public async Task<IActionResult> GetPendingSearch([FromQuery] ConsultFiltersRequest request)
     {
+        Console.WriteLine($"[SearchController] Requisição recebida no endpoint GetPendingSearch");
         List<GetPendingSearchResponse> result = await _searchService.GetPendingSearch(request);
 
         Response response = new Response
@@ -41,6 +42,7 @@ public class SearchController : ControllerBase
     [ProducesResponseType(StatusCodes.Status400BadRequest)]
     public async Task<IActionResult> CreateSearch([FromBody] CreateSearchRequest request)
     {
+        Console.WriteLine($"[SearchController] Requisição recebida no endpoint CreateSearch");
         await _searchService.CreateSearch(request);
 
         Response response = new Response

@@ -1,4 +1,4 @@
-alter PROCEDURE GetAVWeeklyReport
+CREATE PROCEDURE GetAVWeeklyReport
     @DataInicial DATE,
     @DataFinal DATE,
     @Turma NVARCHAR(50)
@@ -35,7 +35,7 @@ BEGIN
         SUM(CASE WHEN p.CapturaPeri = 1 THEN 1 ELSE 0 END) AS TriatomineosCapturadosPeri,
         SUM(CASE WHEN p.CapturaIntra = 1 THEN 1 ELSE 0 END) + SUM(CASE WHEN p.CapturaPeri = 1 THEN 1 ELSE 0 END) AS TriatomineosCapturadosTotal,
         -- HomensTrabalhando
-        COUNT(DISTINCT p.AgenteId) AS HomensTrabalhando,
+        COUNT(DISTINCT p.CriadoPor) AS HomensTrabalhando,
         -- Caes e Gatos
         SUM(p.NumeroDeCachorros) AS Caes,
         SUM(p.NumeroDeGatos) AS Gatos

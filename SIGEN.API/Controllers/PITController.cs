@@ -22,6 +22,7 @@ public class PITController : ControllerBase
     [ProducesResponseType(StatusCodes.Status400BadRequest)]
     public async Task<IActionResult> CreatePIT([FromBody] PITRegisterRequest request)
     {
+        Console.WriteLine($"[PITController] Requisição recebida no endpoint CreatePIT");
         await _pitService.CreatePIT(request);
 
         Response response = new Response
@@ -40,7 +41,7 @@ public class PITController : ControllerBase
     [ProducesResponseType(StatusCodes.Status400BadRequest)]
     public async Task<IActionResult> ConsultPIT([FromQuery] ConsultFiltersRequest request)
     {
-
+        Console.WriteLine($"[PITController] Requisição recebida no endpoint ConsultPIT");
         SearchPITResponse result = await _pitService.ConsultPIT(request);
 
         Response response = new Response
@@ -59,6 +60,7 @@ public class PITController : ControllerBase
     [ProducesResponseType(StatusCodes.Status400BadRequest)]
     public async Task<IActionResult> CreateSearchPIT([FromBody] SearchPITRequest request)
     {
+        Console.WriteLine($"[PITController] Requisição recebida no endpoint CreateSearchPIT");
         await _pitService.CreateSearchPIT(request);
 
         Response response = new Response

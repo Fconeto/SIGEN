@@ -24,6 +24,7 @@ public class SprayController : ControllerBase
     [ProducesResponseType(StatusCodes.Status400BadRequest)]
     public async Task<IActionResult> GetPendingSpray([FromQuery] ConsultFiltersRequest request)
     {
+        Console.WriteLine($"[SprayController] Requisição recebida no endpoint GetPendingSpray");
         List<GetPendingSprayResponse> result = await _sprayService.GetPendingSpray(request);
 
         Response response = new Response
@@ -43,6 +44,7 @@ public class SprayController : ControllerBase
 
     public async Task<IActionResult> CreateSpray([FromBody] SprayRequest request)
     {
+        Console.WriteLine($"[SprayController] Requisição recebida no endpoint CreateSpray");
         await _sprayService.CreateSpray(request);
 
         Response response = new Response

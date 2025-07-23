@@ -34,15 +34,16 @@ namespace SIGEN.API.Middlewares
             context.Response.ContentType = "application/json";
             context.Response.StatusCode = (int)HttpStatusCode.BadRequest;
 
-            string message;
-            if (ex is SigenValidationException)
-            {
-                message = ex.Message;
-            }
-            else
-            {
-                message = "Ocorreu um erro não identificado, por favor tente novamente mais tarde";
-            }
+            string message = ex.Message;
+            Console.WriteLine($"Exception: {ex}");
+            // if (ex is SigenValidationException)
+            // {
+
+            // }
+            // else
+            // {
+            //     message = "Ocorreu um erro não identificado, por favor tente novamente mais tarde";
+            // }
 
             var response = new Response
             {

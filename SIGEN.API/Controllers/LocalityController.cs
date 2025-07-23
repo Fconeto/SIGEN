@@ -23,6 +23,7 @@ public class LocalityController : ControllerBase
     [ProducesResponseType(StatusCodes.Status400BadRequest)]
     public async Task<IActionResult> ConsultLocality()
     {
+        Console.WriteLine("[LocalityController] Requisição recebida no endpoint ConsultLocality");
         List<GetLocalityListResponse> result = await _localityService.GetLocalityList();
 
         Response response = new Response

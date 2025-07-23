@@ -14,11 +14,8 @@ namespace SIGEN.API.Middlewares
 
         public async Task InvokeAsync(HttpContext context)
         {
-            if (context.Request.Path.StartsWithSegments("/api/auth/login") ||
-                context.Request.Path.StartsWithSegments("/api/auth/register"))
-            {
-                System.Console.WriteLine($"[AuthMiddleware] Endpoint acessado: {context.Request.Path}");
-            }
+            Console.WriteLine($"[AuthMiddleware] Endpoint acessado: {context.Request.Path}");
+
             await _next(context);
         }
     }
