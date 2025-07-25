@@ -1,32 +1,23 @@
 # Etapa de build
-FROM node:20-slim AS build
+FROM node:20-bullseye as build
+
 WORKDIR /app
 
-# Instala dependências de build nativas
-RUN apt-get update && apt-get install -y \
-  python3 \
-  make \
-  g++ \
-  && rm -rf /var/lib/apt/lists/*
-
-# Copia arquivos de dependência
+# Copia os arquivos e instala dependências
 COPY package*.json ./
-
-# Força limpeza de cache e recompilação de binários nativos
-ENV npm_config_build_from_source=true
-
 RUN npm install
 
 COPY . .
 
+# Compila o projeto
 RUN npm run build
 
 # Etapa de produção
-FROM node:20-slim AS production
+FROM node:20-bullseye as runtime
+
 WORKDIR /app
 
-ENV NODE_ENV=production
 COPY --from=build /app ./
 
 EXPOSE 3000
-CMD ["npm", "run", "start"]
+CMD ["npm", "start"]
