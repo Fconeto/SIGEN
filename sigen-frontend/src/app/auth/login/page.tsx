@@ -65,6 +65,7 @@ export default function LoginForm() {
 
       if (response.ok && result.isSuccess) {
         if (result.data.token) {
+          localStorage.setItem("agentId", result.data.id);
           Cookies.set("authToken", result.data.token, { expires: 0.5, secure: true, sameSite: "strict" });
         }
         const userType = result.data.tipoDeUsuario;
@@ -79,7 +80,7 @@ export default function LoginForm() {
         setDialog({
           isOpen: true,
           type: "error",
-          message: result.message || "CPF ou senha inválidos.",
+          message: result.Message || "CPF ou senha inválidos.",
         });
       }
     } catch (error) {
@@ -121,7 +122,7 @@ export default function LoginForm() {
               id="cpf"
               value={values.cpf}
               mask={CPF.mask}
-              onChange={(e) => handleChange("cpf", e.target.value)}
+              onInput={(e) => handleChange("cpf", e.currentTarget.value)}
               className="bg-[#292F37] border-0 border-b border-white/70 text-gray-200"
               aria-invalid={!!errors.cpf}
             />

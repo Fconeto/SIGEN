@@ -48,7 +48,7 @@ namespace SIGEN.API.Middlewares
             var response = new Response
             {
                 IsSuccess = false,
-                Message = "Erro ao processar a solicitação: " + message,
+                Message = message,
                 Data = null
             };
 

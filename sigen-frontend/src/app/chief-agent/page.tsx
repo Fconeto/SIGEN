@@ -11,6 +11,9 @@ import {
   Home,
   FileSearch,
   SearchCheck,
+  MapPlus,
+  MapPinPlus,
+  Map,
 } from "lucide-react";
 
 import Cookies from "js-cookie";
@@ -21,7 +24,7 @@ export default function HomePage() {
   const router = useRouter();
 
   const handleLogout = () => {
-    localStorage.removeItem("userData");
+    localStorage.removeItem("agentId");
     Cookies.remove("authToken");
     router.push("/auth/login");
   };
@@ -81,6 +84,12 @@ export default function HomePage() {
             label: "Pesquisa de PIT",
             icon: <SearchCheck className="w-5 h-5" />,
             action: () => router.push("chief-agent/pit-search"),
+          },
+          {
+            id: "location-register",
+            label: "Cadastro de Localidade",
+            icon: <Map className="w-5 h-5" />,
+            action: () => router.push("chief-agent/location-register"),
           },
         ]}
       />

@@ -35,4 +35,22 @@ public class LocalityController : ControllerBase
 
         return Ok(response);
     }
+
+    [HttpPost("create")]
+    [Authorize]
+    [ProducesResponseType(typeof(Response), StatusCodes.Status201Created)]
+    [ProducesResponseType(typeof(Response), StatusCodes.Status400BadRequest)]
+    public async Task<IActionResult> CreateLocality(CreateLocalityRequest request)
+    {
+        await _localityService.CreateLocality(request);
+
+        Response response = new Response
+        {
+            IsSuccess = true,
+            Message = "Cadastro de localidade realizado com sucesso!",
+            Data = null
+        };
+
+        return Created(string.Empty, response);
+    }
 }

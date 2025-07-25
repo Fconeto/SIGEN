@@ -9,6 +9,7 @@ import {
   FileSearch,
   SearchCheck,
   FileText,
+  Map,
 } from "lucide-react";
 
 import Cookies from "js-cookie";
