@@ -69,12 +69,6 @@ export default function HomePage() {
             icon: <SearchCheck className="w-5 h-5" />,
             action: () => router.push("agent/pit-search"),
           },
-          {
-            id: "location-register",
-            label: "Cadastro de Localidade",
-            icon: <Map className="w-5 h-5" />,
-            action: () => router.push("chief-agent/location-register"),
-          },
         ]}
       />
     </SigenAppLayout>

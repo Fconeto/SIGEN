@@ -24,7 +24,7 @@ export default function HomePage() {
   const router = useRouter();
 
   const handleLogout = () => {
-    localStorage.removeItem("userData");
+    localStorage.removeItem("agentId");
     Cookies.remove("authToken");
     router.push("/auth/login");
   };
@@ -89,7 +89,7 @@ export default function HomePage() {
             id: "location-register",
             label: "Cadastro de Localidade",
             icon: <Map className="w-5 h-5" />,
-            action: () => router.push("agent/location-register"),
+            action: () => router.push("chief-agent/location-register"),
           },
         ]}
       />

@@ -78,7 +78,7 @@ export default function LocationRegisterForm() {
 
     setIsLoading(true);
     try {
-      const userId = GlobalService.getInstance().getUser()?.id;
+      const userId = localStorage.getItem("agentId");
       const body = {
         agenteId: userId,
         codigoDaLocalidade: Number(values.locationCode),
@@ -88,7 +88,7 @@ export default function LocationRegisterForm() {
 
       const token = Cookies.get('authToken');
 
-       const res = await fetch(`${API_BASE_URL}/api/locality/create`, {
+      const res = await fetch(`${API_BASE_URL}/api/locality/create`, {
         method: "POST",
         headers: {
           "Content-Type": "application/json", 
@@ -99,14 +99,14 @@ export default function LocationRegisterForm() {
 
       const response = await res.json();
 
-      if (!res.ok) throw new Error(response.message || "Erro ao cadastrar localidade"); 
+      if (!res.ok) throw new Error(response.Message || "Erro ao cadastrar localidade"); 
 
       setIsLoading(false);
       setDialog({
         isOpen: true,
         type: "success",
         title: "Sucesso",
-        message: "Residência cadastrada com sucesso!",
+        message: response.Message || "Localidade cadastrada com sucesso!",
       });
 
       resetForm();
@@ -117,7 +117,7 @@ export default function LocationRegisterForm() {
         isOpen: true,
         type: "error",
         title: "Erro",
-        message: error.message || "Erro ao cadastrar residência.",
+        message: error.Message || "Erro ao cadastrar localidade.",
       });
     }
   };
