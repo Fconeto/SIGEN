@@ -11,6 +11,8 @@ services:
       - ASPNETCORE_ENVIRONMENT=Development
     depends_on:
       - db
+    networks:
+      - sigen-network
 
   frontend:
     build:
@@ -18,11 +20,19 @@ services:
       dockerfile: dockerfile
     ports:
       - "3000:3000"
+    networks:
+      - sigen-network
 
   db:
     image: mcr.microsoft.com/mssql/server:2022-latest
     environment:
-      SA_PASSWORD: "1029384756"
+      SA_PASSWORD: "Complex@123"
       ACCEPT_EULA: "Y"
     ports:
       - "1433:1433"
+    networks:
+      - sigen-network
+
+networks:
+  sigen-network:
+    driver: bridge
