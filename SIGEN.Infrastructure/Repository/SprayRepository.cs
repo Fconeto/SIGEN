@@ -7,11 +7,13 @@ using SIGEN.Domain.Shared.Enums;
 using SIGEN.Domain.Shared.Requests;
 using SIGEN.Domain.Shared.Responses;
 using SIGEN.Infrastructure.Interfaces;
+
 namespace SIGEN.Infrastructure.Repository;
 
 public class SprayRepository : ISprayRepository
 {
     private readonly string _connectionString;
+
     public SprayRepository(IConfiguration configuration)
     {
         _connectionString = configuration.GetConnectionString("DefaultConnection");
@@ -45,6 +47,40 @@ public class SprayRepository : ISprayRepository
                 commandType: CommandType.StoredProcedure
             );
             return result.ToList();
+        }
+    }
+
+    public async Task InsertBorrifacao(Spray spray)
+    {
+        using (var connection = new SqlConnection(_connectionString))
+        {
+            var parameters = new DynamicParameters();
+            parameters.Add("@AgenteId", spray.AgenteId);
+            parameters.Add("@DataDoPreenchimento", spray.DataDoPreenchimento);
+            parameters.Add("@Pendencia", (int)spray.Pendencia);
+            parameters.Add("@TipoDeInseticida", spray.TipoDeInseticida);
+            parameters.Add("@NumeroDeCarga", spray.NumeroDeCarga);
+            parameters.Add("@PesquisaId", spray.PesquisaId);
+            parameters.Add("@DataDeRegistro", spray.DataDeRegistro);
+            parameters.Add("@DataDeAtualizacao", spray.DataDeAtualizacao);
+            parameters.Add("@CriadoPor", spray.CriadoPor);
+            parameters.Add("@AtualizadoPor", spray.AtualizadoPor);
+
+            await connection.ExecuteAsync("InsertBorrifacao", parameters, commandType: CommandType.StoredProcedure);
+        }
+    }
+    public async Task<long?> GetSearchWithPendingSprayById(long pesquisaId)
+    {
+        using (var connection = new SqlConnection(_connectionString))
+        {
+            var parameters = new DynamicParameters();
+            parameters.Add("@PesquisaId", pesquisaId);
+
+            return await connection.QueryFirstOrDefaultAsync<long?>(
+                "GetSearchWithPendingSprayById",
+                parameters,
+                commandType: CommandType.StoredProcedure
+            );
         }
     }
 }

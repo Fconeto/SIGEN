@@ -16,4 +16,6 @@ public interface ISprayRepository
         OrderType orderType,
         int page
     );
+    Task<long?> GetSearchWithPendingSprayById(long searchId);
+    Task InsertBorrifacao(Spray spray);
 }
