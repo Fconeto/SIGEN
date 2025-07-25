@@ -122,7 +122,7 @@ export default function LoginForm() {
               id="cpf"
               value={values.cpf}
               mask={CPF.mask}
-              onInput={(e) => handleChange("cpf", e.target.value)}
+              onInput={(e) => handleChange("cpf", e.currentTarget.value)}
               className="bg-[#292F37] border-0 border-b border-white/70 text-gray-200"
               aria-invalid={!!errors.cpf}
             />
