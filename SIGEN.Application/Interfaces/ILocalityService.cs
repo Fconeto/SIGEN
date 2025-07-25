@@ -6,4 +6,5 @@ namespace SIGEN.Application.Interfaces;
 public interface ILocalityService
 {
     Task<List<GetLocalityListResponse>> GetLocalityList();
+    Task CreateLocality(CreateLocalityRequest request);
 }
