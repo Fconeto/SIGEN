@@ -6,9 +6,13 @@ services:
       context: .
       dockerfile: dockerfile
     ports:
-      - "5000:8080"
+      - "5099:8080"
     environment:
       - ASPNETCORE_ENVIRONMENT=Development
+      - DB_SERVER=db
+      - DB_NAME=agente_de_endemias
+      - DB_USER=sa
+      - DB_PASSWORD=Complex@123
     depends_on:
       - db
     networks:

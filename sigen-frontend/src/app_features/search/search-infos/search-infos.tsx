@@ -5,7 +5,7 @@ import { SigenTable } from "@/components/sigen-table";
 import { SigenPagination } from "@/components/sigen-pagination";
 import { SigenDialog, type SigenDialogProps } from "@/components/sigen-dialog";
 import { useRouter, useSearchParams } from "next/navigation";
-import { use, useEffect, useMemo, useState } from "react";
+import { use, useEffect, useMemo, useState, Suspense } from "react";
 import {
   ResidenceInfos,
   ResidenceSortKey, 
@@ -44,23 +44,6 @@ export default function SprayPendingResults() {
   const searchParams = useSearchParams();
 
   const [sprayPendings, setSprayPendings] = useState<PendingSearchInfos[]>([
-    {
-      atualizadoPor: 0,
-      categoriaDaLocalidade: "",
-      codigoDaLocalidade: 0,
-      complemento: "",
-      criadoPor: 0,
-      dataDeAtualizacao: "",
-      dataDeRegistro: "",
-      id: 0,
-      nomeDaLocalidade: "",
-      nomeDoMorador: "",
-      numero: 0,
-      pageNumber: 1,
-      pageSize: 10,
-      totalCount: 0,
-      totalPages: 1,
-    },
   ]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);

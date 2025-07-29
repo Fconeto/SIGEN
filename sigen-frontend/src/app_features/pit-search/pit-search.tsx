@@ -99,7 +99,7 @@ const handleSubmit = async (e: React.FormEvent) => {
             <SigenInput 
               id="locationCode"
               value={values.locationCode}
-              onChange={(e) => handleChange("locationCode", e.target.value)}
+              onChange={(e) => handleChange("locationCode", Number(e.target.value))}
               aria-invalid={!!errors.locationCode}
               placeholder="Digite o código da localidade"
             />
@@ -127,7 +127,7 @@ const handleSubmit = async (e: React.FormEvent) => {
             <SigenInput 
               id="houseNumber"
               value={values.houseNumber}
-              onChange={(e) => handleChange("houseNumber", e.target.value)}
+              onChange={(e) => handleChange("houseNumber", Number(e.target.value))}
               aria-invalid={!!errors.houseNumber}
               placeholder="Digite o número da casa"
             />
@@ -141,7 +141,7 @@ const handleSubmit = async (e: React.FormEvent) => {
             <SigenInput 
               id="complementNumber"
               value={values.complementNumber}
-              onChange={(e) => handleChange("complementNumber", e.target.value)}
+              onChange={(e) => handleChange("complementNumber", Number(e.target.value))}
               aria-invalid={!!errors.complementNumber}
               placeholder="Digite o número do complemento"
             />

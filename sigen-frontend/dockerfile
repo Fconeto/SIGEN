@@ -1,25 +1,29 @@
 # Usar uma imagem base do Node.js
-FROM node:18 AS base
+FROM node:latest AS base
 
 # Definir o diretório de trabalho
 WORKDIR /app
 
+# Limpar o cache do npm
+RUN npm cache clean --force
+
 # Copiar os arquivos de configuração
 COPY package.json package-lock.json ./
 
-# Instalar dependências
-RUN npm install
+# Instalar dependências de forma limpa
+RUN npm ci
+
+# Garantir que o módulo lightningcss seja instalado corretamente
+RUN npm install lightningcss --force
 
 # Copiar o restante dos arquivos
 COPY . .
 
 # Compilar o projeto
-RUN npm rebuild lightningcss || true
-RUN npm install --force
 RUN npm run build || exit 0
 
 # Etapa de produção
-FROM node:18 AS development
+FROM node:latest AS production
 WORKDIR /app
 COPY --from=base /app .
 CMD ["npm", "start"]

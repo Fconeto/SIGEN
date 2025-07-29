@@ -3,7 +3,7 @@
 import type React from "react";
 import { SigenAppLayout } from "@/components/sigen-app-layout";
 import { useRouter, useSearchParams } from "next/navigation";
-import { useState, useMemo, useEffect } from "react";
+import { useState, useMemo, useEffect, Suspense } from "react";
 import * as XLSX from 'xlsx';
 import Cookies from 'js-cookie';
 import { API_BASE_URL } from "@/config/api-config";
@@ -224,7 +224,7 @@ export default function WeeklyReportResults() {
   };
 
   return (
-    <>
+    <Suspense fallback={<div>Carregando...</div>}>
       <SigenAppLayout
         headerTitle="Relatório Semanal"
         showBackButton
@@ -360,6 +360,6 @@ export default function WeeklyReportResults() {
         title={dialog.title}
         message={dialog.message}
       />
-    </>
+    </Suspense>
   );
 }

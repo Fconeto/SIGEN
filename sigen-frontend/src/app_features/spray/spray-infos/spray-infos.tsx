@@ -17,7 +17,7 @@ export default function SprayPendingResults() {
     key: SortKey;
     direction: "ascending" | "descending";
   } | null>({
-    key: "nomeMorador",
+    key: "nomeDoMorador",
     direction: "ascending",
   });
   const [currentPage, setCurrentPage] = useState(1);
@@ -33,70 +33,70 @@ export default function SprayPendingResults() {
       const mockData: ResidenceInfos[] = [
         {
           id: "1",
-          complement: "1",
-          numeroCasa: "203A",
-          nomeMorador: "João Moreira da Silva",
+          complemento: "1",
+          numero: "203A",
+          nomeDoMorador: "João Moreira da Silva",
         },
         {
           id: "2",
-          complement: "1",
-          numeroCasa: "718",
-          nomeMorador: "Wellington Rocha",
+          complemento: "1",
+          numero: "718",
+          nomeDoMorador: "Wellington Rocha",
         },
         {
           id: "3",
-          complement: "2",
-          numeroCasa: "201A",
-          nomeMorador: "Eduardo Ximenes Paiva",
+          complemento: "2",
+          numero: "201A",
+          nomeDoMorador: "Eduardo Ximenes Paiva",
         },
         {
           id: "4",
-          complement: "3",
-          numeroCasa: "201",
-          nomeMorador: "Lucas Silva",
+          complemento: "3",
+          numero: "201",
+          nomeDoMorador: "Lucas Silva",
         },
         {
           id: "5",
-          complement: "1",
-          numeroCasa: "105",
-          nomeMorador: "Maria Santos",
+          complemento: "1",
+          numero: "105",
+          nomeDoMorador: "Maria Santos",
         },
         {
           id: "6",
-          complement: "4",
-          numeroCasa: "asd",
-          nomeMorador: "Carlos Oliveira",
+          complemento: "4",
+          numero: "asd",
+          nomeDoMorador: "Carlos Oliveira",
         },
-        { id: "7", complement: "5", numeroCasa: "302", nomeMorador: "asd" },
+        { id: "7", complemento: "5", numero: "302", nomeDoMorador: "asd" },
         {
           id: "8",
-          complement: "sd",
-          numeroCasa: "150",
-          nomeMorador: "Ana Costa",
+          complemento: "sd",
+          numero: "150",
+          nomeDoMorador: "Ana Costa",
         },
         {
           id: "9",
-          complement: "6",
-          numeroCasa: "401",
-          nomeMorador: "Pedro Lima",
+          complemento: "6",
+          numero: "401",
+          nomeDoMorador: "Pedro Lima",
         },
         {
           id: "10",
-          complement: "7",
-          numeroCasa: "202",
-          nomeMorador: "Lucia Ferreira",
+          complemento: "7",
+          numero: "202",
+          nomeDoMorador: "Lucia Ferreira",
         },
         {
           id: "11",
-          complement: "8",
-          numeroCasa: "501",
-          nomeMorador: "Roberto Silva",
+          complemento: "8",
+          numero: "501",
+          nomeDoMorador: "Roberto Silva",
         },
         {
           id: "12",
-          complement: "9",
-          numeroCasa: "602",
-          nomeMorador: "Fernanda Costa",
+          complemento: "9",
+          numero: "602",
+          nomeDoMorador: "Fernanda Costa",
         },
       ];
 
@@ -122,7 +122,7 @@ export default function SprayPendingResults() {
         if (aValue === null) return 1;
         if (bValue === null) return -1;
 
-        if (sortConfig.key === "complement") {
+        if (sortConfig.key === "complemento") {
           const numA = Number.parseInt(aValue, 10);
           const numB = Number.parseInt(bValue, 10);
           if (numA < numB) return sortConfig.direction === "ascending" ? -1 : 1;

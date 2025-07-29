@@ -1,3 +1,7 @@
+CREATE DATABASE agente_de_endemias;
+GO
+USE agente_de_endemias;
+
 CREATE TABLE Agente (
     AgenteId BIGINT PRIMARY KEY IDENTITY(1,1),
     NomeDoAgente NVARCHAR(255) NOT NULL,
@@ -12,22 +16,6 @@ CREATE TABLE Agente (
     DataDeAtualizacao DATETIME NOT NULL,
     CriadoPor BIGINT NOT NULL,
     AtualizadoPor BIGINT NOT NULL
-);
-GO
-
-CREATE TABLE Borrifacao (
-    BorrifacaoId BIGINT IDENTITY(1,1) PRIMARY KEY,
-    AgenteId BIGINT NULL,
-    DataDoPreenchimento DATE NOT NULL,
-    Pendencia INT NOT NULL,
-    TipoDeInseticida NVARCHAR(255) NOT NULL,
-    NumeroDeCarga INT NOT NULL,
-    PesquisaId BIGINT NOT NULL,
-    DataDeRegistro DATETIME NOT NULL,
-    DataDeAtualizacao DATETIME NOT NULL,
-    CriadoPor BIGINT NOT NULL,
-    AtualizadoPor BIGINT NOT NULL,
-    CONSTRAINT FK_Borrifacao_Pesquisa FOREIGN KEY (PesquisaId) REFERENCES Pesquisa(PesquisaId)
 );
 GO
 
@@ -90,6 +78,23 @@ CREATE TABLE PIT (
     CriadoPor BIGINT NOT NULL,
     AtualizadoPor BIGINT NOT NULL,
     CONSTRAINT FK_PIT_Pesquisa FOREIGN KEY (PesquisaId) REFERENCES Pesquisa(PesquisaId)
+);
+GO
+
+
+CREATE TABLE Borrifacao (
+    BorrifacaoId BIGINT IDENTITY(1,1) PRIMARY KEY,
+    AgenteId BIGINT NULL,
+    DataDoPreenchimento DATE NOT NULL,
+    Pendencia INT NOT NULL,
+    TipoDeInseticida NVARCHAR(255) NOT NULL,
+    NumeroDeCarga INT NOT NULL,
+    PesquisaId BIGINT NOT NULL,
+    DataDeRegistro DATETIME NOT NULL,
+    DataDeAtualizacao DATETIME NOT NULL,
+    CriadoPor BIGINT NOT NULL,
+    AtualizadoPor BIGINT NOT NULL,
+    CONSTRAINT FK_Borrifacao_Pesquisa FOREIGN KEY (PesquisaId) REFERENCES Pesquisa(PesquisaId)
 );
 GO
 

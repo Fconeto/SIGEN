@@ -11,7 +11,7 @@ import { WallType, WallTypeLabels } from "@/domain/entities/wall";
 import { SigenDialog, SigenDialogProps } from "@/components/sigen-dialog";
 import { useForm, validators } from "@/hooks/useform";
 import { useRouter, useSearchParams } from "next/navigation";
-import { useState } from "react";
+import { Suspense, useState } from "react";
 import { SigenLoadingButton } from "@/components/sigen-loading-button";
 import { TokenService } from "@/services/auth/token-service";
 import { GlobalService } from "@/services/global-service";
@@ -208,7 +208,7 @@ export default function SearchRegisterForm() {
   };
 
   return (
-    <>
+    <Suspense fallback={<div>Carregando...</div>}>
       <SigenAppLayout
         headerTitle="Cadastro de Pesquisa"
         showBackButton
@@ -480,6 +480,6 @@ export default function SearchRegisterForm() {
               title={dialog.title}
               message={dialog.message}
             />
-    </>
+    </Suspense>
   );
 }

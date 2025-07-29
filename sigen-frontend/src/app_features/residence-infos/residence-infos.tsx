@@ -7,7 +7,7 @@ import { useRouter } from 'next/navigation';
 import React, { useEffect, useMemo, useState } from 'react';
 import type { ResidenceInfos as BaseResidenceInfos } from "@/domain/entities/residences";
 
-type ResidenceInfos = Omit<BaseResidenceInfos, 'status'>;
+export type ResidenceInfos = Omit<BaseResidenceInfos, 'status'>;
 
 export type SortKey = keyof ResidenceInfos;
 
@@ -15,7 +15,7 @@ export default function ResidenceInfos() {
   const router = useRouter();
   const [residences, setResidences] = useState<ResidenceInfos[]>([])
   const [loading, setLoading] = useState(false)
-  const [sortConfig, setSortConfig] = useState<{ key: SortKey; direction: 'ascending' | 'descending' } | null>({ key: 'nomeMorador', direction: 'ascending' });
+  const [sortConfig, setSortConfig] = useState<{ key: SortKey; direction: 'ascending' | 'descending' } | null>({ key: 'nomeDoMorador', direction: 'ascending' });
   const [currentPage, setCurrentPage] = useState(1);
   const ITEMS_PER_PAGE = 10;
 
@@ -26,18 +26,18 @@ export default function ResidenceInfos() {
       await new Promise(resolve => setTimeout(resolve, 600));
       
       const mockData: ResidenceInfos[] = [
-        { id: "1", complement: "1", numeroCasa: "203A", nomeMorador: "João Moreira da Silva" },
-        { id: "2", complement: "1", numeroCasa: "718", nomeMorador: "Welligton Rocha" },
-        { id: "3", complement: "2", numeroCasa: "201A", nomeMorador: "João Moreira da Silva" },
-        { id: "4", complement: "2", numeroCasa: "203", nomeMorador: "Eduardo Ximenes Paiva" },
-        { id: "5", complement: "10", numeroCasa: "203A", nomeMorador: "João Moreira da Silva" },
-        { id: "6", complement: "20", numeroCasa: "203A", nomeMorador: "João Moreira da Silva" },
-        { id: "7", complement: "20", numeroCasa: "203A", nomeMorador: "João Moreira da Silva" },
-        { id: "8", complement: "20", numeroCasa: "203A", nomeMorador: "João Moreira da Silva" },
-        { id: "9", complement: "20", numeroCasa: "203A", nomeMorador: "João Moreira da Silva" },
-        { id: "10", complement: "20", numeroCasa: "203A", nomeMorador: "João Moreira da Silva" },
-        { id: "11", complement: "20", numeroCasa: "203A", nomeMorador: "João Moreira da Silva" },
-        { id: "12", complement: "20", numeroCasa: "203A", nomeMorador: "João Moreira da Silva" },
+        { id: "1", complemento: "1", numero: "203A", nomeDoMorador: "João Moreira da Silva" },
+        { id: "2", complemento: "1", numero: "718", nomeDoMorador: "Welligton Rocha" },
+        { id: "3", complemento: "2", numero: "201A", nomeDoMorador: "João Moreira da Silva" },
+        { id: "4", complemento: "2", numero: "203", nomeDoMorador: "Eduardo Ximenes Paiva" },
+        { id: "5", complemento: "10", numero: "203A", nomeDoMorador: "João Moreira da Silva" },
+        { id: "6", complemento: "20", numero: "203A", nomeDoMorador: "João Moreira da Silva" },
+        { id: "7", complemento: "20", numero: "203A", nomeDoMorador: "João Moreira da Silva" },
+        { id: "8", complemento: "20", numero: "203A", nomeDoMorador: "João Moreira da Silva" },
+        { id: "9", complemento: "20", numero: "203A", nomeDoMorador: "João Moreira da Silva" },
+        { id: "10", complemento: "20", numero: "203A", nomeDoMorador: "João Moreira da Silva" },
+        { id: "11", complemento: "20", numero: "203A", nomeDoMorador: "João Moreira da Silva" },
+        { id: "12", complemento: "20", numero: "203A", nomeDoMorador: "João Moreira da Silva" },
       ];
       
       setResidences(mockData);
@@ -48,13 +48,13 @@ export default function ResidenceInfos() {
   }, []);
   
   const paginatedResidences = useMemo(() => {
-    let sortedItems = [...residences];
+    const sortedItems = [...residences];
 
     if (sortConfig !== null) {
       sortedItems.sort((a, b) => {
         const aValue = a[sortConfig.key];
         const bValue = b[sortConfig.key];
-        if (sortConfig.key === 'complement') {
+        if (sortConfig.key === 'complemento') {
           const numA = parseInt(aValue, 10);
           const numB = parseInt(bValue, 10);
           if (numA < numB) return sortConfig.direction === 'ascending' ? -1 : 1;
