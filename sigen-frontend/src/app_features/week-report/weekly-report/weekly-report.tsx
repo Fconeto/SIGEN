@@ -147,9 +147,9 @@ export default function WeeklyReport(){
               id="week"
               type="number"
               value={values.week}
-              onChange={(e) => handleChange("week", e.target.value)}
+              onChange={(e) => handleChange("week", Number(e.target.value))}
               aria-invalid={!!errors.week}
-              placeholder="Digite o semana"
+              placeholder="Digite a semana"
             />
           </SigenFormField>
 
