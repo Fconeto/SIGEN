@@ -45,22 +45,23 @@ namespace SIGEN.Infrastructure.Repository
         {
             using (var connection = new SqlConnection(_connectionString))
             {
+                var parameters = new DynamicParameters();
+                parameters.Add("@NomeDoAgente", agent.NomeDoAgente);
+                parameters.Add("@Turma", (int)agent.Turma);
+                parameters.Add("@Senha", agent.Senha);
+                parameters.Add("@Salt", agent.Salt);
+                parameters.Add("@Matricula", agent.Matricula);
+                parameters.Add("@CPF", agent.CPF);
+                parameters.Add("@Hierarquia", (int)agent.Hierarquia);
+                parameters.Add("@Tentativas", agent.Tentativas);
+                parameters.Add("@DataDeRegistro", agent.DataDeRegistro);
+                parameters.Add("@DataDeAtualizacao", agent.DataDeAtualizacao);
+                parameters.Add("@CriadoPor", agent.CriadoPor);
+                parameters.Add("@AtualizadoPor", agent.AtualizadoPor);
+
                 await connection.ExecuteAsync(
                     "InsertAgente",
-                    new
-                    {
-                        agent.NomeDoAgente,
-                        Turma = (int)agent.Turma,
-                        agent.Senha,
-                        agent.Matricula,
-                        agent.CPF,
-                        Hierarquia = (int)agent.Hierarquia,
-                        agent.Tentativas,
-                        agent.DataDeRegistro,
-                        agent.DataDeAtualizacao,
-                        agent.CriadoPor,
-                        agent.AtualizadoPor
-                    },
+                    parameters,
                     commandType: CommandType.StoredProcedure
                 );
             }

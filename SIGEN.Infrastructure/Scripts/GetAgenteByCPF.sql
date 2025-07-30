@@ -6,6 +6,7 @@ BEGIN
               NomeDoAgente,
               Turma,
               Senha,
+              Salt,
               Matricula,
               CPF,
               Hierarquia,
