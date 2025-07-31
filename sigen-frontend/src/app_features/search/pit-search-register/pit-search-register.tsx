@@ -36,11 +36,6 @@ export default function SearchRegisterPITForm() {
   const searchParams = useSearchParams();
   const id = searchParams.get("id");
 
-  const mandatoryCaptureSelection = (_: any, allValues: SearchForm) => {
-    if (!allValues.captureIntra && !allValues.capturePeri)
-      return "Selecione ao menos um tipo de captura";
-  };
-
   const { values, errors, handleChange, validateForm, resetForm } = useForm(
     {
       pendencyState: undefined,
@@ -86,12 +81,8 @@ export default function SearchRegisterPITForm() {
             ? "O campo não deve conter números"
             : undefined,
       ],
-      captureIntra: [
-        mandatoryCaptureSelection,
-      ],
-      capturePeri: [
-        mandatoryCaptureSelection,
-      ],
+      captureIntra: [],
+      capturePeri: [],
       positiveAttachments:[ validators.required("Campo obrigatório"),
         (value) =>
           value && !/^\d+$/.test(String(value))
