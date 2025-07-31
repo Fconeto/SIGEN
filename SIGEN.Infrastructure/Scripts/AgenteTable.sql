@@ -3,6 +3,7 @@ CREATE TABLE Agente (
     NomeDoAgente NVARCHAR(255) NOT NULL,
     Turma INT NOT NULL,
     Senha NVARCHAR(255) NOT NULL,
+    Salt NVARCHAR(64) NOT NULL,
     Matricula BIGINT NOT NULL,
     CPF NVARCHAR(14) NOT NULL UNIQUE,
     Hierarquia INT NOT NULL,

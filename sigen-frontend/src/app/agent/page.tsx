@@ -37,7 +37,7 @@ export default function HomePage() {
             id: "cadastro-residencia",
             label: "Cadastro de Residência",
             icon: <Home className="w-5 h-5" />,
-            action: () => router.push("/agent/register-house"),
+            action: () => router.push("/agent/residence-register"),
           },
           {
             id: "consulta-residencia",

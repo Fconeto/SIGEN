@@ -6,13 +6,14 @@ namespace SIGEN.Application.Mappers;
 
 public class AuthMapper
 {
-    public Agent Mapper(RegisterRequest request)
+    public Agent Mapper(RegisterRequest request, string salt)
     {
         return new Agent
         {
             NomeDoAgente = request.NomeDoAgente,
             Turma = request.Turma,
             Senha = request.Senha,
+            Salt = salt,
             Matricula = request.Matricula,
             CPF = request.CPF,
             Hierarquia = request.Hierarquia,

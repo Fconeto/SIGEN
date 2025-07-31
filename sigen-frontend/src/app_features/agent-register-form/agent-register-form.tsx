@@ -22,13 +22,14 @@ import { GlobalService } from "@/services/global-service";
 import Cookies from 'js-cookie';
 
 interface AgentForm {
-  agentId: string;
-  matricula: string;
+  agentId: number;
+  registration: string;
   agentName: string;
   team: number;
   cpf: string;
   password: string;
   confirmPassword: string;
+  hierarchy: number;
 }
 
 export default function AgentRegistrationForm() {
@@ -43,23 +44,25 @@ export default function AgentRegistrationForm() {
     validateField,
   } = useForm(
     {
-      agentId: "",
-      matricula: "",
+      agentId: 0,
       agentName: "",
       team: 0,
       password: "",
       confirmPassword: "",
       cpf: "",
+      hierarchy: 0,
     } as AgentForm,
     {
-      matricula: [
+      registration: [
         validators.required("Campo obrigatório"),
-        validators.minLength(6, "Mínimo 6 caracteres"),
         validators.isNumber("Deve ser um número"),
+        validators.condition<AgentForm, "registration">(
+          (value) => Number(value) >= 0,
+          "A matrícula é um valor positivo"
+        ),
       ],
       agentName: [
         validators.required("Campo obrigatório"),
-        validators.minLength(6, "Mínimo 6 caracteres"),
       ],
       team: [validators.required("Campo obrigatório")],
       cpf: [
@@ -71,12 +74,21 @@ export default function AgentRegistrationForm() {
       ],
       password: [
         validators.required("Campo obrigatório"),
-        validators.minLength(6, "Mínimo 6 caracteres"),
+        validators.minLength(8, "Mínimo 8 caracteres"),
+        validators.condition<AgentForm, "password">((value) =>
+          (/\d/.test(String(value))), 
+          "A senha deve conter pelo menos um número"
+        ),
+        validators.condition<AgentForm, "password">((value) =>
+          !/^\d+$/.test(String(value)), 
+          "A senha deve conter pelo menos uma letra"
+        ),
       ],
       confirmPassword: [
         validators.required("Campo obrigatório"),
         validators.equalField<AgentForm>("password", "As senhas não condizem"),
       ],
+      hierarchy: [validators.required("Campo obrigatório"),]
     }
   );
   const [isLoading, setIsLoading] = useState(false);
@@ -100,9 +112,9 @@ export default function AgentRegistrationForm() {
     setIsLoading(true);
 
     try {
+      const token = Cookies.get('authToken');
       const agentId = localStorage.getItem("agentId") || 0;
 
-      const token = Cookies.get('authToken');
       const response = await fetch(`${API_BASE_URL}/api/Auth/register`, {
         method: "POST",
         headers: {
@@ -114,16 +126,16 @@ export default function AgentRegistrationForm() {
           nomeDoAgente: values.agentName,
           turma: values.team,
           senha: values.password,
-          matricula: Number(values.matricula),
+          matricula: values.registration,
           cpf: CPF.strip(values.cpf),
-          hierarquia: 0,
+          hierarquia: values.hierarchy,
         }),
       });
 
       const data = await response.json();
 
       if (!response.ok) {
-        throw new Error(data.message || "Erro ao cadastrar agente");
+        throw new Error(data.Message || "Erro ao cadastrar agente");
       }
 
       setDialog({
@@ -180,19 +192,19 @@ export default function AgentRegistrationForm() {
           </SigenFormField>
 
           <SigenFormField
-            id="matricula"
+            id="registration"
             label="Matrícula do agente:"
-            error={errors.matricula}
+            error={errors.registration}
           >
             <SigenInput
-              id="matricula"
-              value={values.matricula}
+              id="registration"
+              value={values.registration}
               mask={{
                 mask: Number,
                 scale: 0,
               }}
-              onChange={(e) => handleChange("matricula", e.target.value)}
-              aria-invalid={!!errors.matricula}
+              onChange={(e) => handleChange("registration", e.target.value)}
+              aria-invalid={!!errors.registration}
               placeholder="Digite identificador do agente"
               inputMode="numeric"
             />
@@ -249,12 +261,29 @@ export default function AgentRegistrationForm() {
             />
           </SigenFormField>
 
+          <SigenFormField id="hierarchy" label="Hierarquia:" error={errors.hierarchy}>
+            <SigenDropdown
+              value={values.hierarchy}
+              onValueChange={(v) => handleChange("hierarchy", v)}
+              options={[
+                {
+                  value: 0,
+                  label: "Agente de campo",
+                },
+                {
+                  value: 1,
+                  label: "Agente chefe",
+                },
+              ]}
+            />
+          </SigenFormField>
+
           <div className="pt-8">
             <SigenLoadingButton
               type="submit"
               loading={isLoading}
               disabled={
-                !!errors.matricula ||
+                !!errors.registration ||
                 !!errors.agentName ||
                 !!errors.password ||
                 !!errors.team ||

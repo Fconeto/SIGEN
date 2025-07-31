@@ -8,6 +8,7 @@ public class Agent : BaseEntity
     public string NomeDoAgente { get; set; } = string.Empty;
     public Turma Turma { get; set; }
     public string Senha { get; set; } = string.Empty;
+    public string Salt { get; set; } = string.Empty;
     public long Matricula { get; set; }
     public string CPF { get; set; } = string.Empty;
     public Hierarquia Hierarquia { get; set; }

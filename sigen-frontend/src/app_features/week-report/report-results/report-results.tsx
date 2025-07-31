@@ -206,9 +206,9 @@ export default function WeeklyReportResults() {
       { s: { r: 0, c: 2 }, e: { r: 1, c: 2 } }, 
       { s: { r: 0, c: 3 }, e: { r: 1, c: 3 } }, 
       { s: { r: 0, c: 4 }, e: { r: 1, c: 4 } }, 
-      { s: { r: 0, c: 19 }, e: { r: 1, c: 19 } }, 
       { s: { r: 0, c: 20 }, e: { r: 1, c: 20 } }, 
       { s: { r: 0, c: 21 }, e: { r: 1, c: 21 } }, 
+      { s: { r: 0, c: 22 }, e: { r: 1, c: 22 } }, 
 
       { s: { r: 0, c: 5 }, e: { r: 0, c: 7 } }, 
       { s: { r: 0, c: 8 }, e: { r: 0, c: 10 } }, 
