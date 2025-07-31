@@ -2,7 +2,7 @@
 
 import { SigenAppLayout } from "@/components/sigen-app-layout";
 import { SigenDateInput } from "@/components/sigen-date-picker";
-import { SigenDialogProps } from "@/components/sigen-dialog";
+import { SigenDialog, SigenDialogProps } from "@/components/sigen-dialog";
 import { SigenFormField } from "@/components/sigen-form-field";
 import { SigenInput } from "@/components/sigen-input";
 import { SigenLoadingButton } from "@/components/sigen-loading-button";
@@ -10,6 +10,8 @@ import { BugType } from "@/domain/entities/bug";
 import { useForm, validators } from "@/hooks/useform";
 import { useRouter } from "next/navigation";
 import { useState, useEffect } from "react";
+import Cookies from "js-cookie";
+import { API_BASE_URL } from "@/config/api-config";
 
 interface PITRegisterForm {
   PITNumber: number | undefined;
@@ -22,10 +24,16 @@ interface PITRegisterForm {
   locationOfFind: string;
   nomeMorador?: string;
   nomeCapturador: string;
-  bugType: BugType | undefined;
+  bugType: BugType;
   bugTypeOther: string;
   nomeAgente: string;
   registerDate: Date;
+}
+
+const BugNumber = {
+  Barbeiro: 0,
+  NaoSabe: 1,
+  Outro: 2
 }
 
 export default function PITRegisterForm() {
@@ -35,6 +43,7 @@ export default function PITRegisterForm() {
     undefined
   );
   const [firstCapture, setFirstCapture] = useState(false);
+  const [bugTypeOtherSelected, setBugTypeOtherSelected] = useState(false)
 
   const mandatoryCaptureSelection = () => {
     if (!captureBug) {
@@ -55,7 +64,7 @@ export default function PITRegisterForm() {
       locationOfFind: "",
       nomeMorador: "",
       nomeCapturador: "",
-      bugType: undefined,
+      bugType: BugType.Barbeiro,
       bugTypeOther: "",
       nomeAgente: "",
       registerDate: new Date(),
@@ -99,6 +108,10 @@ export default function PITRegisterForm() {
             : undefined,
       ],
       bugType: [validators.required("Campo obrigatório")],
+      bugTypeOther: [validators.condition<PITRegisterForm, "bugTypeOther">(
+        (value) => !(bugTypeOtherSelected && value === ""), 
+        "Especifique o nome do inseto"
+      )],
       nomeAgente: [
         validators.required("Campo obrigatório"),
         (value) =>
@@ -109,6 +122,10 @@ export default function PITRegisterForm() {
       registerDate: [validators.required("Campo obrigatório")],
     }
   );
+
+  useEffect(() => {
+      setBugTypeOtherSelected(values.bugType == BugType.Outro)
+    }, [values.bugType])
 
   const validateCaptureSelection = () => {
     if (values.captureIntra || values.capturePeri) {
@@ -128,7 +145,7 @@ export default function PITRegisterForm() {
   }, [values.captureIntra, values.capturePeri]);
 
   const [isLoading, setIsLoading] = useState(false);
-  const [, setDialog] = useState<SigenDialogProps>({
+  const [dialog, setDialog] = useState<SigenDialogProps>({
     isOpen: false,
     type: "info",
     message: "",
@@ -150,7 +167,7 @@ export default function PITRegisterForm() {
     setIsLoading(true);
 
     const payload = {
-      agenteId: 0,
+      agenteId: localStorage.getItem("agentId"),
       numeracaoDoPit: values.PITNumber,
       cres: values.CRES ?? "",
       municipio: values.city ?? "",
@@ -161,33 +178,38 @@ export default function PITRegisterForm() {
       localOndeEncontrou: values.locationOfFind,
       nomeDoMorador: values.nomeMorador ?? "",
       nomeDoCapturador: values.nomeCapturador,
-      tipoDoInseto: values.bugType ?? 0,
+      tipoDoInseto: Object.values(BugType).indexOf(values.bugType) ?? 0,
       outroTipoDeInseto: values.bugTypeOther,
       nomeDoRecebedor: values.nomeAgente,
     };
 
     try {
-      const response = await fetch("/api/PIT/create", {
+      const token = Cookies.get("authToken");
+      
+      const response = await fetch(`${API_BASE_URL}/api/PIT/create`, {
         method: "POST",
         headers: {
           "Content-Type": "application/json",
+          "Authorization": `Bearer ${token}`
         },
         body: JSON.stringify(payload),
       });
 
-      if (response.ok) {
+      const data = await response.json();
+
+      if (data.isSuccess) {
         setDialog({
           isOpen: true,
           type: "success",
+          title: "Sucesso",
           message: "Cadastro de PIT realizado com sucesso!",
         });
         resetForm();
       } else {
-        const errorData = await response.json();
         setDialog({
           isOpen: true,
           type: "error",
-          message: errorData.message || "Erro ao realizar o cadastro.",
+          message: data.Message || "Erro ao realizar o cadastro.",
         });
       }
     } catch {
@@ -373,7 +395,7 @@ export default function PITRegisterForm() {
             </div>
           </SigenFormField>
 
-          {values.bugType === BugType.outro && (
+          {values.bugType === BugType.Outro && (
             <SigenFormField
               id="bugTypeOther"
               label="Qual?"
@@ -413,7 +435,7 @@ export default function PITRegisterForm() {
               type="text"
               value={values.registerDate}
               readOnly
-              className="bg-gray-100 text-gray-700 rounded px-2 py-1 w-full"
+              disabled
               tabIndex={-1}
             />
           </SigenFormField>
@@ -425,6 +447,13 @@ export default function PITRegisterForm() {
           </div>
         </form>
       </SigenAppLayout>
+      <SigenDialog
+        isOpen={dialog.isOpen}
+        onClose={() => setDialog((prev) => ({ ...prev, isOpen: false }))}
+        type={dialog.type}
+        title={dialog.title}
+        message={dialog.message}
+      />
     </>
   );
 }

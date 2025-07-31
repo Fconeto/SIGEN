@@ -47,8 +47,8 @@ public class PITService : IPITService
 
             SearchPITResponse searchResponse = new SearchPITResponse
             {
-                PITCompleted = pendingPITs,
-                PendingPIT = completedPITs
+                PITCompleted = completedPITs,
+                PendingPIT = pendingPITs
             };
 
             return searchResponse;
