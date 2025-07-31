@@ -34,7 +34,6 @@ export default function LoginForm() {
       cpf: [validators.condition((cpf) => CPF.isValid(cpf), "CPF inválido")],
       password: [
         validators.required("Campo obrigatório"),
-        validators.minLength(6, "Mínimo 6 caracteres"),
       ],
     }
   );
@@ -66,6 +65,7 @@ export default function LoginForm() {
       if (response.ok && result.isSuccess) {
         if (result.data.token) {
           localStorage.setItem("agentId", result.data.id);
+          console.log(result.data.id)
           Cookies.set("authToken", result.data.token, { expires: 0.5, secure: true, sameSite: "strict" });
         }
         const userType = result.data.tipoDeUsuario;

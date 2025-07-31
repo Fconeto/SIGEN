@@ -50,9 +50,9 @@ namespace SIGEN.Application.Services
 
                 await _authRepository.UpdateAgenteTentativas(agente.Id, 0);
 
-                var secretKey = _configuration["Jwt:Secret"];
-                var issuer = "SIGEN";
-                var audience = "SIGENUsers";
+                var secretKey = _configuration["Jwt:Key"];
+                var issuer = _configuration["Jwt:Issuer"];
+                var audience = _configuration["Jwt:Audience"];
                 string token = JwtTokenGenerator.GenerateToken(agente, secretKey, issuer, audience);
 
                 AuthMapper authMapper = new AuthMapper();
