@@ -34,7 +34,6 @@ export default function WeeklyReport(){
       microregional: "",
       city: "",
       workPhase: undefined,
-      week: 0,
       class: undefined,
       headGuard: "",
     } as WeeklyReport,

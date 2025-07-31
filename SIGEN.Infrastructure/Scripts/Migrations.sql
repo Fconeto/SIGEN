@@ -7,6 +7,7 @@ CREATE TABLE Agente (
     NomeDoAgente NVARCHAR(255) NOT NULL,
     Turma INT NOT NULL,
     Senha NVARCHAR(255) NOT NULL,
+    Salt NVARCHAR(64) NOT NULL,
     Matricula BIGINT NOT NULL,
     CPF NVARCHAR(14) NOT NULL UNIQUE,
     Hierarquia INT NOT NULL,
@@ -140,6 +141,7 @@ BEGIN
               NomeDoAgente,
               Turma,
               Senha,
+              Salt,
               Matricula,
               CPF,
               Hierarquia,
@@ -762,6 +764,7 @@ CREATE PROCEDURE InsertAgente
     @NomeDoAgente NVARCHAR(255),
     @Turma INT,
     @Senha NVARCHAR(255),
+    @Salt NVARCHAR(64),
     @Matricula BIGINT,
     @CPF NVARCHAR(14),
     @Hierarquia INT,
@@ -772,8 +775,8 @@ CREATE PROCEDURE InsertAgente
     @AtualizadoPor BIGINT
 AS
 BEGIN
-    INSERT INTO Agente (NomeDoAgente, Turma, Senha, Matricula, CPF, Hierarquia, Tentativas, DataDeRegistro, DataDeAtualizacao, CriadoPor, AtualizadoPor)
-    VALUES (@NomeDoAgente, @Turma, @Senha, @Matricula, @CPF, @Hierarquia, @Tentativas, @DataDeRegistro, @DataDeAtualizacao, @CriadoPor, @AtualizadoPor);
+    INSERT INTO Agente (NomeDoAgente, Turma, Senha, Salt, Matricula, CPF, Hierarquia, Tentativas, DataDeRegistro, DataDeAtualizacao, CriadoPor, AtualizadoPor)
+    VALUES (@NomeDoAgente, @Turma, @Senha, @Salt, @Matricula, @CPF, @Hierarquia, @Tentativas, @DataDeRegistro, @DataDeAtualizacao, @CriadoPor, @AtualizadoPor);
 END
 GO
 

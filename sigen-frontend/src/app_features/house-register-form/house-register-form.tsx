@@ -76,9 +76,6 @@ export default function HouseRegistrationForm() {
           "O campo Código da Localidade deve conter apenas números"
         ),  
       ],
-      category: [
-        validators.required("Campo obrigatório")
-        ],
       propertyType: [validators.required("Campo obrigatório")],
       situation: [validators.required("Campo obrigatório")],
       number: [
@@ -264,6 +261,7 @@ export default function HouseRegistrationForm() {
             <SigenInput
               id="category"
               value={values.category}
+              disabled
               readOnly
               tabIndex={-1}
               aria-readonly

@@ -1,4 +1,5 @@
 using AutoMapper;
+using Microsoft.Extensions.Configuration;
 using SIGEN.Application.Interfaces;
 using SIGEN.Application.Mappers;
 using SIGEN.Application.Validators;
@@ -16,9 +17,11 @@ namespace SIGEN.Application.Services
     public class AuthService : IAuthService
     {
         private readonly IAuthRepository _authRepository;
-        public AuthService(IAuthRepository authRepository)
+        private readonly IConfiguration _configuration;
+        public AuthService(IAuthRepository authRepository, IConfiguration configuration)
         {
             _authRepository = authRepository;
+            _configuration = configuration;
         }
 
         public async Task<LoginResponse> LoginAsync(LoginRequest request)
@@ -38,7 +41,7 @@ namespace SIGEN.Application.Services
                 if (agente.Tentativas >= 5 && agente.UltimaTentativa > DateTime.Now.AddMinutes(-10))
                     throw new SigenValidationException("O usuário está bloqueado por muitas tentativas de login, aguarde " + (int)(DateTime.Now - agente.UltimaTentativa).TotalMinutes + " minutos para tentar novamente.");
 
-                string senhaHash = ComputeSha256Hash(request.Senha);
+                string senhaHash = ComputeSha256Hash(request.Senha, agente.Salt);
                 if (agente.Senha != senhaHash)
                 {
                     await _authRepository.UpdateAgenteTentativas(agente.Id, agente.Tentativas + 1);
@@ -47,9 +50,9 @@ namespace SIGEN.Application.Services
 
                 await _authRepository.UpdateAgenteTentativas(agente.Id, 0);
 
-                var secretKey = Environment.GetEnvironmentVariable("JWT_SECRET") ?? "chave_secreta_temporaria_1234567890";
-                var issuer = "SIGEN";
-                var audience = "SIGENUsers";
+                var secretKey = _configuration["Jwt:Key"];
+                var issuer = _configuration["Jwt:Issuer"];
+                var audience = _configuration["Jwt:Audience"];
                 string token = JwtTokenGenerator.GenerateToken(agente, secretKey, issuer, audience);
 
                 AuthMapper authMapper = new AuthMapper();
@@ -63,8 +66,11 @@ namespace SIGEN.Application.Services
             }
         }
 
-        private string ComputeSha256Hash(string rawData)
+        private string ComputeSha256Hash(string rawData, string salt = "")
         {
+            if (!string.IsNullOrEmpty(salt))
+                rawData += salt;
+
             using (SHA256 sha256Hash = SHA256.Create())
             {
                 byte[] bytes = sha256Hash.ComputeHash(Encoding.UTF8.GetBytes(rawData));
@@ -91,10 +97,12 @@ namespace SIGEN.Application.Services
                 if (agente != null)
                     throw new SigenValidationException("Já existe um agente cadastrado com o CPF informado.");
 
-                request.Senha = ComputeSha256Hash(request.Senha);
+                string salt = Guid.NewGuid().ToString("N");
+
+                request.Senha = ComputeSha256Hash(request.Senha, salt);
 
                 AuthMapper authMapper = new AuthMapper();
-                Agent entity = authMapper.Mapper(request);
+                Agent entity = authMapper.Mapper(request, salt);
 
                 await _authRepository.InsertAgente(entity);
             }
