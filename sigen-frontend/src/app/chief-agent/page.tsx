@@ -41,7 +41,7 @@ export default function HomePage() {
             id: "cadastro-agente",
             label: "Cadastro de Agente",
             icon: <Users className="w-5 h-5" />,
-            action: () => router.push("auth/register"),
+            action: () => router.push("chief-agent/register"),
           },
           {
             id: "relatorio-semanal",
@@ -53,7 +53,7 @@ export default function HomePage() {
             id: "cadastro-residencia",
             label: "Cadastro de Residência",
             icon: <Home className="w-5 h-5" />,
-            action: () => router.push("chief-agent/register-house"),
+            action: () => router.push("chief-agent/residence-register"),
           },
           {
             id: "consulta-residencia",

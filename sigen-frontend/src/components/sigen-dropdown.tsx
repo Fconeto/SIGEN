@@ -73,7 +73,6 @@ export function SigenDropdown<T extends Object>({
           type="text"
           value={search}
           placeholder={placeholder}
-          readOnly
           tabIndex={canDigit ? 0 : -1}
           onChange={(e) => {
             if (canDigit) {
