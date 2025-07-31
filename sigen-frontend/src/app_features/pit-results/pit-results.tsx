@@ -50,18 +50,22 @@ export default function PITResults() {
     type: "info",
     message: "",
   });
-  const [residences, setResidences] = useState<PITSearchInfos[]>([]);
+  const [pendingPIT, setPendingPIT] = useState<PITSearchInfos[]>([]);
+  const [completedPIT, setCompletedPIT] = useState<PITSearchInfos[]>([]);
+
   const [loading, setLoading] = useState(false);
   const [sortConfig, setSortConfig] = useState<{
     key: SortKey;
     direction: "ascending" | "descending";
   } | null>({ key: "nomeDoMorador", direction: "ascending" });
   const [currentPage, setCurrentPage] = useState(1);
-  const [locationInfo, setLocationInfo] = useState({ code: "", name: "" });
+  const [locationInfo, setLocationInfo] = useState("");
+
 
   useEffect(() => {
     const fetchData = async () => {
     let queryString = searchParams.toString();
+    setLocationInfo(localStorage.getItem("locality") || "");
 
     setLoading(true);
     setError(null);
@@ -74,7 +78,7 @@ export default function PITResults() {
       const token = Cookies.get("authToken");
 
       const response = await fetch(
-        `${API_BASE_URL}/api/Search/pending?${queryString}`,
+        `${API_BASE_URL}/api/PIT/consult?${queryString}`,
         {
           headers: {
             "Content-Type": "application/json",
@@ -88,13 +92,9 @@ export default function PITResults() {
       }
 
       const data = await response.json();
-
-      if (data.data && data.data.length > 0) {
-        setResidences((data && data.data) ? data.data : []);
-        setLocationInfo({
-          code: data.data[0]?.codigoDaLocalidade || "",
-          name: data.data[0]?.nomeDaLocalidade || "",
-        });
+      if (data.data) {
+        setPendingPIT((data.data && data.data.pendingPIT) ? data.data.pendingPIT : []);
+        setCompletedPIT((data.data && data.data.pitCompleted) ? data.data.pitCompleted : []);
       } 
       else {
         setDialog({
@@ -123,7 +123,7 @@ export default function PITResults() {
   }, [searchParams, currentPage, sortConfig]); 
 
   const paginatedPendingsPIT = useMemo(() => {
-    const sortedItems: ResidenceInfos[] = residences.map(item => ({
+    const sortedItems: ResidenceInfos[] = pendingPIT.map(item => ({
       id: item.pitId.toString(),
       complemento: item.complemento,
       numero: item.numero.toString(),
@@ -132,10 +132,10 @@ export default function PITResults() {
     }));
 
     return sortedItems;
-  }, [residences]);
+  }, [pendingPIT]);
 
   const paginatedCompletedPIT = useMemo(() => {
-    const sortedItems: ResidenceInfos[] = residences.map(item => ({
+    const sortedItems: ResidenceInfos[] = completedPIT.map(item => ({
       id: item.pitId.toString(),
       complemento: item.complemento,
       numero: item.numero.toString(),
@@ -144,7 +144,7 @@ export default function PITResults() {
     }));
 
     return sortedItems;
-  }, [residences]);
+  }, [completedPIT]);
   
   const handleSort = (key: SortKey) => {
     let direction: "ascending" | "descending" = "ascending";
@@ -162,8 +162,7 @@ export default function PITResults() {
   const addPit = (id: string) => router.push(`./pit-search-register?id=${id}`);
   const viewPit = (id: string) => router.push(`./spray-consult-form/${id}`);
 
-  const totalPages = residences[0]?.totalPages;
-  
+  const totalPages = completedPIT[0]?.totalPages >= pendingPIT[0]?.totalPages ? completedPIT[0]?.totalPages : pendingPIT[0]?.totalPages;
   return (
     <>
       <SigenAppLayout
@@ -174,7 +173,7 @@ export default function PITResults() {
         <div className="p-1 space-y-6">
           <div>
             <div className="p-2 mb-5 text-center bg-gray-200 rounded-md shadow-sm">
-              <h2 className="font-semibold text-gray-700">0001 CUPIM</h2>
+              <h2 className="font-semibold text-gray-700">{locationInfo}</h2>
             </div>
             <h2 className="text-lg text-center font-semibold text-gray-800 mb-3">Pendências</h2>
             <SigenTable

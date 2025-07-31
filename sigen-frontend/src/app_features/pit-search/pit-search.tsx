@@ -19,10 +19,10 @@ interface Locality {
 }
 
 interface PITSearchForm {
-  locationCode: number;
+  locationCode: string;
   nomeMorador: string;
-  houseNumber: number;
-  complementNumber: number;
+  houseNumber: string;
+  complementNumber: string;
 }
 
 export default function PITSearchForm() {
@@ -30,10 +30,10 @@ export default function PITSearchForm() {
 
   const { values, errors, handleChange, validateForm, resetForm } = useForm(
     {
-      locationCode: 0,
+      locationCode: "",
       nomeMorador: "",
-      houseNumber: 0,
-      complementNumber: 0,
+      houseNumber: "",
+      complementNumber: "",
     } as PITSearchForm,
     {
       locationCode: [
@@ -119,6 +119,10 @@ export default function PITSearchForm() {
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
 
+    const locality = localityOptions.find((value) => value.value == values.locationCode)?.label || ""
+
+    localStorage.setItem("locality", locality) 
+
     if (!validateForm()) {
       return;
     }
@@ -126,7 +130,7 @@ export default function PITSearchForm() {
     setIsLoading(true);
 
     const searchParams = {
-      CodigoDaLocalidade: values.locationCode.toString(),
+      CodigoDaLocalidade: values.locationCode,
       ...(values.nomeMorador && { nomeMorador: values.nomeMorador }),
       ...(values.houseNumber && { NumeroDaCasa: values.houseNumber.toString() }),
       ...(values.complementNumber && { NumeroDoComplemento: values.complementNumber.toString() }),
@@ -144,7 +148,7 @@ export default function PITSearchForm() {
       <SigenAppLayout
         headerTitle="Pesquisa de PIT"
         showBackButton
-        onBackClick={() => router.back()}
+        onBackClick={() => router.push("/")}
       >
         <form onSubmit={handleSubmit} className="space-y-2 mt-8">
           <SigenFormField
@@ -154,10 +158,10 @@ export default function PITSearchForm() {
           >
             <SigenCombobox 
               options={localityOptions}
-              value={values.locationCode.toString()}
+              value={values.locationCode}
               placeholder="Selecione uma localidade"
               disabled={isFetchingLocalities}
-              onChange={(value) => handleChange("locationCode", Number(value))}
+              onChange={(value) => handleChange("locationCode", value)}
             />
           </SigenFormField>
 
@@ -183,7 +187,7 @@ export default function PITSearchForm() {
             <SigenInput 
               id="houseNumber"
               value={values.houseNumber}
-              onChange={(e) => handleChange("houseNumber", Number(e.target.value))}
+              onChange={(e) => handleChange("houseNumber", e.target.value)}
               aria-invalid={!!errors.houseNumber}
               placeholder="Digite o número da casa"
             />
@@ -197,7 +201,7 @@ export default function PITSearchForm() {
             <SigenInput 
               id="complementNumber"
               value={values.complementNumber}
-              onChange={(e) => handleChange("complementNumber", Number(e.target.value))}
+              onChange={(e) => handleChange("complementNumber", e.target.value)}
               aria-invalid={!!errors.complementNumber}
               placeholder="Digite o número do complemento"
             />
