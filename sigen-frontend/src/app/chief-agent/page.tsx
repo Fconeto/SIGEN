@@ -69,7 +69,7 @@ export default function HomePage() {
           },
           {
             id: "borrifacao-pending",
-            label: "Borrifação Pendentes",
+            label: "Borrifações Pendentes",
             icon: <Spray className="w-5 h-5" />,
             action: () => router.push("chief-agent/spray-consult"),
           },
