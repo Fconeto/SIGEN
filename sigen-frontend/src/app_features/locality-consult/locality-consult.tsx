@@ -61,22 +61,63 @@ export default function LocalityConsult() {
     e.preventDefault();
 
     if (!validateForm()) {
-      return;
+        return;
     }
 
     setIsLoading(true);
-    
-    const searchParams = {
-      CodigoDaLocalidade: values.locationCode,
-      ...(values.locationName && { nomeDaLocalidade: values.locationName }),
-      ...(values.locationCategory && { categoria: values.locationCategory }),
-    };
 
-    await new Promise((r) => setTimeout(r, 1000)); 
-    setIsLoading(false);
-    
-    const queryString = new URLSearchParams(searchParams).toString();
-    router.push(`./residence-infos?${queryString}`); 
+    try {
+      const apiParams = {
+          ...(values.locationCode && { Codigo: values.locationCode.toString() }),
+          ...(values.locationName && { Nome: values.locationName }),
+          ...(values.locationCategory && { Categoria: values.locationCategory.toString() }),
+      };
+
+      const queryString = new URLSearchParams(apiParams).toString();
+      const token = Cookies.get("authToken");
+
+      const response = await fetch(`${API_BASE_URL}/api/Locality/ConsultList?`, {
+        method: "GET",
+        headers: {
+          "Content-Type": "application/json",
+          "Authorization": `Bearer ${token}`,
+        },
+      });
+
+      if (!response.ok) {
+          const errorData = await response.json();
+          throw new Error(errorData.Message || "Erro ao buscar localidades");
+      }
+
+      const res = await response.json();
+
+      if (res.IsSuccess && res.Data) {
+          const data: Locality[] = res.Data.map((item: any) => ({
+            codigoDaLocalidade: item.CodigoDaLocalidade,
+            nomeDaLocalidade: item.Nome, 
+            categoria: item.Categoria.toString(),
+          }));
+          
+        setLocalities(data);
+
+        router.push(`./locality-infos?${queryString}`);
+      } else {
+          setDialog({
+              isOpen: true,
+              type: "error",
+              message: res.Message || "Nenhuma localidade encontrada.",
+          });
+      }
+    } catch (error: any) {
+        console.error("Erro na requisição:", error);
+        setDialog({
+            isOpen: true,
+            type: "error",
+            message: error.message || "Ocorreu um erro inesperado.",
+        });
+    } finally {
+        setIsLoading(false);
+    }
   };
 
   return (
