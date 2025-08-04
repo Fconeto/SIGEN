@@ -151,7 +151,7 @@ export default function SprayConsult() {
       <SigenAppLayout
         headerTitle="Borrifações Pendentes"
         showBackButton
-        onBackClick={() => router.back()}
+        onBackClick={() => router.push("/chief-agent")}
       >
         <form onSubmit={handleSubmit} className="space-y-2 p-6">
           <SigenFormField

@@ -180,7 +180,7 @@ export default function SearchRegisterForm() {
         
         setTimeout(() => {
           setDialog({ isOpen: false, type: 'info', message: '' });
-          router.push("/agent"); 
+          router.back(); 
         }, 2000);
         
       } else {

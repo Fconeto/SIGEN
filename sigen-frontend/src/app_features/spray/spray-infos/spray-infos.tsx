@@ -89,8 +89,8 @@ export default function SprayPendingResults() {
 
         const data = await response.json();
 
-        if (data.data) {
-          setSprayPendings((data.data && data.data.sprayPendings) ? data.data.sprayPendings : []);
+        if (data.data && data.data.length > 0) {
+          setSprayPendings((data.data) ? data.data : []);
         } 
         else {
           setDialog({
@@ -174,7 +174,7 @@ export default function SprayPendingResults() {
       >
         {loading ? (
           <div className="flex items-center justify-center h-full">
-            <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-gray-800"></div>
+            <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-gray-800">a</div>
           </div>
         ) : (
           <div className="flex flex-col h-full">
@@ -183,7 +183,7 @@ export default function SprayPendingResults() {
                 residences={paginatedSprayPendings}
                 viewResidence={handleAddSpray}
                 sortConfig={sortConfig}
-                complementId={`${localStorage.setItem("locality", locationInfo)}`}
+                complementId={locationInfo}
                 onSort={handleSort}
                 actionIcon={<Plus size={15} />}
                 actionColor="green"
