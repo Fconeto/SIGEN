@@ -99,7 +99,7 @@ export function SigenTable({
             {residences.length === 0 ? (
               <tr>
                 <td colSpan={4} className="px-4 py-8 text-center text-gray-500">
-                  Nenhuma residência encontrada
+                  Nenhum registro encontrado.
                 </td>
               </tr>
             ) : (
