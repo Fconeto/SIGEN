@@ -119,6 +119,10 @@ export default function SprayConsult() {
       return;
     }
 
+    const locality = localityOptions.find((value) => value.value == values.locationId)?.label || ""
+
+    localStorage.setItem("locality", locality) 
+
     setIsLoading(true);
     const searchParams = {
       CodigoDaLocalidade: values.locationId,
@@ -141,15 +145,15 @@ export default function SprayConsult() {
       <SigenAppLayout
         headerTitle="Pesquisas Pendentes"
         showBackButton
-        onBackClick={() => router.back()}
+        onBackClick={() => router.push("/")}
       >
         <form onSubmit={handleSubmit} className="space-y-2 p-6">
           <SigenFormField
             id="locationId"
             label={
               <>
-                Código da Localidade{" "}
-                <span className="text-red-500 font-semibold">*</span>
+                Código da Localidade:
+                <span className="text-red-500 font-semibold"> *</span>
               </>
             }
             error={errors.locationId}

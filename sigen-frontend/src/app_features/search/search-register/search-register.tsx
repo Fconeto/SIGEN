@@ -203,7 +203,7 @@ export default function SearchRegisterForm() {
   };
 
   return (
-    <Suspense fallback={<div>Carregando...</div>}>
+    <>
       <SigenAppLayout
         headerTitle="Cadastro de Pesquisa"
         showBackButton
@@ -475,6 +475,6 @@ export default function SearchRegisterForm() {
               title={dialog.title}
               message={dialog.message}
             />
-    </Suspense>
+    </>
   );
 }

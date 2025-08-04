@@ -79,7 +79,7 @@ export default function SprayControlForm() {
   };
 
   return (
-    <Suspense fallback={<div>Carregando...</div>}>
+    <>
       <SigenAppLayout
         headerTitle="Controle de Borrifação"
         showBackButton
@@ -166,6 +166,6 @@ export default function SprayControlForm() {
         title={dialog.title}
         message={dialog.message}
       />
-    </Suspense>
+    </>
   );
 }

@@ -224,7 +224,7 @@ export default function WeeklyReportResults() {
   };
 
   return (
-    <Suspense fallback={<div>Carregando...</div>}>
+    <>
       <SigenAppLayout
         headerTitle="Relatório Semanal"
         showBackButton
@@ -360,6 +360,6 @@ export default function WeeklyReportResults() {
         title={dialog.title}
         message={dialog.message}
       />
-    </Suspense>
+    </>
   );
 }

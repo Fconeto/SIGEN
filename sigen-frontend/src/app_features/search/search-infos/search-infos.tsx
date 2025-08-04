@@ -64,11 +64,13 @@ export default function SprayPendingResults() {
   });
 
   const [currentPage, setCurrentPage] = useState(1);
-  const [locationInfo, setLocationInfo] = useState({ code: "", name: "" });
+  const [locationInfo, setLocationInfo] = useState("");
 
   useEffect(() => {
     const fetchData = async () => {
       let queryString = searchParams.toString();
+
+      setLocationInfo(localStorage.getItem("locality") || "");
 
       setLoading(true);
       setError(null);
@@ -98,10 +100,6 @@ export default function SprayPendingResults() {
 
         if (data.data && data.data.length > 0) {
           setSprayPendings((data && data.data) ? data.data : []);
-          setLocationInfo({
-            code: data.data[0]?.codigoDaLocalidade || "",
-            name: data.data[0]?.nomeDaLocalidade || "",
-          });
         } 
         else {
           setDialog({
@@ -182,7 +180,7 @@ export default function SprayPendingResults() {
               <SigenTable
                 residences={paginatedSprayPendings}
                 viewResidence={handleAddSearch}
-                complementId={`${locationInfo.code} - ${locationInfo.name}`}
+                complementId={`${locationInfo}`}
                 sortConfig={sortConfig}
                 onSort={handleSort}
                 actionColor="green"

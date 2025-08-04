@@ -1,5 +1,5 @@
 export enum BugType {
-  barbeiro = 'Barbeiro',
-  naoSabe = 'Não Sabe',
-  outro = 'Outro',
+  Barbeiro = 'Barbeiro',
+  NaoSabe = 'Não Sabe',
+  Outro = 'Outro'
 }

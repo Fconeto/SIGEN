@@ -176,7 +176,7 @@ export default function SearchRegisterPITForm() {
   };
 
   return (
-    <Suspense fallback={<div>Carregando...</div>}>
+    <>
       <SigenAppLayout
         headerTitle="Cadastro de Pesquisa (PIT)"
         showBackButton
@@ -475,6 +475,6 @@ export default function SearchRegisterPITForm() {
           </div>
         </form>
       </SigenAppLayout>
-    </Suspense>
+    </>
   );
 }
