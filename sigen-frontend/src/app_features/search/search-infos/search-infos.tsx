@@ -43,8 +43,7 @@ export default function SprayPendingResults() {
   const router = useRouter();
   const searchParams = useSearchParams();
 
-  const [sprayPendings, setSprayPendings] = useState<PendingSearchInfos[]>([
-  ]);
+  const [sprayPendings, setSprayPendings] = useState<PendingSearchInfos[]>([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
   const [dialog, setDialog] = useState<SigenDialogProps>({
@@ -180,7 +179,7 @@ export default function SprayPendingResults() {
               <SigenTable
                 residences={paginatedSprayPendings}
                 viewResidence={handleAddSearch}
-                complementId={`${locationInfo}`}
+                complementId={locationInfo}
                 sortConfig={sortConfig}
                 onSort={handleSort}
                 actionColor="green"

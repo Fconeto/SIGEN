@@ -16,7 +16,7 @@ import Cookies from "js-cookie";
 import { API_BASE_URL } from "@/config/api-config";
 import { SigenCombobox } from "@/components/sigen-combobox";
 
-interface  Residence {
+interface Locality {
   codigo: string;
   nome: string;
   categoria: string;
@@ -67,11 +67,11 @@ export default function ResidenceConsult(){
     message: "",
   });
 
-  const [residences, setResidences] = useState<Residence[]>([]);
+  const [localities, setLocalities] = useState<Locality[]>([]);
   const [isFetchingLocalities, setIsFetchingLocalities] = useState<boolean>(true);
 
   useEffect(() => {
-    const fetchResidences = async () => {
+    const fetchLocalities = async () => {
       setIsFetchingLocalities(true);
       try {
         const token = Cookies.get("authToken");
@@ -86,18 +86,18 @@ export default function ResidenceConsult(){
           });
 
         if (!response.ok) {
-          throw new Error("Falha ao buscar as residências.");
+          throw new Error("Falha ao buscar as localidades.");
         }
 
         const res = await response.json();
 
-        const data: Residence[] = res.data.map((item: any) => ({
+        const data: Locality[] = res.data.map((item: any) => ({
           codigo: item.codigoDaLocalidade,
           nome: item.nome,
           categoria: item.categoria,
         }));
         
-        setResidences(data);
+        setLocalities(data);
       } catch (error) {
         console.error(error);
         setDialog({
@@ -111,20 +111,24 @@ export default function ResidenceConsult(){
       }
     };
 
-    fetchResidences();
+    fetchLocalities();
   }, []); 
 
-  const residencesOptions = useMemo(
+  const localitiesOptions = useMemo(
       () =>
-        residences.map((loc) => ({
+        localities.map((loc) => ({
           value: loc.codigo,
           label: `${loc.codigo} - ${loc.nome}`,
         })),
-      [residences]
+      [localities]
     );
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
+
+    const locality = localitiesOptions.find((value) => value.value == values.locationId)?.label || ""
+
+    localStorage.setItem("locality", locality) 
 
     if (!validateForm()) {
       return;
@@ -143,7 +147,8 @@ export default function ResidenceConsult(){
     setIsLoading(false);
     
     const queryString = new URLSearchParams(searchParams).toString();
-    router.push(`./residence-infos?${queryString}`);  };
+    router.push(`./residence-infos?${queryString}`);  
+  };
   
   return (
     <>
@@ -159,7 +164,7 @@ export default function ResidenceConsult(){
             error={errors.locationId}
           >
             <SigenCombobox
-              options={residencesOptions}
+              options={localitiesOptions}
               value={values.locationId}
               placeholder="Selecione uma localidade"
               disabled={isFetchingLocalities}
