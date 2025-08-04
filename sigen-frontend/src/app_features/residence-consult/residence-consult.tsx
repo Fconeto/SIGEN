@@ -3,7 +3,7 @@
 import type React from "react";
 import { useForm, validators } from "@/hooks/useform";
 import { SigenAppLayout } from "@/components/sigen-app-layout";
-import { useState } from "react";
+import { useEffect, useMemo, useState } from "react";
 import {
   SigenDialog,
   SigenDialogProps,
@@ -11,8 +11,16 @@ import {
 import { useRouter } from "next/navigation";
 import { SigenFormField } from "@/components/sigen-form-field";
 import { SigenInput } from "@/components/sigen-input";
-import { SigenDropdown } from "@/components/sigen-dropdown";
 import { SigenLoadingButton } from "@/components/sigen-loading-button";
+import Cookies from "js-cookie";
+import { API_BASE_URL } from "@/config/api-config";
+import { SigenCombobox } from "@/components/sigen-combobox";
+
+interface Locality {
+  codigo: string;
+  nome: string;
+  categoria: string;
+}
 
 interface ResidenceConsult {
   locationId: string;
@@ -59,8 +67,68 @@ export default function ResidenceConsult(){
     message: "",
   });
 
+  const [localities, setLocalities] = useState<Locality[]>([]);
+  const [isFetchingLocalities, setIsFetchingLocalities] = useState<boolean>(true);
+
+  useEffect(() => {
+    const fetchLocalities = async () => {
+      setIsFetchingLocalities(true);
+      try {
+        const token = Cookies.get("authToken");
+
+        const response = await fetch(`${API_BASE_URL}/api/Locality/consultlocality`, 
+          {
+            method: "GET",
+            headers: {
+              "Content-Type": "application/json",
+              "Authorization": `Bearer ${token}`
+            },
+          });
+
+        if (!response.ok) {
+          throw new Error("Falha ao buscar as localidades.");
+        }
+
+        const res = await response.json();
+
+        const data: Locality[] = res.data.map((item: any) => ({
+          codigo: item.codigoDaLocalidade,
+          nome: item.nome,
+          categoria: item.categoria,
+        }));
+        
+        setLocalities(data);
+      } catch (error) {
+        console.error(error);
+        setDialog({
+          isOpen: true,
+          type: "error",
+          title: "Erro de Rede",
+          message: "Não foi possível carregar a lista de localidades.",
+        });
+      } finally {
+        setIsFetchingLocalities(false);
+      }
+    };
+
+    fetchLocalities();
+  }, []); 
+
+  const localitiesOptions = useMemo(
+      () =>
+        localities.map((loc) => ({
+          value: loc.codigo,
+          label: `${loc.codigo} - ${loc.nome}`,
+        })),
+      [localities]
+    );
+
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
+
+    const locality = localitiesOptions.find((value) => value.value == values.locationId)?.label || ""
+
+    localStorage.setItem("locality", locality) 
 
     if (!validateForm()) {
       return;
@@ -69,19 +137,18 @@ export default function ResidenceConsult(){
     setIsLoading(true);
 
     const searchParams = {
-      locationId: values.locationId,
-      ...(values.nomeMorador && { nomeMorador: values.nomeMorador }),
-      ...(values.numeroComplemento && { numeroComplemento: values.numeroComplemento }),
-      ...(values.numeroCasa && { numeroCasa: values.numeroCasa }),
+      CodigoDaLocalidade: values.locationId,
+      ...(values.nomeMorador && { NomeDoMorador: values.nomeMorador }),
+      ...(values.numeroComplemento && { NumeroDoComplemento: values.numeroComplemento }),
+      ...(values.numeroCasa && { NumeroDaCasa: values.numeroCasa }),
     };
 
     await new Promise((r) => setTimeout(r, 1000)); 
-
-    console.log("Form Data:", values);
     setIsLoading(false);
     
     const queryString = new URLSearchParams(searchParams).toString();
-    router.push(`./residence-infos?${queryString}`);  };
+    router.push(`./residence-infos?${queryString}`);  
+  };
   
   return (
     <>
@@ -96,12 +163,12 @@ export default function ResidenceConsult(){
             label={<>Código da Localidade <span className="text-red-500 font-semibold">*</span></>}
             error={errors.locationId}
           >
-            <SigenInput
-              id="locationId"
+            <SigenCombobox
+              options={localitiesOptions}
               value={values.locationId}
-              onChange={(e) => handleChange("locationId", e.target.value)}
-              aria-invalid={!!errors.locationId}
-              placeholder="Digite o código da localidade"
+              placeholder="Selecione uma localidade"
+              disabled={isFetchingLocalities}
+              onChange={(value) => handleChange("locationId", value)}
             />
           </SigenFormField>
 
@@ -152,6 +219,7 @@ export default function ResidenceConsult(){
           </SigenLoadingButton>
         </form>
       </SigenAppLayout>
+      
       <SigenDialog
         isOpen={dialog.isOpen}
         onClose={() => setDialog((prev) => ({ ...prev, isOpen: false }))}
