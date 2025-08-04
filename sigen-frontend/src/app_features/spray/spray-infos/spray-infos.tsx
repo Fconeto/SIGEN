@@ -7,11 +7,40 @@ import { useRouter, useSearchParams } from "next/navigation";
 import { useEffect, useMemo, useState } from "react";
 import { ResidenceInfos, SortKey } from "../../residence-infos/residence-infos";
 import { Plus } from "lucide-react";
+import { API_BASE_URL } from "@/config/api-config";
+import Cookies from "js-cookie";
+import { SigenDialog, SigenDialogProps } from "@/components/sigen-dialog";
+
+export interface SprayPendingsInfos {
+  totalCount: number;
+  pageSize: number;
+  pageNumber: number;
+  totalPages: number;
+  id: number;
+  pesquisaId: number;
+  codigoDaLocalidade: number;
+  nomeDaLocalidade: string;
+  categoriaDaLocalidade: string;
+  nomeDoMorador: string;
+  numero: number;
+  complemento: string;
+  dataDeRegistro: string;
+  dataDeAtualizacao: string;
+  criadoPor: number;
+  atualizadoPor: number;
+}
+
+const sortResidenceInfos = {
+  id: -1,
+  complemento: 0,
+  numero: 1,
+  nomeDoMorador: 2,
+}
 
 export default function SprayPendingResults() {
   const router = useRouter();
   const searchParams = useSearchParams();
-  const [sprayPendings, setSprayPendings] = useState<ResidenceInfos[]>([]);
+  const [sprayPendings, setSprayPendings] = useState<SprayPendingsInfos[]>([]);
   const [loading, setLoading] = useState(false);
   const [sortConfig, setSortConfig] = useState<{
     key: SortKey;
@@ -21,129 +50,85 @@ export default function SprayPendingResults() {
     direction: "ascending",
   });
   const [currentPage, setCurrentPage] = useState(1);
-  const [locationInfo, setLocationInfo] = useState({ code: "", name: "" });
-  const ITEMS_PER_PAGE = 10;
+  const [locationInfo, setLocationInfo] = useState("");
+  const [error, setError] = useState<string | null>(null);
+  const [dialog, setDialog] = useState<SigenDialogProps>({
+    isOpen: false,
+    type: "info",
+    message: "",
+  });
+  
 
   useEffect(() => {
-    const fetchSprayPendings = async () => {
+    const fetchData = async () => {
+      let queryString = searchParams.toString();
+      setLocationInfo(localStorage.getItem("locality") || "");
+
       setLoading(true);
+      setError(null);
 
-      await new Promise((resolve) => setTimeout(resolve, 600));
+      try {
+        if (sortConfig) {
+          queryString += `&page=${currentPage}&order=${sortConfig.direction}&ordertype=${sortResidenceInfos[sortConfig.key]}`;
+        }
+        const token = Cookies.get("authToken");
 
-      const mockData: ResidenceInfos[] = [
-        {
-          id: "1",
-          complemento: "1",
-          numero: "203A",
-          nomeDoMorador: "João Moreira da Silva",
-        },
-        {
-          id: "2",
-          complemento: "1",
-          numero: "718",
-          nomeDoMorador: "Wellington Rocha",
-        },
-        {
-          id: "3",
-          complemento: "2",
-          numero: "201A",
-          nomeDoMorador: "Eduardo Ximenes Paiva",
-        },
-        {
-          id: "4",
-          complemento: "3",
-          numero: "201",
-          nomeDoMorador: "Lucas Silva",
-        },
-        {
-          id: "5",
-          complemento: "1",
-          numero: "105",
-          nomeDoMorador: "Maria Santos",
-        },
-        {
-          id: "6",
-          complemento: "4",
-          numero: "asd",
-          nomeDoMorador: "Carlos Oliveira",
-        },
-        { id: "7", complemento: "5", numero: "302", nomeDoMorador: "asd" },
-        {
-          id: "8",
-          complemento: "sd",
-          numero: "150",
-          nomeDoMorador: "Ana Costa",
-        },
-        {
-          id: "9",
-          complemento: "6",
-          numero: "401",
-          nomeDoMorador: "Pedro Lima",
-        },
-        {
-          id: "10",
-          complemento: "7",
-          numero: "202",
-          nomeDoMorador: "Lucia Ferreira",
-        },
-        {
-          id: "11",
-          complemento: "8",
-          numero: "501",
-          nomeDoMorador: "Roberto Silva",
-        },
-        {
-          id: "12",
-          complemento: "9",
-          numero: "602",
-          nomeDoMorador: "Fernanda Costa",
-        },
-      ];
+        const response = await fetch(
+          `${API_BASE_URL}/api/Spray/pending?${queryString}`,
+          {
+            headers: {
+              "Content-Type": "application/json",
+              Authorization: `Bearer ${token}`,
+            },
+          }
+        );
 
-      setSprayPendings(mockData);
-
-      const locationId = searchParams.get("locationId") || "0001";
-      setLocationInfo({ code: locationId, name: "CUPIM" });
-
-      setLoading(false);
-    };
-
-    fetchSprayPendings();
-  }, [searchParams]);
-
-  const paginatedSprayPendings = useMemo(() => {
-    const sortedItems = [...sprayPendings];
-    if (sortConfig !== null) {
-      sortedItems.sort((a, b) => {
-        const aValue = a[sortConfig.key];
-        const bValue = b[sortConfig.key];
-
-        if (aValue === null && bValue === null) return 0;
-        if (aValue === null) return 1;
-        if (bValue === null) return -1;
-
-        if (sortConfig.key === "complemento") {
-          const numA = Number.parseInt(aValue, 10);
-          const numB = Number.parseInt(bValue, 10);
-          if (numA < numB) return sortConfig.direction === "ascending" ? -1 : 1;
-          if (numA > numB) return sortConfig.direction === "ascending" ? 1 : -1;
-          return 0;
+        if (!response.ok) {
+          throw new Error("Erro ao consultar os dados. Tente novamente.");
         }
 
-        const aStr = String(aValue).toLowerCase();
-        const bStr = String(bValue).toLowerCase();
+        const data = await response.json();
 
-        if (aStr < bStr) return sortConfig.direction === "ascending" ? -1 : 1;
-        if (aStr > bStr) return sortConfig.direction === "ascending" ? 1 : -1;
-        return 0;
-      });
-    }
+        if (data.data && data.data.length > 0) {
+          setSprayPendings((data.data) ? data.data : []);
+        } 
+        else {
+          setDialog({
+            isOpen: true,
+            type: "info",
+            title: "Sem Resultados",
+            message: "Nenhum dado encontrado para os filtros informados.",
+          });
+        }
+          
+        } catch (err) {
+          setError(err instanceof Error ? err.message : "Ocorreu um erro desconhecido.");
+          const errorMessage = err instanceof Error ? err.message : "Ocorreu um erro inesperado.";
+          setDialog({
+            isOpen: true,
+            type: "error",
+            title: "Erro na Consulta",
+            message: errorMessage,
+          });
+        } finally {
+          setLoading(false);
+        }
+      };
 
-    const startIndex = (currentPage - 1) * ITEMS_PER_PAGE;
-    const endIndex = startIndex + ITEMS_PER_PAGE;
+    fetchData();
+  }, [searchParams, currentPage, sortConfig]); 
 
-    return sortedItems.slice(startIndex, endIndex);
-  }, [sprayPendings, currentPage, sortConfig]);
+  const paginatedSprayPendings = useMemo(() => {
+    const sortedItems: ResidenceInfos[] = sprayPendings.map(item => ({
+      id: item.id.toString(),
+      complemento: item.complemento,
+      numero: item.numero.toString(),
+      nomeDoMorador: item.nomeDoMorador,
+      status: "pending",
+    }));
+
+    return sortedItems;
+  }, [sprayPendings]);
 
   const handleSort = (key: SortKey) => {
     let direction: "ascending" | "descending" = "ascending";
@@ -162,6 +147,8 @@ export default function SprayPendingResults() {
     router.push(`./spray-control/?id=${id}`);
   };
 
+  const totalPages = sprayPendings[0]?.totalPages;
+
   if (loading) {
     return (
       <SigenAppLayout
@@ -177,41 +164,49 @@ export default function SprayPendingResults() {
     );
   }
 
-  const totalPages = Math.ceil(sprayPendings.length / ITEMS_PER_PAGE);
-
   return (
-    <SigenAppLayout
-      headerTitle="Borrifação Pendente"
-      showBackButton
-      onBackClick={() => router.replace("./spray-consult")}
-      scrollDisable
-    >
-      {loading ? (
-        <div className="flex items-center justify-center h-full">
-          <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-gray-800"></div>
-        </div>
-      ) : (
-        <div className="flex flex-col h-full">
-          <div className="flex-1 overflow-y-auto">
-            <SigenTable
-              residences={paginatedSprayPendings}
-              viewResidence={handleAddSpray}
-              complementId={`${locationInfo.code} ${locationInfo.name}`}
-              sortConfig={sortConfig}
-              onSort={handleSort}
-              actionColor="green"
-              actionIcon={<Plus size={15} />}
-            />
+    <>
+      <SigenAppLayout
+        headerTitle="Borrifação Pendente"
+        showBackButton
+        onBackClick={() => router.replace("./spray-consult")}
+        scrollDisable
+      >
+        {loading ? (
+          <div className="flex items-center justify-center h-full">
+            <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-gray-800">a</div>
           </div>
-          <div className="flex-shrink-0 mt-4">
-            <SigenPagination
-              currentPage={currentPage}
-              totalPages={totalPages}
-              onPageChange={setCurrentPage}
-            />
+        ) : (
+          <div className="flex flex-col h-full">
+            <div className="flex-1 overflow-y-auto">
+              <SigenTable
+                residences={paginatedSprayPendings}
+                viewResidence={handleAddSpray}
+                sortConfig={sortConfig}
+                complementId={locationInfo}
+                onSort={handleSort}
+                actionIcon={<Plus size={15} />}
+                actionColor="green"
+              />
+            </div>
+            <div className="flex-shrink-0 mt-4">
+              <SigenPagination
+                currentPage={currentPage}
+                totalPages={totalPages}
+                onPageChange={setCurrentPage}
+              />
+            </div>
           </div>
-        </div>
-      )}
-    </SigenAppLayout>
+        )}
+      </SigenAppLayout>
+
+      <SigenDialog
+        isOpen={dialog.isOpen}
+        onClose={() => setDialog((prev) => ({ ...prev, isOpen: false }))}
+        type={dialog.type}
+        title={dialog.title}
+        message={dialog.message}
+      />
+    </>
   );
 }
