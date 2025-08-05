@@ -65,4 +65,25 @@ public class LocalityRepository : ILocalityRepository
             );
         }
     }
+
+    public async Task<List<Locality>> GetLocalityListByFilters(ConsultLocalityListRequest request)
+    {
+        using (var connection = new SqlConnection(_connectionString))
+        {
+            var parameters = new DynamicParameters();
+            parameters.Add("@CodigoDaLocalidade", request.CodigoDaLocalidade);
+            parameters.Add("@Nome", request.Nome);
+            parameters.Add("@Categoria", request.Categoria);
+            parameters.Add("@Order", (int)request.Order);
+            parameters.Add("@OrderType", (int)request.OrderType);
+            parameters.Add("@Page", request.Page);
+
+            var result = await connection.QueryAsync<Locality>(
+                "GetLocalityListByFilters",
+                parameters,
+                commandType: CommandType.StoredProcedure
+            );
+            return result.ToList();
+        }
+    }
 }

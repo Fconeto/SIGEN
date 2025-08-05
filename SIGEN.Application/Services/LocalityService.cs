@@ -43,6 +43,25 @@ public class LocalityService : ILocalityService
         {
             throw new SigenValidationException(ex.Message);
         }
-        
+    }
+    
+    public async Task<List<GetLocalityListResponse>> ConsultLocalityList(ConsultLocalityListRequest request)
+    {
+        try
+        {
+            LocalityValidator.Validate(request);
+
+            List<Locality> localities = await _localityRepository.GetLocalityListByFilters(request);
+
+            LocalityMapper mapper = new LocalityMapper();
+
+            List<GetLocalityListResponse> result = mapper.Mapper(localities);
+
+            return result;
+        }
+        catch (SigenValidationException ex)
+        {
+            throw new SigenValidationException(ex.Message);
+        }
     }
 }

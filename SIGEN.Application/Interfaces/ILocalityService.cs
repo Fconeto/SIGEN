@@ -7,4 +7,5 @@ public interface ILocalityService
 {
     Task<List<GetLocalityListResponse>> GetLocalityList();
     Task CreateLocality(CreateLocalityRequest request);
+    Task<List<GetLocalityListResponse>> ConsultLocalityList(ConsultLocalityListRequest request);
 }
