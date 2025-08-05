@@ -12,3 +12,10 @@ public enum OrderType
     NumeroDaCasa = 1,
     NomeDoMorador = 2,
 }
+
+public enum LocalityOrderType
+{
+    CodigoDaLocalidade = 0,
+    Nome = 1,
+    Categoria = 2,
+}

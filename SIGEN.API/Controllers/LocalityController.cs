@@ -21,9 +21,9 @@ public class LocalityController : ControllerBase
     [Authorize]
     [ProducesResponseType(typeof(GetLocalityListResponse), StatusCodes.Status200OK)]
     [ProducesResponseType(StatusCodes.Status400BadRequest)]
-    public async Task<IActionResult> ConsultLocality()
+    public async Task<IActionResult> GetLocalityList()
     {
-        Console.WriteLine("[LocalityController] Requisição recebida no endpoint ConsultLocality");
+        Console.WriteLine("[LocalityController] Requisição recebida no endpoint GetLocalityList");
         List<GetLocalityListResponse> result = await _localityService.GetLocalityList();
 
         Response response = new Response
@@ -42,6 +42,7 @@ public class LocalityController : ControllerBase
     [ProducesResponseType(typeof(Response), StatusCodes.Status400BadRequest)]
     public async Task<IActionResult> CreateLocality(CreateLocalityRequest request)
     {
+        Console.WriteLine("[LocalityController] Requisição recebida no endpoint CreateLocality");
         await _localityService.CreateLocality(request);
 
         Response response = new Response
@@ -52,5 +53,24 @@ public class LocalityController : ControllerBase
         };
 
         return Created(string.Empty, response);
+    }
+
+    [HttpGet("consultlist")]
+    [Authorize]
+    [ProducesResponseType(typeof(GetLocalityListResponse), StatusCodes.Status200OK)]
+    [ProducesResponseType(StatusCodes.Status400BadRequest)]
+    public async Task<IActionResult> ConsultLocalityList([FromQuery] ConsultLocalityListRequest request)
+    {
+        Console.WriteLine("[LocalityController] Requisição recebida no endpoint ConsultLocalityList");
+        List<GetLocalityListResponse> result = await _localityService.ConsultLocalityList(request);
+
+        Response response = new Response
+        {
+            IsSuccess = true,
+            Message = "Consulta realizada com sucesso!",
+            Data = result
+        };
+
+        return Ok(response);
     }
 }

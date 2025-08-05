@@ -9,4 +9,5 @@ public interface ILocalityRepository
     Task<List<GetLocalityListResponse>> GetLocalityList();
     Task<Locality> GetLocalityByCode(long codigoDaLocalidade);
     Task CreateLocality(Locality request);
+    Task<List<Locality>> GetLocalityListByFilters(ConsultLocalityListRequest request);
 }
