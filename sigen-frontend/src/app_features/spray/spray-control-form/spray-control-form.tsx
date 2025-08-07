@@ -12,6 +12,8 @@ import { Suspense, useState } from "react";
 import { SigenDialog, type SigenDialogProps } from "@/components/sigen-dialog";
 import { useRouter, useSearchParams } from "next/navigation";
 import { SigenDateInput } from "@/components/sigen-date-picker";
+import { API_BASE_URL } from "@/config/api-config";
+import Cookies from "js-cookie";
 
 interface SprayControlForm {
   date: Date | undefined;
@@ -19,6 +21,12 @@ interface SprayControlForm {
   insecticideType: string;
   numberOfCharges: string;
 }
+
+const pendencyOptions = [
+  { value: "Nenhuma", id: 0 },
+  { value: "Recusa", id: 1 },
+  { value: "Fechado", id: 2 },
+];
 
 export default function SprayControlForm() {
   const router = useRouter();
@@ -51,10 +59,6 @@ export default function SprayControlForm() {
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
 
-    console.log("Form Data:", {
-      ...values,
-    });
-
     if (!validateForm()) {
       setDialog({
         isOpen: true,
@@ -66,16 +70,58 @@ export default function SprayControlForm() {
     }
 
     setIsLoading(true);
-    await new Promise((r) => setTimeout(r, 2000));
 
-    setIsLoading(false);
-    setDialog({
-      isOpen: true,
-      type: "success",
-      title: "Sucesso",
-      message: "Controle de borrifação registrado com sucesso!",
-    });
-    resetForm();
+    const pendencyValue = Number(values.pendency) ? pendencyOptions[Number(values.pendency)].value : 0;
+    const dateValue = values.date ? values.date.toISOString().split("T")[0] : "";
+
+    try {
+      const token = Cookies.get('authToken');
+      const response = await fetch(`${API_BASE_URL}/api/spray/create`, {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+          "Authorization": `Bearer ${token}`,
+        },
+        body: JSON.stringify({
+          agenteId: localStorage.getItem("agentId") || 0,
+          DataDoPreenchimento: dateValue,
+          Pendencia: pendencyValue,
+          TipoDeInseticida: values.insecticideType,
+          NumeroDeCarga: Number(values.numberOfCharges),
+          PesquisaId: id,
+        }),
+      });
+      
+      if (response.ok) {
+        setDialog({
+          isOpen: true,
+          type: 'success',
+          message: 'Cadastro realizado com sucesso!',
+        });
+        resetForm();
+        
+        setTimeout(() => {
+          setDialog({ isOpen: false, type: 'info', message: '' });
+          router.back(); 
+        }, 2000);
+        
+      } else {
+        const errorData = await response.json();
+        setDialog({
+          isOpen: true,
+          type: 'error',
+          message: errorData.message || 'Ocorreu um erro ao realizar o cadastro.',
+        });
+      }
+    } catch (error: any) {
+      setDialog({
+          isOpen: true,
+          type: 'error',
+          message: error.message || 'Não foi possível conectar ao servidor. Tente novamente mais tarde.'
+      });
+    } finally {
+      setIsLoading(false);
+    }
   };
 
   return (

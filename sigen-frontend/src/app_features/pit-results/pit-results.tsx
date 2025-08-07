@@ -16,6 +16,7 @@ type ResidenceInfos = BaseResidenceInfos;
 type SortKey = keyof Omit<ResidenceInfos, "status">;
 
 export interface PITSearchInfos {
+  id: number;
   totalCount: number;
   pageSize: number;
   pageNumber: number;
@@ -123,8 +124,9 @@ export default function PITResults() {
   }, [searchParams, currentPage, sortConfig]); 
 
   const paginatedPendingsPIT = useMemo(() => {
-    const sortedItems: ResidenceInfos[] = pendingPIT.map(item => ({
+    const sortedItems = pendingPIT.map(item => ({
       id: item.pitId.toString(),
+      residenceId: item.id ? item.id.toString() : "0",
       complemento: item.complemento,
       numero: item.numero.toString(),
       nomeDoMorador: item.nomeDoMorador,
@@ -135,8 +137,9 @@ export default function PITResults() {
   }, [pendingPIT]);
 
   const paginatedCompletedPIT = useMemo(() => {
-    const sortedItems: ResidenceInfos[] = completedPIT.map(item => ({
+    const sortedItems = completedPIT.map(item => ({
       id: item.pitId.toString(),
+      residenceId: item.id ? item.id.toString() : "0",
       complemento: item.complemento,
       numero: item.numero.toString(),
       nomeDoMorador: item.nomeDoMorador,
@@ -159,7 +162,10 @@ export default function PITResults() {
     setCurrentPage(1);
   };
 
-  const addPit = (id: string) => router.push(`./pit-search-register?id=${id}`);
+  const addPit = (id: string) => {
+    const residenceId = paginatedPendingsPIT.find((item) => item.id === id)?.residenceId;
+    router.push(`./pit-search-register?id=${id}&ResidenceId=${residenceId}`);
+  }
   const viewPit = (id: string) => router.push(`./spray-consult-form/${id}`);
 
   const totalPages = completedPIT[0]?.totalPages >= pendingPIT[0]?.totalPages ? completedPIT[0]?.totalPages : pendingPIT[0]?.totalPages;

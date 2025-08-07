@@ -41,8 +41,6 @@ builder.Services.AddAuthentication(options =>
     };
 });
 
-// Add services to the container.
-// Learn more about configuring OpenAPI at https://aka.ms/aspnet/openapi
 builder.Services.AddSwaggerGen(c =>
 {
     c.AddSecurityDefinition("Bearer", new Microsoft.OpenApi.Models.OpenApiSecurityScheme
@@ -92,21 +90,51 @@ builder.Services.AddScoped<IReportRepository, ReportRepository>();
 
 var app = builder.Build();
 
+using (var scope = app.Services.CreateScope())
+{
+    var services = scope.ServiceProvider;
+    var config = services.GetRequiredService<IConfiguration>();
+    var authService = services.GetRequiredService<IAuthService>();
+
+    var adminSection = config.GetSection("AdminSeed");
+    var cpf = adminSection["CPF"];
+    var password = adminSection["Password"];
+    var nome = adminSection["Name"];
+    var matricula = long.TryParse(adminSection["Registration"], out var m) ? m : 1;
+    var hierarquia = int.TryParse(adminSection["Hierarchy"], out var h) ? h : 1;
+    var turma = int.TryParse(adminSection["Team"], out var t) ? t : 1;
+
+    if (!string.IsNullOrEmpty(cpf) && !string.IsNullOrEmpty(password))
+    {
+        var registerRequest = new SIGEN.Domain.Shared.Requests.RegisterRequest
+        {
+            NomeDoAgente = nome,
+            CPF = cpf,
+            Senha = password,
+            Matricula = matricula,
+            Hierarquia = (SIGEN.Domain.Shared.Enums.Hierarquia)hierarquia,
+            Turma = (SIGEN.Domain.Shared.Enums.Turma)turma
+        };
+        try
+        {
+            authService.RegisterAsync(registerRequest).Wait();
+        }
+        catch {}
+    }
+}
+
 app.UseCors();
 
-// Middleware padrão de autenticação e autorização
 app.UseMiddleware<ExceptionHandlingMiddleware>();
 app.UseAuthentication();
 app.UseAuthorization();
 
-// Configure the HTTP request pipeline.
 if (app.Environment.IsDevelopment())
 {
     app.UseSwagger();
     app.UseSwaggerUI();
 }
 
-// Middleware customizado para logging de autenticação
 app.UseMiddleware<AuthLoggingMiddleware>();
 
 app.MapControllers();
