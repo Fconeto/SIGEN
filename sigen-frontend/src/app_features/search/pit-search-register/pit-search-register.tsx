@@ -8,11 +8,13 @@ import { SigenInputConnector } from "@/components/sigen-input-connector";
 import { CeilingType, CeilingTypeLabels } from "@/domain/entities/ceiling";
 import { PendencyState, PendencyStateLabels } from "@/domain/entities/pendency";
 import { WallType, WallTypeLabels } from "@/domain/entities/wall";
-import { SigenDialogProps } from "@/components/sigen-dialog";
+import { SigenDialog, SigenDialogProps } from "@/components/sigen-dialog";
 import { useForm, validators } from "@/hooks/useform";
 import { useRouter, useSearchParams } from "next/navigation";
 import { Suspense, useState } from "react";
 import { SigenLoadingButton } from "@/components/sigen-loading-button";
+import { API_BASE_URL } from "@/config/api-config";
+import Cookies from "js-cookie";
 
 interface SearchForm {
   pendencyState?: number | undefined;
@@ -35,6 +37,7 @@ export default function SearchRegisterPITForm() {
 
   const searchParams = useSearchParams();
   const id = searchParams.get("id");
+  const residenceId = searchParams.get("ResidenceId");
 
   const { values, errors, handleChange, validateForm, resetForm } = useForm(
     {
@@ -111,11 +114,11 @@ export default function SearchRegisterPITForm() {
   );
 
   const [isLoading, setIsLoading] = useState(false);
-  const [, setDialog] = useState<SigenDialogProps>({
-    isOpen: false,
-    type: "info",
-    message: "",
-  });
+  const [dialog, setDialog] = useState<SigenDialogProps>({
+      isOpen: false,
+      type: "info",
+      message: "",
+    });
   
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -140,13 +143,35 @@ export default function SearchRegisterPITForm() {
 
     setIsLoading(true);
 
+    const body = {
+      AgenteId: localStorage.getItem("agentId") || 0,
+      PITId: Number(id),
+      ResidenciaId: Number(residenceId),
+      Data: new Date().toISOString(),
+      Pendencia: values.pendencyState,
+      NomeDoMorador: values.nomeMorador,
+      NumeroDeHabitantes: values.numberOfPeople,
+      TipoDeParede: values.wallType,
+      OutroTipoDeParede: values.otherWallType,
+      TipoDeTeto: values.ceilingType,
+      OutroTipoDeTeto: values.otherCeilingType,
+      CapturaIntra: values.captureIntra,
+      CapturaPeri: values.capturePeri,
+      AnexosPositivos: values.positiveAttachments,
+      AnexosNegativos: values.negativeAttachments,
+      NumGatos: values.numberOfCats,
+      NumCachorros: values.numberOfDogs,
+    };
     try {
-      const response = await fetch(`/api/pit/searchpit?id=${id}`, {
+      const token = Cookies.get("authToken");
+      
+      const response = await fetch(`${API_BASE_URL}/api/pit/searchpit`, {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
+          'Authorization': `Bearer ${token}`,
         },
-        body: JSON.stringify(values), 
+        body: JSON.stringify(body), 
       });
       
       if (response.ok) {
@@ -156,6 +181,11 @@ export default function SearchRegisterPITForm() {
           message: 'Cadastro realizado com sucesso!',
         });
         resetForm();
+
+        setTimeout(() => {
+          setDialog({ isOpen: false, type: 'info', message: '' });
+          router.back(); 
+        }, 2000);
       } else {
         const errorData = await response.json();
         setDialog({
@@ -475,6 +505,13 @@ export default function SearchRegisterPITForm() {
           </div>
         </form>
       </SigenAppLayout>
+      <SigenDialog
+        isOpen={dialog.isOpen}
+        onClose={() => setDialog((prev) => ({ ...prev, isOpen: false }))}
+        type={dialog.type}
+        title={dialog.title}
+        message={dialog.message}
+      />
     </>
   );
 }

@@ -134,7 +134,7 @@ export default function SprayConsult() {
     setIsLoading(true);
     const searchParams = {
       CodigoDaLocalidade: values.locationId,
-      ...(values.nomeMorador && { nomeMorador: values.nomeMorador }),
+      ...(values.nomeMorador && { nomeDoMorador: values.nomeMorador }),
       ...(values.numeroComplemento && { NumeroDoComplemento: values.numeroComplemento, }),
       ...(values.numeroCasa && { NumeroDaCasa: values.numeroCasa }),
     };

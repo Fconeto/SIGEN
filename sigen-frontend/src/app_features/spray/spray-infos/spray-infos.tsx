@@ -120,7 +120,7 @@ export default function SprayPendingResults() {
 
   const paginatedSprayPendings = useMemo(() => {
     const sortedItems: ResidenceInfos[] = sprayPendings.map(item => ({
-      id: item.id.toString(),
+      id: item.pesquisaId.toString(),
       complemento: item.complemento,
       numero: item.numero.toString(),
       nomeDoMorador: item.nomeDoMorador,

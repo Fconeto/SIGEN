@@ -1,6 +1,41 @@
 version: '3.8'
 
 services:
+  frontend:
+    build:
+      context: ./sigen-frontend
+      dockerfile: dockerfile
+    ports:
+      - "3000:3000"
+    networks:
+      - sigen-network
+
+  db:
+    build:
+      context: .
+      dockerfile: db.Dockerfile
+    environment:
+      SA_PASSWORD: "Complex@123"
+      ACCEPT_EULA: "Y"
+    ports:
+      - "1433:1433"
+    volumes:
+      - sql_data:/var/opt/mssql
+      - ./SIGEN.Infrastructure/Scripts:/docker-entrypoint-initdb.d
+    command: >
+      /bin/sh -c "
+      /opt/mssql/bin/sqlservr & 
+      pid=$!; 
+      until /opt/mssql-tools18/bin/sqlcmd -S localhost -U sa -P 'Complex@123' -Q 'SELECT 1' -C > /dev/null 2>&1; do 
+        echo 'Waiting for SQL Server to start...'; 
+        sleep 5; 
+      done; 
+      /opt/mssql-tools18/bin/sqlcmd -S localhost -U sa -P 'Complex@123' -Q \"IF DB_ID('agente_de_endemias') IS NULL CREATE DATABASE [agente_de_endemias]\" -C;
+      /opt/mssql-tools18/bin/sqlcmd -S localhost -U sa -P 'Complex@123' -d agente_de_endemias -i /docker-entrypoint-initdb.d/Migrations.sql -C;
+      wait $pid"
+    networks:
+      - sigen-network
+
   backend:
     build:
       context: .
@@ -18,24 +53,8 @@ services:
     networks:
       - sigen-network
 
-  frontend:
-    build:
-      context: ./sigen-frontend
-      dockerfile: dockerfile
-    ports:
-      - "3000:3000"
-    networks:
-      - sigen-network
-
-  db:
-    image: mcr.microsoft.com/mssql/server:2022-latest
-    environment:
-      SA_PASSWORD: "Complex@123"
-      ACCEPT_EULA: "Y"
-    ports:
-      - "1433:1433"
-    networks:
-      - sigen-network
+volumes:
+  sql_data:
 
 networks:
   sigen-network:

@@ -1,7 +1,3 @@
-CREATE DATABASE agente_de_endemias;
-GO
-USE agente_de_endemias;
-
 CREATE TABLE Agente (
     AgenteId BIGINT PRIMARY KEY IDENTITY(1,1),
     NomeDoAgente NVARCHAR(255) NOT NULL,
@@ -25,6 +21,24 @@ CREATE TABLE Localidade (
     CodigoDaLocalidade BIGINT NOT NULL UNIQUE,
     Nome NVARCHAR(255) NOT NULL,
     Categoria NVARCHAR(50) NOT NULL,
+    DataDeRegistro DATETIME NOT NULL,
+    DataDeAtualizacao DATETIME NOT NULL,
+    CriadoPor BIGINT NOT NULL,
+    AtualizadoPor BIGINT NOT NULL
+);
+GO
+
+CREATE TABLE Residencia (
+    ResidenciaId BIGINT PRIMARY KEY IDENTITY(1,1),
+    CodigoDaLocalidade BIGINT NOT NULL,
+    TipoDoImovel INT NOT NULL,
+    NomeDoMorador NVARCHAR(255),
+    Numero INT,
+    Complemento NVARCHAR(255),
+    NumeroDoQuarteirao BIGINT,
+    ComplementoDoQuarteirao NVARCHAR(255),
+    Demolida INT NOT NULL,
+    Inabitado INT NOT NULL,
     DataDeRegistro DATETIME NOT NULL,
     DataDeAtualizacao DATETIME NOT NULL,
     CriadoPor BIGINT NOT NULL,
@@ -96,24 +110,6 @@ CREATE TABLE Borrifacao (
     CriadoPor BIGINT NOT NULL,
     AtualizadoPor BIGINT NOT NULL,
     CONSTRAINT FK_Borrifacao_Pesquisa FOREIGN KEY (PesquisaId) REFERENCES Pesquisa(PesquisaId)
-);
-GO
-
-CREATE TABLE Residencia (
-    ResidenciaId BIGINT PRIMARY KEY IDENTITY(1,1),
-    CodigoDaLocalidade BIGINT NOT NULL,
-    TipoDoImovel INT NOT NULL,
-    NomeDoMorador NVARCHAR(255),
-    Numero INT,
-    Complemento NVARCHAR(255),
-    NumeroDoQuarteirao BIGINT,
-    ComplementoDoQuarteirao NVARCHAR(255),
-    Demolida INT NOT NULL,
-    Inabitado INT NOT NULL,
-    DataDeRegistro DATETIME NOT NULL,
-    DataDeAtualizacao DATETIME NOT NULL,
-    CriadoPor BIGINT NOT NULL,
-    AtualizadoPor BIGINT NOT NULL
 );
 GO
 
@@ -658,7 +654,7 @@ BEGIN
 END
 GO
 
-ALTER PROCEDURE GetResidenceListByFilters
+CREATE PROCEDURE GetResidenceListByFilters
     @CodigoDaLocalidade BIGINT,
     @NomeDoMorador NVARCHAR(255) = NULL,
     @NumeroDaCasa INT = NULL,
@@ -1176,7 +1172,7 @@ BEGIN
         Complemento = @Complemento,
         NumeroDoQuarteirao = @NumeroDoQuarteirao,
         ComplementoDoQuarteirao = @ComplementoDoQuarteirao,
-        SituacaoDoImovel = @SituacaoDoImovel,
+        Demolida = @SituacaoDoImovel,
         DataDeRegistro = @DataDeRegistro,
         DataDeAtualizacao = @DataDeAtualizacao,
         CriadoPor = @CriadoPor,

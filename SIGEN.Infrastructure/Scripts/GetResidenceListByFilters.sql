@@ -1,4 +1,4 @@
-ALTER PROCEDURE GetResidenceListByFilters
+CREATE PROCEDURE GetResidenceListByFilters
     @CodigoDaLocalidade BIGINT,
     @NomeDoMorador NVARCHAR(255) = NULL,
     @NumeroDaCasa INT = NULL,
